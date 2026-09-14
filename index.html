@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#DC2626">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="CRCR Campo">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="stylesheet" href="./styles.css">
+<title>CRCR Campo — Cruz Roja CR (100% local)</title>
+</head>
+<body>
+<div id="app">
+<header style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:#0F172A;border-bottom:1px solid #1E293B;flex-shrink:0;">
+  <div style="display:flex;align-items:center;gap:8px;">
+    <div style="width:32px;height:32px;background:#DC2626;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:900;color:#fff;">✚</div>
+    <div><div style="font-size:12px;font-weight:800;">CRCR Campo</div>
+    <div id="dot" style="font-size:9px;color:#4ADE80;font-weight:600;">● Motor local — sin red</div></div>
+  </div>
+  <div style="display:flex;align-items:center;gap:4px;">
+    <div id="recpill" style="display:none;background:#450A0A;border:1px solid #DC2626;color:#FCA5A5;border-radius:20px;padding:3px 8px;font-size:10px;font-weight:600;align-items:center;gap:5px;">
+      <span style="width:5px;height:5px;border-radius:50%;background:#DC2626;animation:blink 1s infinite;display:inline-block;"></span>REC
+    </div>
+    <div id="tdisp" style="padding:3px 8px;border-radius:5px;font-family:monospace;font-size:11px;font-weight:700;color:#fff;background:#1E293B;">⏱00:00:00</div>
+    <button id="tbtn" onclick="toggleTimer()" style="width:26px;height:26px;border-radius:5px;background:#1E293B;color:#94A3B8;font-size:12px;border:1px solid #334155;">▶</button>
+    <button onclick="resetTimer()" style="width:26px;height:26px;border-radius:5px;background:#1E293B;color:#94A3B8;font-size:12px;border:1px solid #334155;">↺</button>
+  </div>
+</header>
+<div id="motorStatus" class="motor-status cargando" style="padding:4px 12px;background:#0F172A;border-bottom:1px solid #1E293B;flex-shrink:0;">⏳ Preparando motor de voz local (Whisper)…</div>
+<nav style="display:flex;background:#0F172A;border-bottom:1px solid #1E293B;overflow-x:auto;flex-shrink:0;">
+  <button class="nav-btn" id="n-home" onclick="go('home')" style="background:#DC2626;color:#fff;"><span style="font-size:13px;">🏠</span>Inicio</button>
+  <button class="nav-btn" id="n-desp" onclick="go('desp')" style="color:#64748B;"><span style="font-size:13px;">📻</span>Despacho</button>
+  <button class="nav-btn" id="n-triage" onclick="go('triage')" style="color:#64748B;"><span style="font-size:13px;">🏷️</span>Triage</button>
+  <button class="nav-btn" id="n-entrev" onclick="go('entrev')" style="color:#64748B;"><span style="font-size:13px;">🎙️</span>Entrevista</button>
+  <button class="nav-btn" id="n-boleta" onclick="go('boleta')" style="color:#64748B;"><span style="font-size:13px;">📋</span>Boleta</button>
+  <button class="nav-btn" id="n-enf" onclick="go('enf')" style="color:#64748B;"><span style="font-size:13px;">🩺</span>Enfermed.</button>
+  <button class="nav-btn" id="n-repaso" onclick="go('repaso')" style="color:#64748B;"><span style="font-size:13px;">📚</span>Repaso</button>
+  <button class="nav-btn" id="n-equipo" onclick="go('equipo')" style="color:#64748B;"><span style="font-size:13px;">🏥</span>Equipo</button>
+  <button class="nav-btn" id="n-hist" onclick="go('hist')" style="color:#64748B;"><span style="font-size:13px;">🗂️</span>Historial</button>
+  <button class="nav-btn" id="n-chat" onclick="go('chat')" style="color:#64748B;"><span style="font-size:13px;">🔎</span>Buscar</button>
+</nav>
+<main style="flex:1;overflow:hidden;">
+<!-- HOME -->
+<div id="s-home" class="screen active"><div class="page">
+  <div style="background:linear-gradient(135deg,#1A0606,#2D0A0A);border:1px solid #7F1D1D;border-radius:11px;padding:16px;text-align:center;">
+    <div style="width:48px;height:48px;background:#DC2626;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:900;color:#fff;margin:0 auto 10px;">✚</div>
+    <div style="font-size:16px;font-weight:800;">Asistente Operativo CRCR</div>
+    <div style="font-size:10px;color:#6B7280;margin-top:4px;">100% offline · Motor propio · Ningún dato sale del dispositivo</div>
+    <div id="tbadge" style="display:none;margin-top:8px;"></div>
+  </div>
+  <div class="card">
+    <div class="lbl">Incidente activo</div>
+    <div class="g2">
+      <div class="fld"><div class="flbl">Unidad</div><input id="inc-u" placeholder="Ej: U-05"></div>
+      <div class="fld"><div class="flbl">Socorrista</div><input id="inc-s" placeholder="Nombre"></div>
+      <div class="fld"><div class="flbl">H. Despacho</div><input id="inc-hd" type="time"></div>
+      <div class="fld"><div class="flbl">H. Llegada</div><input id="inc-hl" type="time"></div>
+    </div>
+    <button onclick="cerrarIncidente()" class="btn-gray">🗂️ Cerrar incidente y archivar</button>
+  </div>
+  <div class="card"><div class="lbl">Protocolos rápidos</div><div class="g2" id="qbtns"></div></div>
+  <div class="card">
+    <div class="lbl">Notas (<span id="nc">0</span>)</div>
+    <div style="display:flex;gap:6px;">
+      <input id="ni" placeholder="Anotá algo..." style="flex:1;" onkeydown="if(event.key==='Enter')addN()">
+      <button onclick="addN()" style="width:34px;height:34px;background:#DC2626;color:#fff;border-radius:7px;font-size:20px;flex-shrink:0;">+</button>
+    </div>
+    <div id="nl"></div>
+  </div>
+</div></div>
+
+<!-- DESPACHO -->
+<div id="s-desp" class="screen"><div class="page">
+  <div class="card">
+    <div class="lbl">🎙️ Grabación local</div>
+    <div style="font-size:10px;color:#475569;font-style:italic;">Audio y transcripción quedan solo en este dispositivo (Whisper local). Sin nube.</div>
+    <div style="display:flex;gap:6px;">
+      <select id="rlbl" style="flex:1;"><option>Despacho</option><option>Entrevista</option><option>Escena</option><option>Hospital</option></select>
+      <button id="rbtn" onclick="toggleRec()" style="background:#DC2626;color:#fff;border-radius:7px;padding:9px 14px;font-size:13px;font-weight:700;">🎙️ Grabar</button>
+    </div>
+    <div id="rstat" style="display:none;background:#450A0A;border-radius:6px;padding:7px 10px;font-size:11px;color:#FCA5A5;">
+      <span style="width:5px;height:5px;border-radius:50%;background:#DC2626;animation:blink 1s infinite;display:inline-block;"></span> Grabando localmente...
+    </div>
+    <div id="rtxt" style="display:none;background:#080E1A;border-radius:5px;padding:6px;font-size:10px;color:#94A3B8;line-height:1.5;"></div>
+  </div>
+  <div class="card">
+    <div class="lbl">Texto del despacho</div>
+    <textarea id="dtxt" rows="3" placeholder="Ej: E36 colisión Ruta 27 km 14, código 65..."></textarea>
+    <button onclick="interpDesp()" class="btn-red">🧭 Interpretar (motor local)</button>
+  </div>
+  <div class="card">
+    <div class="lbl">Códigos radio CRC — <span style="color:#DC2626;">E = Emergencia</span></div>
+    <input id="csearch" placeholder="Buscá código o descripción..." oninput="renderCods()">
+    <div id="clist" style="max-height:240px;overflow-y:auto;display:flex;flex-direction:column;gap:3px;margin-top:2px;"></div>
+  </div>
+  <div id="recsbox" style="display:none;" class="card"><div class="lbl">Grabaciones locales</div><div id="recsl"></div></div>
+</div></div>
+
+<!-- TRIAGE -->
+<div id="s-triage" class="screen"><div class="page">
+  <div class="card" style="border:2px solid #DC2626;" id="trcard">
+    <div id="trlbl" style="font-size:10px;color:#475569;">Algoritmo START — Paso 1/7</div>
+    <div id="trq" style="font-size:18px;font-weight:700;text-align:center;padding:8px 0;line-height:1.4;">¿El paciente camina por sus propios medios?</div>
+    <div style="display:flex;gap:10px;" id="trbuts">
+      <button onclick="answTriage(true)" style="flex:1;padding:13px;border-radius:9px;background:#16A34A;color:#fff;font-size:15px;font-weight:700;">✅ SÍ</button>
+      <button onclick="answTriage(false)" style="flex:1;padding:13px;border-radius:9px;background:#DC2626;color:#fff;font-size:15px;font-weight:700;">✗ NO</button>
+    </div>
+  </div>
+  <div id="trres" style="display:none;" class="card"></div>
+  <button onclick="resetTriage()" class="btn-gray" style="width:100%;">↺ Nuevo paciente / Reiniciar</button>
+  <div class="card" style="border:1px solid #D97706;">
+    <div class="lbl" style="color:#D97706;">🏷️ SALT — Triage Masivo</div>
+    <div style="font-size:11px;color:#CBD5E1;line-height:1.8;">
+      <b style="color:#D97706;">S</b>ort — mover/agitar/caminar<br>
+      <b style="color:#D97706;">A</b>ssess — evaluar los que no se movieron<br>
+      <b style="color:#D97706;">L</b>ifesaving — hemorragia, vía aérea<br>
+      <b style="color:#D97706;">T</b>reat/transport — clasificar y trasladar
+    </div>
+  </div>
+  <div class="card">
+    <div class="lbl">Conteo de víctimas</div>
+    <div class="g2">
+      <div style="background:#450A0A;border:1px solid #DC2626;border-radius:8px;padding:10px;text-align:center;">
+        <div style="font-size:26px;font-weight:900;color:#DC2626;" id="cr">0</div>
+        <div style="font-size:10px;color:#FCA5A5;">ROJO</div>
+        <div style="display:flex;gap:4px;justify-content:center;margin-top:6px;">
+          <button onclick="adj('r',-1)" style="width:28px;height:28px;background:#374151;color:#fff;border-radius:5px;font-size:16px;">−</button>
+          <button onclick="adj('r',1)" style="width:28px;height:28px;background:#DC2626;color:#fff;border-radius:5px;font-size:16px;">+</button>
+        </div>
+      </div>
+      <div style="background:#451A03;border:1px solid #D97706;border-radius:8px;padding:10px;text-align:center;">
+        <div style="font-size:26px;font-weight:900;color:#D97706;" id="ca">0</div>
+        <div style="font-size:10px;color:#FDE68A;">AMARILLO</div>
+        <div style="display:flex;gap:4px;justify-content:center;margin-top:6px;">
+          <button onclick="adj('a',-1)" style="width:28px;height:28px;background:#374151;color:#fff;border-radius:5px;font-size:16px;">−</button>
+          <button onclick="adj('a',1)" style="width:28px;height:28px;background:#D97706;color:#fff;border-radius:5px;font-size:16px;">+</button>
+        </div>
+      </div>
+      <div style="background:#052E16;border:1px solid #16A34A;border-radius:8px;padding:10px;text-align:center;">
+        <div style="font-size:26px;font-weight:900;color:#16A34A;" id="cv">0</div>
+        <div style="font-size:10px;color:#86EFAC;">VERDE</div>
+        <div style="display:flex;gap:4px;justify-content:center;margin-top:6px;">
+          <button onclick="adj('v',-1)" style="width:28px;height:28px;background:#374151;color:#fff;border-radius:5px;font-size:16px;">−</button>
+          <button onclick="adj('v',1)" style="width:28px;height:28px;background:#16A34A;color:#fff;border-radius:5px;font-size:16px;">+</button>
+        </div>
+      </div>
+      <div style="background:#111827;border:1px solid #4B5563;border-radius:8px;padding:10px;text-align:center;">
+        <div style="font-size:26px;font-weight:900;color:#6B7280;" id="cn">0</div>
+        <div style="font-size:10px;color:#9CA3AF;">NEGRO</div>
+        <div style="display:flex;gap:4px;justify-content:center;margin-top:6px;">
+          <button onclick="adj('n',-1)" style="width:28px;height:28px;background:#374151;color:#fff;border-radius:5px;font-size:16px;">−</button>
+          <button onclick="adj('n',1)" style="width:28px;height:28px;background:#4B5563;color:#fff;border-radius:5px;font-size:16px;">+</button>
+        </div>
+      </div>
+    </div>
+    <div id="ctotal" style="text-align:center;font-size:11px;color:#6B7280;margin-top:4px;">Total: 0 víctimas</div>
+    <button onclick="resetC()" class="btn-gray" style="font-size:11px;padding:7px;">↺ Reiniciar conteo</button>
+  </div>
+  <div class="card">
+    <div class="lbl">Niveles START</div>
+    <div id="trlevels"></div>
+  </div>
+  <div class="card" style="border:1px solid #4ADE80;">
+    <div class="lbl" style="color:#4ADE80;">👶 JUMPSTART — Pediátrico (&lt;8 años)</div>
+    <div style="font-size:11px;color:#94A3B8;line-height:1.8;">
+      • ¿Camina? → <b style="color:#16A34A;">VERDE</b><br>
+      • No camina, no respira → <b style="color:#F59E0B;">5 ventilaciones rescate</b><br>
+      • Respira tras ventilaciones → <b style="color:#DC2626;">ROJO</b><br>
+      • No respira tras ventilaciones → <b style="color:#6B7280;">NEGRO</b><br>
+      • FR &lt;15 o &gt;45 → <b style="color:#DC2626;">ROJO</b><br>
+      • Pulso ausente → <b style="color:#DC2626;">ROJO</b><br>
+      • Todo normal → <b style="color:#D97706;">AMARILLO</b>
+    </div>
+  </div>
+</div></div>
+
+<!-- ENTREVISTA -->
+<div id="s-entrev" class="screen"><div class="page">
+  <div class="card">
+    <div class="lbl">🎙️ Grabación entrevista — local</div>
+    <button id="rbtn2" onclick="toggleRec2()" class="btn-red">🎙️ Grabar entrevista</button>
+    <div id="rstat2" style="display:none;background:#450A0A;border-radius:6px;padding:7px;font-size:11px;color:#FCA5A5;">Grabando...</div>
+    <div id="rtxt2" style="display:none;background:#080E1A;border-radius:5px;padding:6px;font-size:10px;color:#94A3B8;line-height:1.5;"></div>
+  </div>
+  <div class="card"><div class="lbl">SAMPLE</div><div id="sfields"></div></div>
+  <div class="card"><div class="lbl">OPQRST</div><div id="ofields"></div></div>
+  <button onclick="analyzeSO()" class="btn-blue" style="width:100%;">🧠 Analizar (motor local)</button>
+</div></div>
+
+<!-- BOLETA -->
+<div id="s-boleta" class="screen"><div class="page">
+  <div style="display:flex;gap:4px;overflow-x:auto;padding-bottom:2px;">
+    <button class="tab-btn" id="bt-veh" onclick="setbt('veh')" style="background:#DC2626;color:#fff;flex-shrink:0;">Vehículo</button>
+    <button class="tab-btn" id="bt-desp" onclick="setbt('desp')" style="background:#1E293B;color:#94A3B8;flex-shrink:0;">Despacho</button>
+    <button class="tab-btn" id="bt-pac" onclick="setbt('pac')" style="background:#1E293B;color:#94A3B8;flex-shrink:0;">Paciente</button>
+    <button class="tab-btn" id="bt-sv" onclick="setbt('sv')" style="background:#1E293B;color:#94A3B8;flex-shrink:0;">Sign.Vitales</button>
+    <button class="tab-btn" id="bt-exf" onclick="setbt('exf')" style="background:#1E293B;color:#94A3B8;flex-shrink:0;">Exam.Físico</button>
+    <button class="tab-btn" id="bt-tto" onclick="setbt('tto')" style="background:#1E293B;color:#94A3B8;flex-shrink:0;">Tratamiento</button>
+  </div>
+  <button onclick="autoBot()" class="btn-blue" style="width:100%;">🧭 Autocompletar con datos ya capturados</button>
+  <div id="bcontent"></div>
+</div></div>
+
+<!-- ENFERMEDADES -->
+<div id="s-enf" class="screen"><div class="page">
+  <div id="elf"><div class="card">
+    <div class="lbl">🩺 Enfermedades — Reconocimiento rápido</div>
+    <div style="font-size:10px;color:#475569;font-style:italic;">100% offline · Incluye todos los códigos E CRC</div>
+    <input id="esearch" placeholder="Buscá por nombre, código E, síntoma..." oninput="renderEnf()">
+    <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:2px;" id="etags"></div>
+  </div>
+  <div class="card"><div id="elist"></div></div></div>
+  <div id="edetail" style="display:none;"></div>
+</div></div>
+
+<!-- REPASO -->
+<div id="s-repaso" class="screen"><div class="page">
+  <div id="rlv">
+    <div class="card"><div class="lbl">📚 Protocolos — 100% offline</div></div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px;" id="rcards"></div>
+    <div class="card" id="rsections"></div>
+  </div>
+  <div id="rdv" style="display:none;"></div>
+</div></div>
+
+<!-- EQUIPO -->
+<div id="s-equipo" class="screen"><div class="page">
+  <div class="card">
+    <div class="lbl">🏥 Equipo hospitalario</div>
+    <input id="eqsearch" placeholder="Buscar equipo..." oninput="renderEq()">
+    <div style="display:flex;gap:4px;flex-wrap:wrap;" id="eqfil"></div>
+    <div style="display:flex;justify-content:space-between;font-size:10px;margin-top:2px;">
+      <span style="color:#16A34A;font-weight:700;" id="eqok">✅ 0 disponible</span>
+      <span style="color:#DC2626;font-weight:700;" id="eqerr">⚠️ 0 faltante</span>
+    </div>
+    <div id="eqlist"></div>
+  </div>
+  <div class="card">
+    <div class="lbl">💊 Botiquín</div>
+    <input id="bsearch" placeholder="Buscar insumo..." oninput="renderBot()">
+    <div style="display:flex;justify-content:space-between;font-size:10px;margin-top:2px;">
+      <span style="color:#16A34A;font-weight:700;" id="bok">✅ 0 disponible</span>
+      <span style="color:#DC2626;font-weight:700;" id="berr">⚠️ 0 faltante</span>
+    </div>
+    <div id="blist"></div>
+  </div>
+  <button onclick="regFalt()" class="btn-gray" style="width:100%;">📋 Registrar faltantes en notas</button>
+</div></div>
+
+<!-- HISTORIAL -->
+<div id="s-hist" class="screen"><div class="page">
+  <div class="card"><div class="lbl">🗂️ Incidentes archivados (local)</div>
+  <div style="font-size:10px;color:#475569;font-style:italic;">Guardado en este dispositivo con IndexedDB. Nada se sube a ningún servidor.</div></div>
+  <div id="histlist"></div>
+</div></div>
+
+<!-- BUSCAR (antes "Chat IA") -->
+<div id="s-chat" class="chat-wrap">
+  <div id="chatmsgs" style="flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px;">
+    <div id="chatph" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:40px;text-align:center;">
+      <div style="width:50px;height:50px;background:#1E293B;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;color:#DC2626;">🔎</div>
+      <div style="color:#475569;font-size:14px;">Buscá en la base offline (códigos, enfermedades, protocolos).<br>No es IA generativa — solo encuentra lo que ya está en el app.</div>
+    </div>
+  </div>
+  <div style="padding:8px 10px;background:#0F172A;border-top:1px solid #1E293B;display:flex;flex-direction:column;gap:6px;flex-shrink:0;">
+    <textarea id="cinput" rows="2" placeholder="Ej: dolor de pecho, código E36, quemadura..."></textarea>
+    <div style="display:flex;gap:6px;">
+      <button onclick="sendChat()" style="flex:1;padding:7px;background:#DC2626;border-radius:7px;color:#fff;font-size:13px;font-weight:700;border:none;">Buscar →</button>
+    </div>
+  </div>
+</div>
+
+</main>
+</div>
+
+<script src="./app.js"></script>
+<script>
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('./sw.js').catch(()=>{});
+  });
+}
+</script>
+</body>
+</html>

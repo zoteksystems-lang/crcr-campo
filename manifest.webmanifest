@@ -1,0 +1,15 @@
+{
+  "name": "CRCR Campo — Asistente offline Cruz Roja",
+  "short_name": "CRCR Campo",
+  "description": "Asistente de campo 100% local para socorristas: triage, boleta APA, protocolos y motor de voz/OCR sin conexión.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#080E1A",
+  "theme_color": "#DC2626",
+  "lang": "es-CR",
+  "icons": [
+    { "src": "./icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

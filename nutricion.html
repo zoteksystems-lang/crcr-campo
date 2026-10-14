@@ -65,6 +65,8 @@ a.back{color:#94A3B8;font-size:11px;text-decoration:none;}
 
   <div class="card">
     <div class="lbl">Información nutricional <span id="unidad">por 100 g</span></div>
+    <div class="fld"><div class="flbl">¿La etiqueta solo trae "por porción"? Escribe la porción en g/ml y copia los valores tal cual</div>
+      <input id="porcion" inputmode="decimal" placeholder="Vacío = los valores ya son por 100 g / 100 ml"></div>
     <div class="g2">
       <div class="fld"><div class="flbl">Energía (kcal)</div><input id="kcal" inputmode="decimal"></div>
       <div class="fld"><div class="flbl">Grasas totales (g)</div><input id="grasa" inputmode="decimal"></div>
@@ -89,6 +91,21 @@ a.back{color:#94A3B8;font-size:11px;text-decoration:none;}
     <div class="lbl">Comparados (mejor tipo arriba)</div>
     <div id="lista"></div>
   </div>
+
+  <details class="card" open>
+    <summary class="lbl" style="cursor:pointer;">Guía de compra — Costa Rica</summary>
+    <div style="font-size:11px;color:#94A3B8;line-height:1.55;">
+      <p><b style="color:#F1F5F9;">Antes de usarla:</b> en Costa Rica no hay sellos frontales obligatorios. La tabla nutricional suele venir <b>por porción</b> y con el sodio en <b>mg</b>; usa el campo "porción" de arriba y elige "Sodio (mg)". Algunos importados (sobre todo de México) traen octágonos negros ("EXCESO AZÚCARES", "EXCESO SODIO"…), que pueden quedarse puestos. Si un producto trae dos o más, casi siempre sale Tipo C o D.</p>
+      <p style="margin-top:6px;"><b style="color:#F1F5F9;">Por pasillo</b> (lo típico; confirma siempre con la etiqueta):</p>
+      <p>🥛 <b>Lácteos:</b> yogur natural o griego "sin azúcar añadido" → suele dar A (alto en proteína). Yogures bebibles y de sabores → B–C por azúcar. Leche descremada o semidescremada sin sabor → A; leches saborizadas → C. Quesos frescos y maduros → a menudo C por sal o saturadas: elige cottage o requesón, o porciones pequeñas.</p>
+      <p>🍞 <b>Pan y cereales:</b> avena en hojuelas natural → A (mucha fibra, casi sin azúcar). Pan 100% integral con ≥ 6 g de fibra/100 g → B (la sal ronda 1 g). Cereales de caja azucarados, granolas con miel y "pan dulce" → C–D.</p>
+      <p>🥫 <b>Despensa:</b> atún en agua → A–B (proteína alta; mira la sal). Frijoles enteros o molidos en lata o bolsa → buena fibra, pero revisa el sodio. Salsas tipo inglesa, salsas listas, consomés y sopas instantáneas → sal en rojo: úsalas en cantidades mínimas.</p>
+      <p>🥓 <b>Embutidos:</b> jamón de pavo o pollo → suele dar C por sal. Salchichas, mortadela, chorizo y salami → D. Mejor pollo, pescado o huevo frescos.</p>
+      <p>🍪 <b>Snacks y galletas:</b> casi todos salen C–D (azúcar, grasa saturada o sal). Palomitas naturales hechas en casa y maní o almendras sin sal salen rojo en grasa por naturaleza, pero son buena opción en porción pequeña (un puño): el semáforo penaliza la grasa, no distingue la buena.</p>
+      <p>🥤 <b>Bebidas:</b> agua, agua con gas, café y té sin azúcar, refrescos "zero" → A. Jugos, néctares, tés fríos y bebidas deportivas → con más de 6,25 g de azúcar/100 ml son C.</p>
+      <p style="margin-top:6px;"><b style="color:#F1F5F9;">Dónde comprar:</b> Palí y Maxi Palí (marcas propias baratas; compara la etiqueta, no la marca). Masxmenos y Walmart (también tienen tienda en línea). Megasuper. Auto Mercado y Fresh Market (más importados, algunos con octágonos). PriceSmart (avena, atún y frutos secos en presentación grande). <b>Feria del agricultor</b> para frutas, verduras, huevos y granos: sin etiqueta, y lo mejor para bajar de peso.</p>
+    </div>
+  </details>
 
   <div class="card">
     <div class="lbl">Cómo se calcula el tipo</div>
@@ -141,6 +158,14 @@ function producto(){
     const v=parseFloat(String(p.sal).replace(',','.'));
     p.sodio=isNaN(v)?'':(modo==='sodiomg'?v/1000:v);
     p.sal='';
+  }
+  // Etiquetas por porción (comunes en Costa Rica): se llevan a 100 g / 100 ml.
+  const porcion=parseFloat($('porcion').value.replace(',','.'));
+  if(porcion>0){
+    for(const c of [...CAMPOS,'sodio']){
+      const v=parseFloat(String(p[c]??'').replace(',','.'));
+      if(!isNaN(v))p[c]=v*100/porcion;
+    }
   }
   return p;
 }
@@ -195,7 +220,7 @@ $('guardar').addEventListener('click',()=>{
   escribirLista(l);renderLista();
 });
 $('limpiar').addEventListener('click',()=>{
-  for(const c of [...CAMPOS,'nombre','ingredientes'])$(c).value='';
+  for(const c of [...CAMPOS,'nombre','ingredientes','porcion'])$(c).value='';
   render();
 });
 $('lista').addEventListener('click',e=>{

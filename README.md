@@ -15,6 +15,11 @@ dispositivo.
 - `vendor/` — transformers.js + Tesseract.js, vendorizados (no CDN).
 - `models/` — pesos de Whisper-tiny (cuantizado, multilingüe) y el idioma
   español de Tesseract, servidos desde el propio dominio.
+- `nutricion.html` + `engine/nutricion.js` — semáforo nutricional para
+  alimentos envasados: con los valores por 100 g / 100 ml de la etiqueta
+  marca cada nutriente en verde/ámbar/rojo (umbrales FSA) y clasifica el
+  producto en Tipo A (apto) · B (moderación) · C (ocasional) · D (evitar)
+  para una dieta de bajar de peso. Permite guardar productos y compararlos.
 - `sw.js` / `manifest.webmanifest` — Service Worker que precachea todo
   (~70MB la primera vez) para que después funcione sin conexión.
 

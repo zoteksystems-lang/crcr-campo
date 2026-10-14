@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#DC2626">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="stylesheet" href="./styles.css">
+<title>Semáforo Nutricional</title>
+<style>
+html,body{overflow:auto;height:auto;}
+.wrap{max-width:560px;margin:0 auto;}
+.seg{display:flex;gap:5px;}
+.seg button{flex:1;background:#1E293B;border:1px solid #334155;color:#94A3B8;border-radius:7px;padding:8px;font-size:12px;font-weight:700;}
+.seg button.on{background:#DC2626;border-color:#DC2626;color:#fff;}
+.chk{display:flex;align-items:center;gap:7px;font-size:12px;color:#CBD5E1;}
+.chk input{width:16px;height:16px;-webkit-appearance:checkbox;appearance:checkbox;}
+.tipo{border-radius:11px;padding:14px;text-align:center;border:2px solid;}
+.tipo .letra{font-size:40px;font-weight:900;line-height:1;}
+.tipo .tit{font-size:14px;font-weight:800;margin-top:4px;}
+.tipo .det{font-size:11px;margin-top:4px;opacity:.85;}
+.t-verde{background:#052E16;border-color:#16A34A;color:#4ADE80;}
+.t-ambar{background:#2D2006;border-color:#D97706;color:#FBBF24;}
+.t-naranja{background:#2D1206;border-color:#EA580C;color:#FB923C;}
+.t-rojo{background:#2D0A0A;border-color:#DC2626;color:#F87171;}
+.t-null{background:#0F172A;border-color:#334155;color:#64748B;}
+.fila{display:flex;align-items:center;gap:8px;font-size:12px;padding:6px 0;border-bottom:1px solid #1E293B;}
+.fila:last-child{border-bottom:none;}
+.luz{width:14px;height:14px;border-radius:50%;flex-shrink:0;background:#334155;}
+.luz.verde{background:#22C55E;}.luz.ambar{background:#F59E0B;}.luz.rojo{background:#EF4444;}
+.fila .n{flex:1;}
+.fila .v{font-weight:700;font-family:monospace;}
+.fila .p{color:#64748B;font-size:10px;width:52px;text-align:right;}
+.msg{font-size:11px;padding:6px 8px;border-radius:6px;}
+.msg.alerta{background:#2D2006;color:#FBBF24;}
+.msg.ok{background:#052E16;color:#4ADE80;}
+.msg.info{background:#1E293B;color:#94A3B8;}
+table{width:100%;border-collapse:collapse;font-size:10px;}
+th,td{padding:5px 4px;border-bottom:1px solid #1E293B;text-align:left;}
+th{color:#64748B;font-weight:700;}
+td.verde{color:#4ADE80;}td.ambar{color:#FBBF24;}td.rojo{color:#F87171;}
+.item{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid #1E293B;font-size:12px;}
+.badge{width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:900;flex-shrink:0;border:1px solid;}
+.x{background:none;color:#64748B;font-size:15px;padding:0 4px;}
+a.back{color:#94A3B8;font-size:11px;text-decoration:none;}
+</style>
+</head>
+<body>
+<div class="wrap"><div class="page">
+  <div style="display:flex;justify-content:space-between;align-items:center;">
+    <div><div style="font-size:15px;font-weight:800;">🚦 Semáforo Nutricional</div>
+    <div style="font-size:10px;color:#64748B;">Valores de la etiqueta por 100 g / 100 ml — nunca por porción</div></div>
+    <a class="back" href="./index.html">← CRCR Campo</a>
+  </div>
+
+  <div class="card">
+    <div class="lbl">Producto</div>
+    <input id="nombre" placeholder="Nombre (ej: Yogur griego 0%)">
+    <div class="seg" id="segTipo">
+      <button data-v="solido" class="on">Sólido · 100 g</button>
+      <button data-v="bebida">Bebida · 100 ml</button>
+    </div>
+    <label class="chk"><input type="checkbox" id="bajarPeso" checked> Modo bajar de peso (criterios más estrictos de azúcar y sal)</label>
+  </div>
+
+  <div class="card">
+    <div class="lbl">Información nutricional <span id="unidad">por 100 g</span></div>
+    <div class="g2">
+      <div class="fld"><div class="flbl">Energía (kcal)</div><input id="kcal" inputmode="decimal"></div>
+      <div class="fld"><div class="flbl">Grasas totales (g)</div><input id="grasa" inputmode="decimal"></div>
+      <div class="fld"><div class="flbl">Grasas saturadas (g)</div><input id="saturada" inputmode="decimal"></div>
+      <div class="fld"><div class="flbl">Azúcares (g)</div><input id="azucar" inputmode="decimal"></div>
+      <div class="fld"><div class="flbl"><select id="salModo" style="padding:0;border:none;background:none;font-size:9px;font-weight:700;color:#475569;text-transform:uppercase;width:auto;"><option value="sal">Sal (g)</option><option value="sodio">Sodio (g)</option><option value="sodiomg">Sodio (mg)</option></select></div><input id="sal" inputmode="decimal"></div>
+      <div class="fld"><div class="flbl">Fibra (g)</div><input id="fibra" inputmode="decimal"></div>
+      <div class="fld"><div class="flbl">Proteína (g)</div><input id="proteina" inputmode="decimal"></div>
+    </div>
+    <div class="fld"><div class="flbl">Ingredientes (opcional — detecta azúcares y sal ocultos)</div>
+      <textarea id="ingredientes" rows="2" placeholder="Pega o escribe la lista de ingredientes"></textarea></div>
+  </div>
+
+  <div id="resultado"></div>
+
+  <div style="display:flex;gap:6px;">
+    <button class="btn-red" id="guardar">＋ Guardar para comparar</button>
+    <button class="btn-gray" id="limpiar" style="flex-shrink:0;">Limpiar</button>
+  </div>
+
+  <div class="card" id="cardLista" style="display:none;">
+    <div class="lbl">Comparados (mejor tipo arriba)</div>
+    <div id="lista"></div>
+  </div>
+
+  <div class="card">
+    <div class="lbl">Cómo se calcula el tipo</div>
+    <div style="font-size:11px;color:#94A3B8;line-height:1.5;">
+      <b style="color:#4ADE80;">A — Apto:</b> sin rojos, como mucho un ámbar (sin contar los que compensen fibra, proteína o calorías bajas) y sin alertas de dieta.<br>
+      <b style="color:#FBBF24;">B — Moderación:</b> sin rojos, pero con varios ámbar o alguna alerta.<br>
+      <b style="color:#FB923C;">C — Ocasional:</b> un nutriente en rojo.<br>
+      <b style="color:#F87171;">D — Evitar:</b> dos o más nutrientes en rojo.<br>
+      Fibra (≥3 g / ≥6 g), proteína (≥10 g) y calorías bajas (≤40 kcal sólidos, ≤20 kcal bebidas) compensan ámbar, pero nunca un rojo.
+      En modo bajar de peso, azúcares &gt;12,5 g (sólidos) o &gt;6,25 g (bebidas) cuentan como rojo; sal &gt;1 g y azúcar como ingrediente principal son alertas.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="lbl">Umbrales del semáforo</div>
+    <table>
+      <tr><th>Por 100 g</th><th>Bajo</th><th>Medio</th><th>Alto</th></tr>
+      <tr><td>Grasas</td><td class="verde">≤ 3</td><td class="ambar">3,1–17,5</td><td class="rojo">&gt; 17,5</td></tr>
+      <tr><td>Saturadas</td><td class="verde">≤ 1,5</td><td class="ambar">1,6–5</td><td class="rojo">&gt; 5</td></tr>
+      <tr><td>Azúcares</td><td class="verde">≤ 5</td><td class="ambar">5,1–22,5</td><td class="rojo">&gt; 22,5</td></tr>
+      <tr><td>Sal</td><td class="verde">≤ 0,3</td><td class="ambar">0,31–1,5</td><td class="rojo">&gt; 1,5</td></tr>
+      <tr><th>Por 100 ml</th><th></th><th></th><th></th></tr>
+      <tr><td>Grasas</td><td class="verde">≤ 1,5</td><td class="ambar">1,6–8,75</td><td class="rojo">&gt; 8,75</td></tr>
+      <tr><td>Saturadas</td><td class="verde">≤ 0,75</td><td class="ambar">0,76–2,5</td><td class="rojo">&gt; 2,5</td></tr>
+      <tr><td>Azúcares</td><td class="verde">≤ 2,5</td><td class="ambar">2,6–11,25</td><td class="rojo">&gt; 11,25</td></tr>
+      <tr><td>Sal</td><td class="verde">≤ 0,3</td><td class="ambar">0,31–0,75</td><td class="rojo">&gt; 0,75</td></tr>
+    </table>
+    <div style="font-size:10px;color:#64748B;">% IR = % de la ingesta de referencia diaria (2000 kcal · 70 g grasa · 20 g saturadas · 90 g azúcares · 6 g sal). Sal = sodio × 2,5.</div>
+  </div>
+</div></div>
+
+<script type="module">
+import {evaluar} from './engine/nutricion.js';
+
+const $=id=>document.getElementById(id);
+const CAMPOS=['kcal','grasa','saturada','azucar','sal','fibra','proteina'];
+const CLAVE='crcr-nutricion-comparados';
+let tipo='solido';
+
+function leerLista(){try{return JSON.parse(localStorage.getItem(CLAVE))||[];}catch{return[];}}
+function escribirLista(l){try{localStorage.setItem(CLAVE,JSON.stringify(l));}catch{}}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function fmt(n){return n===null?'—':String(Math.round(n*100)/100).replace('.',',');}
+
+function producto(){
+  const p={tipo,ingredientes:$('ingredientes').value};
+  for(const c of CAMPOS)p[c]=$(c).value;
+  const modo=$('salModo').value;
+  if(modo!=='sal'){
+    const v=parseFloat(String(p.sal).replace(',','.'));
+    p.sodio=isNaN(v)?'':(modo==='sodiomg'?v/1000:v);
+    p.sal='';
+  }
+  return p;
+}
+
+function render(){
+  const r=evaluar(producto(),{bajarPeso:$('bajarPeso').checked});
+  const u=tipo==='bebida'?'ml':'g';
+  let h=`<div class="tipo t-${r.color}"><div class="letra">${r.clase||'?'}</div>
+    <div class="tit">${esc(r.titulo)}</div><div class="det">${esc(r.detalle)}</div></div>`;
+  h+=`<div class="card"><div class="lbl">Semáforo por 100 ${u}</div>`;
+  for(const n of Object.values(r.nutrientes)){
+    h+=`<div class="fila"><span class="luz ${n.color||''}"></span><span class="n">${n.nombre}${n.estricto?' <span style="color:#64748B;font-size:10px;">(estricto)</span>':''}</span>
+      <span class="v">${fmt(n.valor)} g</span><span class="p">${n.pctIR===null?'':n.pctIR+'% IR'}</span></div>`;
+  }
+  if(r.kcal!==null)h+=`<div class="fila"><span class="luz" style="background:none;">🔥</span><span class="n">Energía</span><span class="v">${fmt(r.kcal)} kcal</span><span class="p">${r.pctKcal}% IR</span></div>`;
+  h+='</div>';
+  const msgs=[
+    ...r.alertas.map(a=>`<div class="msg alerta">⚠️ ${esc(a)}</div>`),
+    ...r.positivos.map(a=>`<div class="msg ok">✅ ${esc(a)}</div>`)
+  ];
+  const ing=r.ingredientes;
+  if(ing.azucares.length&&!ing.azucarPrincipal)msgs.push(`<div class="msg info">🍬 Azúcares en ingredientes: ${esc(ing.azucares.join(', '))}</div>`);
+  if(ing.sales.length)msgs.push(`<div class="msg info">🧂 Sal/sodio en ingredientes: ${esc(ing.sales.join(', '))}</div>`);
+  if(r.clase&&r.faltan.length)msgs.push(`<div class="msg info">Falta: ${esc(r.faltan.join(', '))} — el tipo puede cambiar al completarlo.</div>`);
+  if(msgs.length)h+=`<div class="card">${msgs.join('')}</div>`;
+  $('resultado').innerHTML=h;
+  return r;
+}
+
+function renderLista(){
+  const l=leerLista().sort((a,b)=>(a.clase||'Z').localeCompare(b.clase||'Z')||a.puntos-b.puntos);
+  $('cardLista').style.display=l.length?'flex':'none';
+  $('lista').innerHTML=l.map(it=>`<div class="item">
+    <span class="badge t-${it.color}">${it.clase}</span>
+    <span style="flex:1;">${esc(it.nombre)}<div style="font-size:10px;color:#64748B;">🟢${it.conteo.verdes} 🟡${it.conteo.ambar} 🔴${it.conteo.rojos} · ${it.tipo==='bebida'?'bebida':'sólido'}</div></span>
+    <button class="x" data-id="${it.id}" aria-label="Quitar">✕</button></div>`).join('');
+}
+
+$('segTipo').addEventListener('click',e=>{
+  const b=e.target.closest('button');if(!b)return;
+  tipo=b.dataset.v;
+  for(const x of $('segTipo').children)x.classList.toggle('on',x===b);
+  $('unidad').textContent=tipo==='bebida'?'por 100 ml':'por 100 g';
+  render();
+});
+document.querySelectorAll('input,textarea,select').forEach(el=>el.addEventListener('input',render));
+$('guardar').addEventListener('click',()=>{
+  const r=render();
+  if(!r.clase){alert('Ingresa al menos un nutriente.');return;}
+  const l=leerLista();
+  l.push({id:Date.now(),nombre:$('nombre').value.trim()||'Sin nombre',clase:r.clase,color:r.color,conteo:r.conteo,puntos:r.puntos,tipo:r.tipo});
+  escribirLista(l);renderLista();
+});
+$('limpiar').addEventListener('click',()=>{
+  for(const c of [...CAMPOS,'nombre','ingredientes'])$(c).value='';
+  render();
+});
+$('lista').addEventListener('click',e=>{
+  const b=e.target.closest('button.x');if(!b)return;
+  escribirLista(leerLista().filter(it=>String(it.id)!==b.dataset.id));renderLista();
+});
+render();renderLista();
+</script>
+</body>
+</html>

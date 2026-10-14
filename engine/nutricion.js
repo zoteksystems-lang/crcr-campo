@@ -185,3 +185,108 @@ export function evaluar(p, opciones={}){
     completo:faltan.length===0
   };
 }
+
+// ---------------------------------------------------------------------------
+// Lectura de la tabla nutricional a partir del texto del OCR (Tesseract).
+// Soporta el formato centroamericano/EE. UU. ("Tamaño de porción", "Calorías",
+// "Grasa total", "Sodio … mg", %VD) y el europeo ("Valor energético kJ/kcal",
+// "de las cuales saturadas", "Sal"), en español o inglés, con columna por
+// 100 g / 100 ml o solo por porción. Devuelve solo lo que pudo leer.
+
+// Orden importa: la primera regla que calce gana para cada línea.
+const REGLAS_TABLA=[
+  {campo:null,re:/\btrans\b|monoinsat|poliinsat|mono insat|poli insat|colesterol|cholesterol|potasio|potassium|calcio|calcium|hierro|iron|vitamina|vitamin/},
+  {campo:'saturada',re:/saturad|saturated/},
+  {campo:'grasa',re:/\bgrasas?\b|lipidos|\bfat\b/},
+  {campo:'azucarAnadido',re:/anadid|added/},
+  {campo:'azucar',re:/azucar|sugar/},
+  {campo:'fibra',re:/fibra|fiber|fibre/},
+  {campo:'proteina',re:/protein/},
+  {campo:'sodio',re:/sodio|sodium/},
+  {campo:'sal',re:/^sal\b|\bsal\b|\bsalt\b/},
+  {campo:'kcal',re:/calori|energ|kcal|\bkj\b/}
+];
+
+function aNumero(s){return parseFloat(s.replace(',','.'));}
+
+// Arregla confusiones típicas del OCR dentro de números: O→0, l/I→1, "5 g" leído "5g".
+function limpiarLineaOCR(l){
+  return l
+    .replace(/calor[ií]as? de grasa\s*\d+([.,]\d+)?|calories from fat\s*\d+/gi,' ')
+    .replace(/(\d)[oO](?=\d|\b|\s*(?:g|mg|kcal|kj)\b)/g,'$10')
+    .replace(/\b[oO](?=[.,]\d)/g,'0')
+    .replace(/(\d)[lI](?=\d)/g,'$11');
+}
+
+// Valores de una línea: números con su unidad, ignorando los %VD.
+function valoresLinea(linea){
+  const sinPct=linea.replace(/\d+(?:[.,]\d+)?\s*%/g,' ');
+  const out=[];
+  const re=/(<\s*)?(\d+(?:[.,]\d+)?)\s*(mg|g|kcal|kj|ml)?\b/gi;
+  let m;
+  while((m=re.exec(sinPct))){
+    out.push({v:m[1]?0:aNumero(m[2]),u:(m[3]||'').toLowerCase()});
+  }
+  return out;
+}
+
+export function parsearTablaNutricional(texto){
+  const lineas=(texto||'').split(/\n+/).map(l=>limpiarLineaOCR(l.trim())).filter(Boolean);
+  const res={};
+  let col=0,hay100=false,bebida=false;
+
+  // Encabezado de columnas: ¿hay "100 g/ml"? ¿va antes o después de "porción"?
+  for(const l of lineas){
+    const n=normalize(l);
+    const i100=n.search(/100\s*(g|ml|gr)\b/);
+    if(i100<0)continue;
+    hay100=true;
+    if(/100\s*ml/.test(n))bebida=true;
+    const iPor=n.search(/porcion|racion|serving|envase/);
+    col=iPor>=0&&iPor<i100?1:0;
+    break;
+  }
+
+  // Tamaño de porción (para convertir si no hay columna por 100).
+  for(const l of lineas){
+    const n=normalize(l);
+    if(!/porcion|racion|serving size/.test(n))continue;
+    const m=n.match(/(\d+(?:[ .]\d+)?)\s*(g|gr|ml)\b/);
+    if(m){
+      res.porcion=aNumero(m[1].replace(' ','.'));
+      if(m[2]==='ml')bebida=true;
+      break;
+    }
+  }
+
+  for(const l of lineas){
+    const n=normalize(l);
+    const regla=REGLAS_TABLA.find(r=>r.re.test(n));
+    if(!regla||!regla.campo)continue;
+    const campo=regla.campo;
+    if(res[campo]!==undefined)continue;
+    let vals=valoresLinea(l).filter(x=>!(x.v===100&&/100\s*(g|ml)/i.test(l)));
+    if(campo==='kcal'){
+      const kcal=vals.filter(x=>x.u==='kcal'),kj=vals.filter(x=>x.u==='kj');
+      if(kcal.length)vals=kcal;
+      else if(kj.length)vals=kj.map(x=>({v:Math.round(x.v/4.184),u:'kcal'}));
+      else vals=vals.filter(x=>!x.u);
+    }else{
+      // En nutrientes solo valen números con unidad (o sin unidad si no hay otros).
+      const conUnidad=vals.filter(x=>x.u==='g'||x.u==='mg');
+      if(conUnidad.length)vals=conUnidad;
+    }
+    if(!vals.length)continue;
+    const x=vals[Math.min(col,vals.length-1)];
+    if(campo==='sodio')res.sodioMg=x.u==='g'?x.v*1000:x.v;
+    else res[campo]=x.u==='mg'?x.v/1000:x.v;
+  }
+  if(res.azucar===undefined&&res.azucarAnadido!==undefined)res.azucar=res.azucarAnadido;
+  delete res.azucarAnadido;
+  if(res.sodio!==undefined)delete res.sodio;
+  // Con columna por 100 g los valores ya están normalizados: la porción no se aplica.
+  if(hay100)delete res.porcion;
+  res.tipo=bebida?'bebida':'solido';
+  res.por100=hay100;
+  return res;
+}

@@ -4,7 +4,7 @@ Asistente de campo para Cruz Roja Costarricense. Sin nube: interpretación de
 despacho, signos vitales, entrevista SAMPLE/OPQRST, diagnóstico diferencial,
 boleta APA y buscador corren con reglas propias en `engine/*.js` sobre las
 tablas de `data.js`. La voz se transcribe con Whisper local (transformers.js)
-y la cédula se lee con Tesseract.js local — ningún dato de paciente sale del
+y la cédula (y la tabla nutricional en `nutricion.html`) se lee con Tesseract.js local — ningún dato de paciente sale del
 dispositivo.
 
 ## Estructura
@@ -19,7 +19,8 @@ dispositivo.
   alimentos envasados: con los valores por 100 g / 100 ml de la etiqueta
   marca cada nutriente en verde/ámbar/rojo (umbrales FSA) y clasifica el
   producto en Tipo A (apto) · B (moderación) · C (ocasional) · D (evitar)
-  para una dieta de bajar de peso. Permite guardar productos y compararlos.
+  para una dieta de bajar de peso. Lee la tabla nutricional con una foto
+  (OCR local) y permite guardar productos y compararlos.
 - `sw.js` / `manifest.webmanifest` — Service Worker que precachea todo
   (~70MB la primera vez) para que después funcione sin conexión.
 

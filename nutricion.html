@@ -54,6 +54,17 @@ a.back{color:#94A3B8;font-size:11px;text-decoration:none;}
   </div>
 
   <div class="card">
+    <div class="lbl">📷 Leer la etiqueta con la cámara</div>
+    <div style="font-size:10px;color:#475569;">Toma la foto de frente, con buena luz y solo la tabla en el cuadro. Se lee en este dispositivo (Tesseract local, sin internet) y llena los campos de abajo. <b>Revisa los números en azul</b> antes de confiar en el resultado.</div>
+    <div style="display:flex;gap:6px;">
+      <label class="btn-red" style="flex:1;text-align:center;cursor:pointer;">📷 Tabla nutricional<input type="file" accept="image/*" capture="environment" id="fotoTabla" style="display:none;"></label>
+      <label class="btn-gray" style="flex-shrink:0;cursor:pointer;display:flex;align-items:center;">📷 Ingredientes<input type="file" accept="image/*" capture="environment" id="fotoIng" style="display:none;"></label>
+    </div>
+    <div id="ocrStat" class="motor-status" style="display:none;"></div>
+    <details id="ocrCrudo" style="display:none;"><summary style="font-size:10px;color:#64748B;cursor:pointer;">Ver texto leído</summary><pre id="ocrTexto" style="font-size:10px;color:#94A3B8;white-space:pre-wrap;margin-top:4px;"></pre></details>
+  </div>
+
+  <div class="card">
     <div class="lbl">Producto</div>
     <input id="nombre" placeholder="Nombre (ej: Yogur griego 0%)">
     <div class="seg" id="segTipo">
@@ -138,7 +149,7 @@ a.back{color:#94A3B8;font-size:11px;text-decoration:none;}
 </div></div>
 
 <script type="module">
-import {evaluar} from './engine/nutricion.js';
+import {evaluar,parsearTablaNutricional} from './engine/nutricion.js';
 
 const $=id=>document.getElementById(id);
 const CAMPOS=['kcal','grasa','saturada','azucar','sal','fibra','proteina'];
@@ -180,7 +191,7 @@ function render(){
     h+=`<div class="fila"><span class="luz ${n.color||''}"></span><span class="n">${n.nombre}${n.estricto?' <span style="color:#64748B;font-size:10px;">(estricto)</span>':''}</span>
       <span class="v">${fmt(n.valor)} g</span><span class="p">${n.pctIR===null?'':n.pctIR+'% IR'}</span></div>`;
   }
-  if(r.kcal!==null)h+=`<div class="fila"><span class="luz" style="background:none;">🔥</span><span class="n">Energía</span><span class="v">${fmt(r.kcal)} kcal</span><span class="p">${r.pctKcal}% IR</span></div>`;
+  if(r.kcal!==null)h+=`<div class="fila"><span class="luz" style="background:none;">🔥</span><span class="n">Energía</span><span class="v">${Math.round(r.kcal)} kcal</span><span class="p">${r.pctKcal}% IR</span></div>`;
   h+='</div>';
   const msgs=[
     ...r.alertas.map(a=>`<div class="msg alerta">⚠️ ${esc(a)}</div>`),
@@ -220,12 +231,85 @@ $('guardar').addEventListener('click',()=>{
   escribirLista(l);renderLista();
 });
 $('limpiar').addEventListener('click',()=>{
-  for(const c of [...CAMPOS,'nombre','ingredientes','porcion'])$(c).value='';
+  for(const c of [...CAMPOS,'nombre','ingredientes','porcion']){$(c).value='';$(c).classList.remove('auto-field');}
   render();
 });
 $('lista').addEventListener('click',e=>{
   const b=e.target.closest('button.x');if(!b)return;
   escribirLista(leerLista().filter(it=>String(it.id)!==b.dataset.id));renderLista();
+});
+
+// --- Lectura por foto (OCR local) ---
+let ocr=null;
+// Escala de grises + contraste + tamaño razonable: Tesseract lee mucho mejor así.
+function prepararImagen(file){
+  return new Promise((ok,mal)=>{
+    const img=new Image();
+    img.onload=()=>{
+      const esc=Math.min(1,2000/Math.max(img.width,img.height));
+      const c=document.createElement('canvas');
+      c.width=Math.round(img.width*esc);c.height=Math.round(img.height*esc);
+      const ctx=c.getContext('2d');
+      ctx.filter='grayscale(1) contrast(1.6)';
+      ctx.drawImage(img,0,0,c.width,c.height);
+      URL.revokeObjectURL(img.src);
+      ok(c.toDataURL('image/png'));
+    };
+    img.onerror=mal;
+    img.src=URL.createObjectURL(file);
+  });
+}
+async function leerFoto(file){
+  const st=$('ocrStat');
+  st.style.display='flex';st.className='motor-status cargando';
+  st.textContent='🔍 Leyendo la foto en este dispositivo… (la primera vez tarda más)';
+  if(!ocr)ocr=await import('./engine/ocr.js');
+  const texto=await ocr.leerTexto(await prepararImagen(file));
+  $('ocrTexto').textContent=texto;$('ocrCrudo').style.display='block';
+  return texto;
+}
+function marcar(id,valor){
+  const el=$(id);
+  el.value=String(Math.round(valor*100)/100);
+  el.classList.add('auto-field');
+}
+function ponerTipo(t){
+  for(const x of $('segTipo').children)if(x.dataset.v===t)x.click();
+}
+$('fotoTabla').addEventListener('change',async e=>{
+  const file=e.target.files[0];e.target.value='';if(!file)return;
+  const st=$('ocrStat');
+  try{
+    const r=parsearTablaNutricional(await leerFoto(file));
+    for(const c of CAMPOS)$(c).classList.remove('auto-field');
+    let n=0;
+    for(const c of ['kcal','grasa','saturada','azucar','fibra','proteina'])if(r[c]!==undefined){marcar(c,r[c]);n++;}
+    if(r.sal!==undefined){$('salModo').value='sal';marcar('sal',r.sal);n++;}
+    else if(r.sodioMg!==undefined){$('salModo').value='sodiomg';marcar('sal',r.sodioMg);n++;}
+    $('porcion').value=r.porcion?String(r.porcion):'';
+    $('porcion').classList.toggle('auto-field',!!r.porcion);
+    ponerTipo(r.tipo);
+    render();
+    st.className=n?'motor-status listo':'motor-status';
+    st.textContent=n
+      ?`✅ Leí ${n} valores ${r.por100?'de la columna por 100':'por porción'+(r.porcion?` (${r.porcion} ${r.tipo==='bebida'?'ml':'g'})`:' — escribe la porción')}. Revisa los campos en azul.`
+      :'⚠️ No pude reconocer la tabla. Prueba otra foto más cerca y derecha, o escribe los valores.';
+  }catch(err){
+    st.className='motor-status';st.textContent='⚠️ Error al leer la foto: '+err.message;
+  }
+});
+$('fotoIng').addEventListener('change',async e=>{
+  const file=e.target.files[0];e.target.value='';if(!file)return;
+  const st=$('ocrStat');
+  try{
+    const t=await leerFoto(file);
+    $('ingredientes').value=t.replace(/\s+/g,' ').trim();
+    $('ingredientes').classList.add('auto-field');
+    render();
+    st.className='motor-status listo';st.textContent='✅ Ingredientes leídos. Revisa el texto.';
+  }catch(err){
+    st.className='motor-status';st.textContent='⚠️ Error al leer la foto: '+err.message;
+  }
 });
 render();renderLista();
 </script>

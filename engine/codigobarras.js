@@ -64,6 +64,7 @@ export function desdeOFF(json,codigo){
     porcion:num(p.serving_quantity),
     nova:num(p.nova_group),
     tipo:bebida?'bebida':'solido',
+    categorias:p.categories_tags||[],
     datos,
     fuente:'Open Food Facts'
   };

@@ -53,6 +53,48 @@ a.back{color:#94A3B8;font-size:11px;text-decoration:none;}
     <a class="back" href="./index.html">← CRCR Campo</a>
   </div>
 
+  <div class="card" id="planCard">
+    <div style="display:flex;align-items:center;gap:8px;">
+      <div style="flex:1;min-width:0;">
+        <div class="lbl">🎯 Mi plan de nutrición</div>
+        <div id="planResumen" style="font-size:11px;color:#94A3B8;margin-top:2px;"></div>
+      </div>
+      <button class="btn-blue" id="btnPlan" style="flex-shrink:0;padding:7px 10px;">Cargar plan</button>
+    </div>
+    <label class="chk" id="usarPlanFila" style="display:none;"><input type="checkbox" id="usarPlan" checked> Juzgar los productos según mi plan</label>
+    <div id="planEditor" style="display:none;flex-direction:column;gap:7px;">
+      <div style="font-size:10px;color:#475569;">Sube el plan que te dio tu nutricionista (PDF, fotos o texto) y reviso cada producto contra él. También puedes llenarlo a mano: tu propio plan personalizado. Todo queda solo en este teléfono.</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <label class="btn-blue" style="flex:1;text-align:center;cursor:pointer;">📄 PDF o texto<input type="file" accept=".pdf,.txt,application/pdf,text/plain" id="planArchivo" style="display:none;"></label>
+        <label class="btn-blue" style="flex:1;text-align:center;cursor:pointer;">📷 Fotos del plan<input type="file" accept="image/*" multiple id="planFotos" style="display:none;"></label>
+      </div>
+      <textarea id="planTexto" rows="3" placeholder="…o pega aquí el texto del plan"></textarea>
+      <button class="btn-gray" id="btnAnalizarPlan">Analizar texto</button>
+      <div id="planStat" class="motor-status" style="display:none;"></div>
+      <div class="lbl" style="margin-top:4px;">Metas del día (revisa y corrige)</div>
+      <div class="g2">
+        <div class="fld"><div class="flbl">Calorías (kcal/día)</div><input id="pl-kcal" inputmode="numeric"></div>
+        <div class="fld"><div class="flbl">Tiempos de comida</div><input id="pl-comidas" inputmode="numeric" placeholder="ej: 5"></div>
+        <div class="fld"><div class="flbl">Proteína (g/día)</div><input id="pl-proteina" inputmode="numeric"></div>
+        <div class="fld"><div class="flbl">Carbohidratos (g/día)</div><input id="pl-carbos" inputmode="numeric"></div>
+        <div class="fld"><div class="flbl">Grasa (g/día)</div><input id="pl-grasa" inputmode="numeric"></div>
+        <div class="fld"><div class="flbl">Fibra (g/día)</div><input id="pl-fibra" inputmode="numeric"></div>
+        <div class="fld"><div class="flbl">Azúcar máx. (g/día)</div><input id="pl-azucarMax" inputmode="decimal"></div>
+        <div class="fld"><div class="flbl">Sal máx. (g/día)</div><input id="pl-salMax" inputmode="decimal" placeholder="sodio mg × 2,5 ÷ 1000"></div>
+      </div>
+      <div class="lbl" style="margin-top:4px;">Condiciones</div>
+      <div id="pl-condiciones" style="display:grid;grid-template-columns:1fr 1fr;gap:4px;"></div>
+      <div class="fld"><div class="flbl">Mi plan dice evitar (separado por comas)</div><textarea id="pl-evitar" rows="2" placeholder="gaseosas, embutidos, galletas…"></textarea></div>
+      <div class="fld"><div class="flbl">Mi plan recomienda (separado por comas)</div><textarea id="pl-preferir" rows="2" placeholder="avena, yogurt griego, atún en agua…"></textarea></div>
+      <div style="display:flex;gap:6px;">
+        <button class="btn-red" id="btnGuardarPlan">Guardar mi plan</button>
+        <button class="btn-gray" id="btnBorrarPlan" style="flex-shrink:0;">Borrar</button>
+        <button class="btn-gray" id="btnCerrarPlan" style="flex-shrink:0;">Cerrar</button>
+      </div>
+      <div style="font-size:10px;color:#475569;">Esta herramienta te ayuda a aplicar tu plan en el súper; ante cualquier duda manda lo que diga tu nutricionista.</div>
+    </div>
+  </div>
+
   <div class="card">
     <button class="btn-red" id="btnEscanear" style="font-size:15px;padding:14px;">▦ Escanear código de barras</button>
     <div id="camara" style="display:none;position:relative;border-radius:8px;overflow:hidden;background:#000;">
@@ -182,6 +224,7 @@ a.back{color:#94A3B8;font-size:11px;text-decoration:none;}
 <script type="module">
 import {evaluar,parsearTablaNutricional} from './engine/nutricion.js';
 import {buscarProducto,guardarLocal,normalizarCodigo,codigoValido} from './engine/codigobarras.js';
+import {parsearPlan,evaluarConPlan,leerPlan,guardarPlan,borrarPlan,resumenPlan,CONDICIONES,VEREDICTO_PLAN} from './engine/plan.js';
 
 const $=id=>document.getElementById(id);
 const CAMPOS=['kcal','grasa','saturada','azucar','sal','fibra','proteina','carbos'];
@@ -221,11 +264,29 @@ function render(){
   const p=producto();
   const r=evaluar(p,{bajarPeso:$('bajarPeso').checked});
   const u=tipo==='bebida'?'ml':'g';
-  let h=r.clase?`<div class="tipo t-${r.color}">
+  const pl=planActivo();
+  let h;
+  if(r.clase&&pl){
+    const d={};
+    for(const c of CAMPOS)d[c]=numero(p[c]);
+    d.sal=r.nutrientes.sal.valor;
+    const colores=Object.fromEntries(Object.entries(r.nutrientes).map(([k,v])=>[k,v.color]));
+    const x=evaluarConPlan(d,pl,{porcion:numero($('porcionRef').value),nombre:$('nombre').value,
+      ingredientes:$('ingredientes').value,categorias:actual.categorias,tipo,colores});
+    const v=VEREDICTO_PLAN[x.estado];
+    const lista=x.razones.map(z=>`<div class="msg ${z.e==='info'?'info':'alerta'}">${z.e==='no'?'❌':z.e==='info'?'ℹ️':'⚠️'} ${esc(z.txt)}</div>`)
+      .concat(x.positivos.map(t=>`<div class="msg ok">✅ ${esc(t)}</div>`));
+    h=`<div class="tipo t-${v.color}">
+      <div style="font-size:21px;font-weight:900;">${v.texto}</div>
+      <div class="det">Semáforo general: Tipo ${r.clase} (${esc(r.titulo.replace(/^Tipo . — /,''))})</div></div>`;
+    if(x.porcionMax&&x.estado!=='no')lista.push(`<div class="msg info">🍽️ Para no pasarte, hasta <b>${x.porcionMax} ${u}</b> por tiempo de comida (${Math.round(x.kcalComida/2)} kcal, la mitad de una comida de tu plan).</div>`);
+    if(x.sinPorcion)lista.push(`<div class="msg info">Calculado sobre 100 ${u}: pon tu porción en Macros para afinarlo.</div>`);
+    if(lista.length)h+=`<div class="card"><div class="lbl">Según tu plan</div>${lista.join('')}</div>`;
+  }else h=r.clase?`<div class="tipo t-${r.color}">
     <div style="font-size:22px;font-weight:900;">${esc(r.veredicto)}</div>
     <div class="tit">Tipo ${r.clase} · ${esc(r.titulo.replace(/^Tipo . — /,''))}</div>
     <div class="det">${esc(r.detalle)}</div></div>`
-    :`<div class="tipo t-null"><div class="tit">Escanea un producto para saber si es apto para bajar de peso</div></div>`;
+    :`<div class="tipo t-null"><div class="tit">Escanea un producto para saber si es apto ${pl?'para tu plan':'para bajar de peso'}</div></div>`;
   if(r.clase){
     h+=`<div class="card"><div class="lbl">Semáforo por 100 ${u}</div>`;
     for(const n of Object.values(r.nutrientes)){
@@ -293,7 +354,7 @@ function mostrarCabecera(){
 // Carga en pantalla un producto de la base (valores ya por 100 g/ml).
 function cargarProducto(prod){
   limpiarFormulario();
-  actual={codigo:prod.codigo,imagen:prod.imagen||'',marca:prod.marca||'',cantidad:prod.cantidad||'',fuente:prod.fuente||'',nova:prod.nova};
+  actual={codigo:prod.codigo,imagen:prod.imagen||'',marca:prod.marca||'',cantidad:prod.cantidad||'',fuente:prod.fuente||'',nova:prod.nova,categorias:prod.categorias||[]};
   $('nombre').value=prod.nombre||'';
   ponerTipo(prod.tipo);
   for(const c of CAMPOS){const v=prod.datos?.[c];if(v!==undefined&&v!==null)$(c).value=String(Math.round(v*100)/100);}
@@ -458,7 +519,7 @@ $('guardar').addEventListener('click',()=>{
     const p=producto(),datos={};
     for(const c of CAMPOS){const v=numero(p[c]);if(v!==null)datos[c]=v;}
     if(datos.sal===undefined&&r.nutrientes.sal.valor!==null)datos.sal=r.nutrientes.sal.valor;
-    guardarLocal({codigo:actual.codigo,nombre,marca:actual.marca,cantidad:actual.cantidad,imagen:actual.imagen,
+    guardarLocal({codigo:actual.codigo,nombre,marca:actual.marca,cantidad:actual.cantidad,imagen:actual.imagen,categorias:actual.categorias,
       ingredientes:$('ingredientes').value,porcion:numero($('porcionRef').value),nova:actual.nova,
       tipo,datos,fuente:actual.fuente&&actual.fuente!=='este teléfono'?actual.fuente+' (guardado)':'este teléfono'});
     estado('scanStat','listo',`💾 Guardado. La próxima vez que escanees ${actual.codigo} sale al instante, aun sin internet.`);
@@ -473,6 +534,103 @@ $('lista').addEventListener('click',e=>{
   const b=e.target.closest('button.x');if(!b)return;
   escribirLista(leerLista().filter(it=>String(it.id)!==b.dataset.id));renderLista();
 });
+
+// --- Mi plan de nutrición ---
+const PL_NUM=['kcal','comidas','proteina','carbos','grasa','fibra','azucarMax','salMax'];
+$('pl-condiciones').innerHTML=Object.entries(CONDICIONES).map(([k,c])=>
+  `<label class="chk" style="font-size:11px;"><input type="checkbox" id="pl-c-${k}"> ${c.nombre}</label>`).join('');
+function planActivo(){
+  const p=leerPlan();
+  return p&&$('usarPlan').checked?p:null;
+}
+function mostrarPlan(){
+  const p=leerPlan();
+  $('planResumen').textContent=p?(p.nombre||'Plan guardado')+' — '+(resumenPlan(p)||'sin metas numéricas'):'Sin plan: uso los criterios generales para bajar de peso.';
+  $('btnPlan').textContent=p?'Editar':'Cargar plan';
+  $('usarPlanFila').style.display=p?'flex':'none';
+}
+function planAFormulario(p){
+  for(const k of PL_NUM)$('pl-'+k).value=p[k]??'';
+  for(const k of Object.keys(CONDICIONES))$('pl-c-'+k).checked=!!p.condiciones?.[k];
+  $('pl-evitar').value=(p.evitar||[]).join(', ');
+  $('pl-preferir').value=(p.preferir||[]).join(', ');
+}
+function formularioAPlan(){
+  const p={nombre:'Mi plan',condiciones:{},evitar:[],preferir:[]};
+  for(const k of PL_NUM)p[k]=numero($('pl-'+k).value);
+  for(const k of Object.keys(CONDICIONES))if($('pl-c-'+k).checked)p.condiciones[k]=true;
+  const lista=id=>$(id).value.split(/[,;\n]/).map(x=>x.trim()).filter(Boolean);
+  p.evitar=lista('pl-evitar');p.preferir=lista('pl-preferir');
+  return p;
+}
+function analizarTextoPlan(texto,origen){
+  $('planTexto').value=texto;
+  const p=parsearPlan(texto);
+  planAFormulario(p);
+  const n=PL_NUM.filter(k=>p[k]).length+Object.keys(p.condiciones).length+(p.evitar.length?1:0)+(p.preferir.length?1:0);
+  estado('planStat',n?'listo':'',n
+    ?`✅ Del ${origen} saqué ${n} datos. Revisa las metas y toca "Guardar mi plan".`
+    :`⚠️ No encontré metas en el ${origen}. Llénalas a mano con lo que te indicó tu nutricionista.`);
+}
+async function textoDePDF(file){
+  const pdfjs=await import('./vendor/pdf.min.mjs');
+  pdfjs.GlobalWorkerOptions.workerSrc='./vendor/pdf.worker.min.mjs';
+  const doc=await pdfjs.getDocument({data:await file.arrayBuffer()}).promise;
+  let out='';
+  for(let i=1;i<=doc.numPages;i++){
+    const tc=await (await doc.getPage(i)).getTextContent();
+    out+=tc.items.map(it=>it.str+(it.hasEOL?'\n':' ')).join('')+'\n';
+  }
+  return out;
+}
+$('btnPlan').addEventListener('click',()=>{
+  const ed=$('planEditor');
+  const abrir=ed.style.display==='none';
+  ed.style.display=abrir?'flex':'none';
+  if(abrir)planAFormulario(leerPlan()||{condiciones:{}});
+});
+$('btnCerrarPlan').addEventListener('click',()=>{$('planEditor').style.display='none';});
+$('btnAnalizarPlan').addEventListener('click',()=>analizarTextoPlan($('planTexto').value,'texto'));
+$('planArchivo').addEventListener('change',async e=>{
+  const file=e.target.files[0];e.target.value='';if(!file)return;
+  try{
+    estado('planStat','cargando','📄 Leyendo el archivo…');
+    const esPDF=/pdf$/i.test(file.type)||/\.pdf$/i.test(file.name);
+    const texto=esPDF?await textoDePDF(file):await file.text();
+    if(esPDF&&texto.replace(/\s/g,'').length<40){
+      estado('planStat','','⚠️ El PDF parece escaneado (es imagen, no texto). Usa "📷 Fotos del plan" con capturas de cada página.');return;
+    }
+    analizarTextoPlan(texto,esPDF?'PDF':'archivo');
+  }catch(err){estado('planStat','','⚠️ No pude leer el archivo: '+err.message);}
+});
+$('planFotos').addEventListener('change',async e=>{
+  const files=[...e.target.files];e.target.value='';if(!files.length)return;
+  try{
+    if(!ocr)ocr=await import('./engine/ocr.js');
+    let texto='';
+    for(let i=0;i<files.length;i++){
+      estado('planStat','cargando',`🔍 Leyendo foto ${i+1} de ${files.length} en este teléfono…`);
+      texto+=await ocr.leerTexto(await prepararImagen(files[i]))+'\n';
+    }
+    analizarTextoPlan(texto,files.length>1?'las fotos':'la foto');
+  }catch(err){estado('planStat','','⚠️ No pude leer las fotos: '+err.message);}
+});
+$('btnGuardarPlan').addEventListener('click',()=>{
+  const p=formularioAPlan();
+  if(!PL_NUM.some(k=>p[k])&&!Object.keys(p.condiciones).length&&!p.evitar.length){
+    estado('planStat','','Pon al menos una meta, una condición o algo que evitar.');return;
+  }
+  p.guardado=Date.now();
+  guardarPlan(p);$('usarPlan').checked=true;
+  mostrarPlan();$('planEditor').style.display='none';render();
+});
+$('btnBorrarPlan').addEventListener('click',()=>{
+  if(!confirm('¿Borrar tu plan de este teléfono?'))return;
+  borrarPlan();planAFormulario({condiciones:{}});$('planTexto').value='';estado('planStat','','');
+  mostrarPlan();render();
+});
+$('usarPlan').addEventListener('change',render);
+mostrarPlan();
 render();renderLista();
 </script>
 </body>

@@ -1,7 +1,7 @@
 // Service Worker — precachea TODO (app + motor Whisper + OCR Tesseract) en la
 // primera visita con red, para que después la app funcione 100% sin conexión.
 // Subir la versión de CACHE_NAME cuando se publique una actualización real.
-const CACHE_NAME='crcr-campo-v3';
+const CACHE_NAME='crcr-campo-v4';
 const ARCHIVOS=[
   './',
   './index.html',
@@ -20,12 +20,15 @@ const ARCHIVOS=[
   './engine/escaner.js',
   './engine/nutricion.js',
   './engine/ocr.js',
+  './engine/plan.js',
   './engine/store.js',
   './engine/util.js',
   './engine/vitals.js',
   './engine/whisper.js',
   './vendor/ort-wasm-simd.wasm',
   './vendor/ort-wasm.wasm',
+  './vendor/pdf.min.mjs',
+  './vendor/pdf.worker.min.mjs',
   './vendor/tesseract-core-simd-lstm.wasm',
   './vendor/tesseract-core-simd-lstm.wasm.js',
   './vendor/tesseract-worker.min.js',

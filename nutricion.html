@@ -3,14 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#0B1220">
+<meta name="theme-color" content="#0E1C1B">
 <link rel="manifest" href="./manifest-nutricion.webmanifest">
 <link rel="icon" href="./icon-nutricion.svg">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Mi Nutrición">
+<meta name="apple-mobile-web-app-title" content="Mi Bienestar">
 <link rel="apple-touch-icon" href="./icon-nutricion.svg">
 <link rel="stylesheet" href="./styles.css">
-<title>Mi Nutrición</title>
+<title>Mi Bienestar</title>
 <style>
 html,body{overflow:auto;height:auto;}
 .wrap{max-width:560px;margin:0 auto;}
@@ -48,92 +48,188 @@ td.verde{color:#4ADE80;}td.ambar{color:#FBBF24;}td.rojo{color:#F87171;}
 .x{background:none;color:#64748B;font-size:15px;padding:0 4px;}
 a.back{color:#94A3B8;font-size:11px;text-decoration:none;}
 
-/* --- Mi Nutrición: estilo app --- */
-body{background:#0B1220;font-size:14px;}
+/* --- estilo app --- */
+body{background:#0E1C1B;font-size:14px;}
 .wrap{padding-bottom:84px;}
 .page{gap:12px;padding:12px 14px 24px;}
-.card{background:#111A2E;border:1px solid #1C2742;border-radius:16px;padding:14px;gap:10px;}
-.lbl{font-size:12px;letter-spacing:.4px;color:#9FB0CC;text-transform:none;font-weight:800;}
+.card{background:#15292A;border:1px solid #21393A;border-radius:16px;padding:14px;gap:10px;}
+.lbl{font-size:12px;letter-spacing:.4px;color:#A9C2BB;text-transform:none;font-weight:800;}
 details.card>summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;}
 details.card>summary::after{content:'›';font-size:18px;color:#64748B;transition:transform .2s;}
 details.card[open]>summary::after{transform:rotate(90deg);}
 details.card>summary::-webkit-details-marker{display:none;}
-input,select,textarea{font-size:15px;padding:10px 12px;border-radius:10px;background:#0E1626;border-color:#22304D;}
-.flbl{font-size:11px;color:#7A8BA8;text-transform:none;font-weight:600;}
-.btn-pri{background:#10B981;color:#04130D;border-radius:12px;padding:13px;font-size:15px;font-weight:800;width:100%;}
+input,select,textarea{font-size:15px;padding:10px 12px;border-radius:10px;background:#102221;border-color:#2A4544;}
+.flbl{font-size:11px;color:#7F9C95;text-transform:none;font-weight:600;}
+.btn-pri{background:#8BD17C;color:#04130D;border-radius:12px;padding:13px;font-size:15px;font-weight:800;width:100%;}
 .btn-blue{border-radius:12px;padding:11px 14px;font-size:14px;}
-.btn-gray{border-radius:12px;padding:11px 14px;font-size:14px;}
+.btn-gray{border-radius:12px;padding:11px 14px;font-size:14px;background:#102221;border:1px solid #2A4544;color:var(--suave,#A9C2BB);}
+.btn-blue{background:#12313A;border:1px solid #2F6F80;color:#9FDDED;}
 .top{display:flex;align-items:center;gap:10px;padding:14px 14px 4px;max-width:560px;margin:0 auto;}
-.logo{width:40px;height:40px;border-radius:12px;background:#10B981;display:flex;align-items:center;justify-content:center;font-size:22px;}
+.logo{width:40px;height:40px;border-radius:12px;background:#8BD17C;display:flex;align-items:center;justify-content:center;font-size:22px;}
 .app-t{font-size:18px;font-weight:900;}
-.app-s{font-size:12px;color:#7A8BA8;}
-.pill{font-size:11px;padding:4px 9px;border-radius:20px;background:#1C2742;color:#9FB0CC;white-space:nowrap;}
+.app-s{font-size:12px;color:#7F9C95;}
+.pill{font-size:11px;padding:4px 9px;border-radius:20px;background:#21393A;color:#A9C2BB;white-space:nowrap;}
 .pill.on{color:#4ADE80;}
 .tab[hidden]{display:none!important;}
 .tab{display:flex;flex-direction:column;gap:12px;}
-nav.tabs{position:fixed;left:0;right:0;bottom:0;display:flex;background:rgba(11,18,32,.96);backdrop-filter:blur(8px);border-top:1px solid #1C2742;padding:6px 6px calc(6px + env(safe-area-inset-bottom));z-index:10;}
-nav.tabs button{flex:1;background:none;color:#7A8BA8;font-size:11px;font-weight:700;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0;border-radius:12px;}
+nav.tabs{position:fixed;left:0;right:0;bottom:0;display:flex;background:rgba(14,28,27,.96);backdrop-filter:blur(8px);border-top:1px solid #21393A;padding:6px 6px calc(6px + env(safe-area-inset-bottom));z-index:10;}
+nav.tabs button{flex:1;background:none;color:#7F9C95;font-size:11px;font-weight:700;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0;border-radius:12px;}
 nav.tabs button span{font-size:20px;line-height:1.1;}
-nav.tabs button.on{color:#F1F5F9;background:#1C2742;}
+nav.tabs button.on{color:#F1F5F9;background:#21393A;}
 .tipo{border-radius:16px;padding:18px 14px;}
 .msg{font-size:13px;padding:9px 11px;border-radius:10px;line-height:1.4;}
 .fila{font-size:14px;padding:8px 0;}
 .fila .p{font-size:11px;}
 table{font-size:12px;}
-.nota,.ayuda{font-size:12px;color:#7A8BA8;line-height:1.5;}
+.nota,.ayuda{font-size:12px;color:#7F9C95;line-height:1.5;}
 .ayuda p{margin-bottom:8px;}
-.ayuda code{font-size:10px;word-break:break-all;color:#9FB0CC;}
+.ayuda code{font-size:10px;word-break:break-all;color:#A9C2BB;}
 .motor-status{font-size:12px;}
 .hero{text-align:center;padding:18px;}
 .hero .big{font-size:40px;font-weight:900;letter-spacing:-1px;}
-.hero .sub{font-size:13px;color:#9FB0CC;}
-.barra{height:8px;border-radius:8px;background:#1C2742;overflow:hidden;margin-top:6px;}
-.barra>div{height:100%;background:#10B981;border-radius:8px;}
+.hero .sub{font-size:13px;color:#A9C2BB;}
+.barra{height:8px;border-radius:8px;background:#21393A;overflow:hidden;margin-top:6px;}
+.barra>div{height:100%;background:#8BD17C;border-radius:8px;}
 .acciones{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
-.accion{background:#111A2E;border:1px solid #1C2742;border-radius:16px;padding:14px 4px;color:#E2E8F0;font-size:13px;font-weight:700;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;}
+.accion{background:#15292A;border:1px solid #21393A;border-radius:16px;padding:14px 4px;color:#E2E8F0;font-size:13px;font-weight:700;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;}
 .accion span{font-size:24px;}
 .chips{display:flex;gap:6px;overflow-x:auto;}
-.chips button{background:#0E1626;border:1px solid #22304D;color:#9FB0CC;border-radius:20px;padding:7px 13px;font-size:13px;font-weight:700;white-space:nowrap;}
-.chips button.on{background:#10B981;border-color:#10B981;color:#04130D;}
+.chips button{background:#102221;border:1px solid #2A4544;color:#A9C2BB;border-radius:20px;padding:7px 13px;font-size:13px;font-weight:700;white-space:nowrap;}
+.chips button.on{background:#8BD17C;border-color:#8BD17C;color:#04130D;}
 .mini{width:52px;padding:6px 8px;font-size:14px;display:inline-block;}
 .hora{width:auto;padding:6px 8px;font-size:14px;display:inline-block;}
 .dias{display:flex;gap:4px;padding-left:24px;}
-.dias button{width:32px;height:32px;border-radius:50%;background:#0E1626;border:1px solid #22304D;color:#7A8BA8;font-size:12px;font-weight:800;}
-.dias button.on{background:#10B981;border-color:#10B981;color:#04130D;}
-.rec{display:flex;gap:9px;font-size:13px;line-height:1.45;padding:8px 0;border-bottom:1px solid #1C2742;color:#CBD5E1;}
+.dias button{width:32px;height:32px;border-radius:50%;background:#102221;border:1px solid #2A4544;color:#7F9C95;font-size:12px;font-weight:800;}
+.dias button.on{background:#8BD17C;border-color:#8BD17C;color:#04130D;}
+.rec{display:flex;gap:9px;font-size:13px;line-height:1.45;padding:8px 0;border-bottom:1px solid #21393A;color:#CBD5E1;}
 .rec:last-child{border-bottom:none;}
 .chart{position:relative;}
 .chart svg{width:100%;height:auto;display:block;overflow:visible;}
-.tip{position:absolute;pointer-events:none;background:#0B1220;border:1px solid #2A3A5C;border-radius:8px;padding:6px 8px;font-size:12px;color:#F1F5F9;white-space:nowrap;transform:translate(-50%,-110%);display:none;z-index:2;}
-.leyenda{display:flex;gap:14px;font-size:11px;color:#9FB0CC;}
+.tip{position:absolute;pointer-events:none;background:#0E1C1B;border:1px solid #33504E;border-radius:8px;padding:6px 8px;font-size:12px;color:#F1F5F9;white-space:nowrap;transform:translate(-50%,-110%);display:none;z-index:2;}
+.leyenda{display:flex;gap:14px;font-size:11px;color:#A9C2BB;}
 .leyenda i{display:inline-block;width:14px;height:2px;background:#3987E5;vertical-align:middle;margin-right:5px;}
 .leyenda b{display:inline-block;width:8px;height:8px;border-radius:50%;background:#64748B;vertical-align:middle;margin-right:5px;}
 .vacio{font-size:13px;color:#64748B;text-align:center;padding:18px 0;}
 .receta{display:flex;flex-direction:column;gap:8px;}
 .receta h3{font-size:16px;font-weight:800;}
 .tags{display:flex;gap:6px;flex-wrap:wrap;}
-.tag{font-size:11px;font-weight:700;padding:3px 8px;border-radius:20px;background:#1C2742;color:#9FB0CC;}
+.tag{font-size:11px;font-weight:700;padding:3px 8px;border-radius:20px;background:#21393A;color:#A9C2BB;}
 .tag.ok{background:#052E16;color:#4ADE80;}.tag.no{background:#2D0A0A;color:#F87171;}
 .macros4{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;text-align:center;}
-.macros4 div{background:#0E1626;border-radius:10px;padding:7px 2px;font-size:11px;color:#7A8BA8;}
+.macros4 div{background:#102221;border-radius:10px;padding:7px 2px;font-size:11px;color:#7F9C95;}
 .macros4 b{display:block;font-size:16px;color:#F1F5F9;}
-.ing{display:flex;justify-content:space-between;gap:8px;font-size:14px;padding:6px 0;border-bottom:1px solid #1C2742;}
+.ing{display:flex;justify-content:space-between;gap:8px;font-size:14px;padding:6px 0;border-bottom:1px solid #21393A;}
 .ing:last-child{border-bottom:none;}
 .ing .g{font-weight:800;white-space:nowrap;}
-details.receta>summary::after{content:'Ver ingredientes y preparación ›';display:block;margin-top:8px;font-size:13px;font-weight:700;color:#10B981;transform:none!important;}
+details.receta>summary::after{content:'Ver ingredientes y preparación ›';display:block;margin-top:8px;font-size:13px;font-weight:700;color:#8BD17C;transform:none!important;}
 details.receta[open]>summary::after{content:'Ocultar ‹';}
 ol.pasos{padding-left:20px;font-size:13px;color:#CBD5E1;line-height:1.5;}
+
+/* --- Mi Bienestar --- */
+@font-face{font-family:'Bricolage';src:url('./vendor/fonts/bricolage-grotesque-latin-wght-normal.woff2') format('woff2');font-weight:200 800;font-display:swap;}
+:root{--agua:#5CC8E6;--hoja:#8BD17C;--tinta:#DCE9E4;--suave:#A9C2BB;--fondo:#0E1C1B;--musgo:#15292A;}
+body{color:var(--tinta);}
+.app-t,.hoy-h,.vaso-n,.big,.receta h3,.pausa-n,.pausa-t{font-family:'Bricolage',system-ui,sans-serif;}
+.app-t{font-size:20px;font-weight:800;letter-spacing:-.3px;}
+:focus-visible{outline:2px solid var(--agua);outline-offset:2px;}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;}}
+.hoy-h{font-size:26px;font-weight:700;letter-spacing:-.5px;line-height:1.15;}
+.hoy-sub{font-size:14px;color:var(--suave);margin-top:2px;}
+.agua{display:grid;grid-template-columns:118px 1fr;gap:16px;align-items:center;padding:16px;}
+.vaso svg{width:118px;height:150px;display:block;}
+.vaso-n{font-size:34px;font-weight:800;letter-spacing:-1px;line-height:1;}
+.vaso-n small{font-size:15px;font-weight:600;color:var(--suave);letter-spacing:0;}
+.agua-b{display:flex;gap:8px;margin-top:10px;}
+.btn-agua{flex:1;background:var(--agua);color:#06222B;border-radius:14px;padding:14px 8px;font-size:16px;font-weight:800;}
+.btn-menos{width:48px;background:#102221;border:1px solid #2A4544;color:var(--suave);border-radius:14px;font-size:20px;font-weight:800;}
+.ola{transition:transform .6s cubic-bezier(.3,.7,.3,1);}
+.pausa{display:flex;flex-direction:column;gap:10px;}
+.pausa-fila{display:flex;align-items:center;gap:12px;}
+.pausa-ico{width:46px;height:46px;border-radius:50%;background:#1F3B2C;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;}
+.rutinas{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.rutina{background:#102221;border:1px solid #2A4544;border-radius:14px;padding:10px 6px;color:var(--tinta);font-size:13px;font-weight:700;display:flex;flex-direction:column;align-items:center;gap:2px;}
+.rutina small{font-size:11px;color:var(--suave);font-weight:500;}
+.rutina.principal{background:var(--hoja);border-color:var(--hoja);color:#0E1C1B;}
+.rutina.principal small{color:#1F3B2C;}
+.dia-fila{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #21393A;font-size:14px;}
+.dia-fila:last-child{border-bottom:none;}
+.dia-fila .ic{width:28px;text-align:center;font-size:18px;}
+.dia-fila .tx{flex:1;}
+.dia-fila .vl{font-weight:800;}
+.dia-fila .pb{height:4px;border-radius:4px;background:#21393A;margin-top:5px;overflow:hidden;}
+.dia-fila .pb>div{height:100%;border-radius:4px;}
+.consejo{font-size:14px;line-height:1.5;color:var(--tinta);}
+#pausaOverlay{position:fixed;inset:0;background:var(--fondo);z-index:50;display:none;flex-direction:column;align-items:center;justify-content:space-between;padding:24px 20px calc(24px + env(safe-area-inset-bottom));text-align:center;}
+#pausaOverlay.on{display:flex;}
+.pausa-prog{width:100%;max-width:420px;display:flex;gap:4px;}
+.pausa-prog i{flex:1;height:4px;border-radius:4px;background:#21393A;}
+.pausa-prog i.ok{background:var(--hoja);}
+.pausa-e{font-size:84px;line-height:1;}
+.pausa-n{font-size:28px;font-weight:800;letter-spacing:-.5px;margin-top:12px;}
+.pausa-x{font-size:16px;color:var(--suave);line-height:1.5;max-width:360px;margin-top:8px;}
+.pausa-t{font-size:64px;font-weight:800;color:var(--hoja);font-variant-numeric:tabular-nums;}
+.pausa-ctl{display:flex;gap:10px;width:100%;max-width:420px;}
+
+/* Pautas de interfaz (accesibilidad y tacto) */
+html{color-scheme:dark;}
+button,label,.accion,.rutina{touch-action:manipulation;}
+button:hover,.accion:hover,.rutina:hover{filter:brightness(1.12);}
+button:active,.accion:active,.rutina:active{filter:brightness(.92);}
+#pausaOverlay{overscroll-behavior:contain;}
+.vaso-n,.dia-fila .vl,.pausa-t,table,.macros4 b,.big{font-variant-numeric:tabular-nums;}
+.hoy-h,.pausa-n,.receta h3{text-wrap:balance;}
+.msg,.rec,.consejo,.pausa-x{text-wrap:pretty;}
+.tx,.dia-fila .tx{min-width:0;}
 </style>
 </head>
 <body>
 <div class="wrap"><div class="page">
 <header class="top">
-  <div class="logo">🥗</div>
-  <div style="flex:1;min-width:0;"><div class="app-t">Mi Nutrición</div><div class="app-s" id="subtitulo">Escanea, mide y cocina para tu meta</div></div>
+  <div class="logo">🌿</div>
+  <div style="flex:1;min-width:0;"><div class="app-t">Mi Bienestar</div><div class="app-s" id="subtitulo">Agua, movimiento, comida y progreso</div></div>
   <span id="redEstado" class="pill">● sin conexión</span>
 </header>
 
-<section class="tab" id="tab-escanear">
+<section class="tab" id="tab-hoy">
+  <div>
+    <div class="hoy-h" id="hoySaludo">Hola</div>
+    <div class="hoy-sub" id="hoyFecha"></div>
+  </div>
+
+  <div class="card agua" id="cardAgua">
+    <div class="vaso" id="vaso" aria-hidden="true"></div>
+    <div>
+      <div class="vaso-n" id="aguaNum">0 <small>de 8 vasos</small></div>
+      <div class="hoy-sub" id="aguaMl"></div>
+      <div class="agua-b">
+        <button class="btn-menos" id="aguaMenos" aria-label="Quitar un vaso">−</button>
+        <button class="btn-agua" id="aguaMas">+ 1 vaso</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card pausa">
+    <div class="pausa-fila">
+      <div class="pausa-ico">🧘</div>
+      <div style="flex:1;"><div style="font-weight:800;font-size:16px;">Pausa activa</div><div class="hoy-sub" id="pausaInfo"></div></div>
+    </div>
+    <div class="rutinas" id="rutinas"></div>
+  </div>
+
+  <div class="card">
+    <div class="lbl">Tu día</div>
+    <div id="tuDia"></div>
+  </div>
+
+  <div class="card" id="cardConsejo" hidden>
+    <div class="lbl">Para hoy</div>
+    <div class="consejo" id="consejo"></div>
+  </div>
+
+  <button class="btn-gray" id="irRecordatorios">🔔 Recordatorios de agua y pausas</button>
+</section>
+
+<section class="tab" id="tab-escanear" hidden>
   <div class="card">
     <button class="btn-pri" id="btnEscanear" style="font-size:15px;padding:14px;">▦ Escanear código de barras</button>
     <div id="camara" style="display:none;position:relative;border-radius:8px;overflow:hidden;background:#000;">
@@ -144,9 +240,9 @@ ol.pasos{padding-left:20px;font-size:13px;color:#CBD5E1;line-height:1.5;}
     <div style="display:flex;gap:6px;">
       <input id="codigo" inputmode="numeric" placeholder="…o escribe el número del código" style="flex:1;">
       <button class="btn-blue" id="btnBuscar">Buscar</button>
-      <label class="btn-gray" title="Foto del código" style="cursor:pointer;display:flex;align-items:center;">🖼️<input type="file" accept="image/*" capture="environment" id="fotoCodigo" style="display:none;"></label>
+      <label class="btn-gray" title="Foto del código" aria-label="Leer el código desde una foto" style="cursor:pointer;display:flex;align-items:center;">🖼️<input type="file" accept="image/*" capture="environment" id="fotoCodigo" style="display:none;"></label>
     </div>
-    <div id="scanStat" class="motor-status" style="display:none;"></div>
+    <div id="scanStat" class="motor-status" role="status" style="display:none;"></div>
   </div>
 
   <div class="card" id="prodCard" style="display:none;flex-direction:row;align-items:center;gap:10px;">
@@ -181,7 +277,7 @@ ol.pasos{padding-left:20px;font-size:13px;color:#CBD5E1;line-height:1.5;}
       <label class="btn-blue" style="flex:1;text-align:center;cursor:pointer;">📷 Tabla nutricional<input type="file" accept="image/*" capture="environment" id="fotoTabla" style="display:none;"></label>
       <label class="btn-gray" style="flex-shrink:0;cursor:pointer;display:flex;align-items:center;">📷 Ingredientes<input type="file" accept="image/*" capture="environment" id="fotoIng" style="display:none;"></label>
     </div>
-    <div id="ocrStat" class="motor-status" style="display:none;"></div>
+    <div id="ocrStat" class="motor-status" role="status" style="display:none;"></div>
     <details id="ocrCrudo" style="display:none;"><summary style="font-size:10px;color:#64748B;cursor:pointer;">Ver texto leído</summary><pre id="ocrTexto" style="font-size:10px;color:#94A3B8;white-space:pre-wrap;margin-top:4px;"></pre></details>
   </div>
 
@@ -225,7 +321,7 @@ ol.pasos{padding-left:20px;font-size:13px;color:#CBD5E1;line-height:1.5;}
     <button class="accion" id="btnRegistrar"><span>✏️</span>Registrar</button>
     <label class="accion"><span>⬆️</span>Importar<input type="file" id="importar" multiple accept=".csv,.zip,.xml,.txt,text/csv,application/zip,text/xml" style="display:none;"></label>
   </div>
-  <div id="segStat" class="motor-status" style="display:none;"></div>
+  <div id="segStat" class="motor-status" role="status" style="display:none;"></div>
 
   <div class="card" id="cardRegistro" hidden>
     <div class="lbl">Registrar medición</div>
@@ -251,11 +347,12 @@ ol.pasos{padding-left:20px;font-size:13px;color:#CBD5E1;line-height:1.5;}
   <div class="card" id="cardGrasa"><div class="lbl">Grasa corporal</div><div class="chart" id="chGrasa"></div></div>
   <div class="card" id="cardPasos"><div class="lbl">Pasos (últimos 14 días)</div><div class="chart" id="chPasos"></div></div>
 
-  <details class="card">
+  <details class="card" id="cardRecordatorios">
     <summary class="lbl">🔔 Recordatorios</summary>
     <label class="chk"><input type="checkbox" id="r-pesar"> ⚖️ Pesarme a las <input id="r-pesarHora" type="time" value="07:00" class="hora"></label>
     <div class="dias" id="r-dias"></div>
     <label class="chk"><input type="checkbox" id="r-agua"> 💧 Agua cada <input id="r-aguaCada" inputmode="numeric" value="2" class="mini"> h, de <input id="r-aguaDesde" inputmode="numeric" value="8" class="mini"> a <input id="r-aguaHasta" inputmode="numeric" value="20" class="mini"> h</label>
+    <label class="chk"><input type="checkbox" id="r-pausa"> 🧘 Pausa activa cada <input id="r-pausaCada" inputmode="numeric" value="60" class="mini"> min, de <input id="r-pausaDesde" inputmode="numeric" value="8" class="mini"> a <input id="r-pausaHasta" inputmode="numeric" value="17" class="mini"> h (lunes a viernes)</label>
     <label class="chk"><input type="checkbox" id="r-pasos"> 🚶 Caminar a las <input id="r-pasosHora" type="time" value="18:00" class="hora"></label>
     <label class="chk"><input type="checkbox" id="r-consejo"> 💡 Consejo del día a las <input id="r-consejoHora" type="time" value="09:00" class="hora"></label>
     <div style="display:flex;gap:8px;flex-wrap:wrap;">
@@ -263,7 +360,7 @@ ol.pasos{padding-left:20px;font-size:13px;color:#CBD5E1;line-height:1.5;}
       <button class="btn-gray" id="btnICS" style="flex:1;">📅 Al calendario</button>
     </div>
     <div class="nota">Los avisos de la app salen sin internet mientras la app esté abierta o instalada (Android). Para que te avisen <b>siempre</b>, aunque la app esté cerrada (también en iPhone), usa <b>📅 Al calendario</b>: tu calendario hace los recordatorios.</div>
-    <div id="notifStat" class="motor-status" style="display:none;"></div>
+    <div id="notifStat" class="motor-status" role="status" style="display:none;"></div>
   </details>
 
   <details class="card">
@@ -324,7 +421,7 @@ ol.pasos{padding-left:20px;font-size:13px;color:#CBD5E1;line-height:1.5;}
       </div>
       <textarea id="planTexto" rows="3" placeholder="…o pega aquí el texto del plan"></textarea>
       <button class="btn-gray" id="btnAnalizarPlan">Analizar texto</button>
-      <div id="planStat" class="motor-status" style="display:none;"></div>
+      <div id="planStat" class="motor-status" role="status" style="display:none;"></div>
       <div class="lbl" style="margin-top:4px;">Metas del día (revisa y corrige)</div>
       <div class="g2">
         <div class="fld"><div class="flbl">Calorías (kcal/día)</div><input id="pl-kcal" inputmode="numeric"></div>
@@ -394,8 +491,25 @@ ol.pasos{padding-left:20px;font-size:13px;color:#CBD5E1;line-height:1.5;}
   </div>
 </section>
 </div></div>
+
+<div id="pausaOverlay" role="dialog" aria-modal="true" aria-labelledby="pausaN">
+  <div class="pausa-prog" id="pausaProg"></div>
+  <div>
+    <div class="pausa-e" id="pausaE"></div>
+    <div class="pausa-n" id="pausaN" aria-live="polite"></div>
+    <div class="pausa-x" id="pausaX"></div>
+  </div>
+  <div class="pausa-t" id="pausaT" aria-hidden="true"></div>
+  <div class="pausa-ctl">
+    <button class="btn-gray" id="pausaSalir" style="flex:1;">Terminar</button>
+    <button class="btn-gray" id="pausaPausar" style="flex:1;">Pausar</button>
+    <button class="btn-pri" id="pausaSig" style="flex:1;">Siguiente</button>
+  </div>
+  <div class="nota">Muévete sin dolor. Si algo molesta, sáltalo.</div>
+</div>
 <nav class="tabs">
-  <button data-tab="escanear" class="on"><span>▦</span>Escanear</button>
+  <button data-tab="hoy" class="on"><span>🌿</span>Hoy</button>
+  <button data-tab="escanear"><span>▦</span>Escanear</button>
   <button data-tab="progreso"><span>📈</span>Progreso</button>
   <button data-tab="recetas"><span>🍳</span>Recetas</button>
   <button data-tab="plan"><span>🎯</span>Plan</button>
@@ -407,6 +521,7 @@ import {buscarProducto,guardarLocal,normalizarCodigo,codigoValido} from './engin
 import {parsearPlan,evaluarConPlan,leerPlan,guardarPlan,borrarPlan,resumenPlan,CONDICIONES,VEREDICTO_PLAN} from './engine/plan.js';
 import * as seg from './engine/seguimiento.js';
 import {sugerirRecetas} from './engine/recetas.js';
+import * as bien from './engine/bienestar.js';
 
 const $=id=>document.getElementById(id);
 const CAMPOS=['kcal','grasa','saturada','azucar','sal','fibra','proteina','carbos'];
@@ -819,13 +934,14 @@ $('usarPlan').addEventListener('change',render);
 mostrarPlan();
 
 // =================== Pestañas ===================
-const TABS=['escanear','progreso','recetas','plan'];
+const TABS=['hoy','escanear','progreso','recetas','plan'];
 function irA(tab){
-  if(!TABS.includes(tab))tab='escanear';
+  if(!TABS.includes(tab))tab='hoy';
   for(const t of TABS)$('tab-'+t).hidden=t!==tab;
   for(const b of document.querySelectorAll('nav.tabs button'))b.classList.toggle('on',b.dataset.tab===tab);
   if(tab==='progreso')pintarProgreso();
   if(tab==='recetas')pintarRecetas();
+  if(tab==='hoy')pintarHoy();
   window.scrollTo({top:0});
   try{localStorage.setItem('crcr-nutricion-tab',tab);}catch{}
 }
@@ -882,13 +998,13 @@ function chartLinea(el,serie,{unidad,dec=1,leyenda=true}){
   const xs=serie.map(p=>+new Date(p.fecha)),ys=serie.flatMap(p=>[p.valor,p.media]);
   const e=escalas(xs,ys,W,H,m);
   const grid=[0,0.5,1].map(t=>{const v=e.y0+(e.y1-e.y0)*t,y=e.y(v);
-    return `<line x1="${m.l}" x2="${W-m.r}" y1="${y}" y2="${y}" stroke="#1C2742" stroke-width="1"/><text x="${m.l-5}" y="${y+3}" text-anchor="end" font-size="9" fill="#7A8BA8">${fmt1(v,dec)}</text>`;}).join('');
+    return `<line x1="${m.l}" x2="${W-m.r}" y1="${y}" y2="${y}" stroke="#21393A" stroke-width="1"/><text x="${m.l-5}" y="${y+3}" text-anchor="end" font-size="9" fill="#7F9C95">${fmt1(v,dec)}</text>`;}).join('');
   const linea=serie.map((p,i)=>`${i?'L':'M'}${e.x(xs[i]).toFixed(1)},${e.y(p.media).toFixed(1)}`).join('');
-  const puntos=serie.map((p,i)=>`<circle cx="${e.x(xs[i]).toFixed(1)}" cy="${e.y(p.valor).toFixed(1)}" r="3.5" fill="#64748B" stroke="#111A2E" stroke-width="2"/>`).join('');
-  const ej=`<text x="${m.l}" y="${H-4}" font-size="9" fill="#7A8BA8">${fechaCorta(serie[0].fecha)}</text><text x="${W-m.r}" y="${H-4}" font-size="9" fill="#7A8BA8" text-anchor="end">${fechaCorta(serie[serie.length-1].fecha)}</text>`;
+  const puntos=serie.map((p,i)=>`<circle cx="${e.x(xs[i]).toFixed(1)}" cy="${e.y(p.valor).toFixed(1)}" r="3.5" fill="#64748B" stroke="#15292A" stroke-width="2"/>`).join('');
+  const ej=`<text x="${m.l}" y="${H-4}" font-size="9" fill="#7F9C95">${fechaCorta(serie[0].fecha)}</text><text x="${W-m.r}" y="${H-4}" font-size="9" fill="#7F9C95" text-anchor="end">${fechaCorta(serie[serie.length-1].fecha)}</text>`;
   el.innerHTML=`${leyenda?`<div class="leyenda"><span><b></b>cada día</span><span><i></i>promedio 7 días</span></div>`:''}
     <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Tendencia">${grid}${puntos}<path d="${linea}" fill="none" stroke="#3987E5" stroke-width="2" stroke-linejoin="round"/>
-    <line class="cruz" y1="${m.t}" y2="${H-m.b}" stroke="#9FB0CC" stroke-width="1" style="display:none"/><circle class="foco" r="5" fill="#3987E5" stroke="#111A2E" stroke-width="2" style="display:none"/>${ej}
+    <line class="cruz" y1="${m.t}" y2="${H-m.b}" stroke="#A9C2BB" stroke-width="1" style="display:none"/><circle class="foco" r="5" fill="#3987E5" stroke="#15292A" stroke-width="2" style="display:none"/>${ej}
     <rect x="${m.l}" y="0" width="${W-m.l-m.r}" height="${H}" fill="transparent" class="hit"/></svg><div class="tip"></div>
     ${tablaHTML(serie,[['Fecha',f=>fechaCorta(f.fecha)],['Valor',f=>fmt1(f.valor,dec)+' '+unidad],['Promedio',f=>fmt1(f.media,dec)+' '+unidad]])}`;
   const svg=el.querySelector('svg'),tip=el.querySelector('.tip'),cruz=el.querySelector('.cruz'),foco=el.querySelector('.foco');
@@ -916,9 +1032,9 @@ function chartBarras(el,serie,{unidad,meta}){
     const x=m.l+banda*i+(banda-ancho)/2,yt=y(p.valor),r=Math.min(4,ancho/2,base-yt);
     return `<path d="M${x},${base}V${yt+r}Q${x},${yt} ${x+r},${yt}H${x+ancho-r}Q${x+ancho},${yt} ${x+ancho},${yt+r}V${base}Z" fill="#3987E5"/>
       <rect x="${m.l+banda*i}" y="${m.t}" width="${banda}" height="${base-m.t}" fill="transparent" data-i="${i}" class="hit"/>`;}).join('');
-  const lineaMeta=meta?`<line x1="${m.l}" x2="${W-m.r}" y1="${y(meta)}" y2="${y(meta)}" stroke="#9FB0CC" stroke-width="1"/>`:'';
-  el.innerHTML=`${meta?`<div class="leyenda"><span><i style="background:#9FB0CC;height:1px"></i>meta ${meta.toLocaleString('es')} pasos</span></div>`:''}<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Pasos por día"><line x1="${m.l}" x2="${W-m.r}" y1="${base}" y2="${base}" stroke="#1C2742"/>${lineaMeta}${barras}
-    <text x="${m.l}" y="${H-4}" font-size="9" fill="#7A8BA8">${fechaCorta(serie[0].fecha)}</text><text x="${W-m.r}" y="${H-4}" font-size="9" fill="#7A8BA8" text-anchor="end">${fechaCorta(serie[serie.length-1].fecha)}</text></svg><div class="tip"></div>
+  const lineaMeta=meta?`<line x1="${m.l}" x2="${W-m.r}" y1="${y(meta)}" y2="${y(meta)}" stroke="#A9C2BB" stroke-width="1"/>`:'';
+  el.innerHTML=`${meta?`<div class="leyenda"><span><i style="background:#A9C2BB;height:1px"></i>meta ${meta.toLocaleString('es')} pasos</span></div>`:''}<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Pasos por día"><line x1="${m.l}" x2="${W-m.r}" y1="${base}" y2="${base}" stroke="#21393A"/>${lineaMeta}${barras}
+    <text x="${m.l}" y="${H-4}" font-size="9" fill="#7F9C95">${fechaCorta(serie[0].fecha)}</text><text x="${W-m.r}" y="${H-4}" font-size="9" fill="#7F9C95" text-anchor="end">${fechaCorta(serie[serie.length-1].fecha)}</text></svg><div class="tip"></div>
     ${tablaHTML(serie,[['Fecha',f=>fechaCorta(f.fecha)],['Pasos',f=>Math.round(f.valor).toLocaleString('es')]])}`;
   const svg=el.querySelector('svg'),tip=el.querySelector('.tip');
   svg.querySelectorAll('.hit').forEach(h=>{
@@ -1102,6 +1218,7 @@ function cargarRec(){
   const c=leerRec();
   $('r-pesar').checked=!!c.pesar?.activo;$('r-pesarHora').value=c.pesar?.hora||'07:00';diasPesar=c.pesar?.dias||[1];
   $('r-agua').checked=!!c.agua?.activo;$('r-aguaCada').value=c.agua?.cadaHoras||2;$('r-aguaDesde').value=c.agua?.desde??8;$('r-aguaHasta').value=c.agua?.hasta??20;
+  $('r-pausa').checked=!!c.pausa?.activo;$('r-pausaCada').value=c.pausa?.cadaMin||60;$('r-pausaDesde').value=c.pausa?.desde??8;$('r-pausaHasta').value=c.pausa?.hasta??17;
   $('r-pasos').checked=!!c.pasos?.activo;$('r-pasosHora').value=c.pasos?.hora||'18:00';
   $('r-consejo').checked=!!c.consejo?.activo;$('r-consejoHora').value=c.consejo?.hora||'09:00';
   pintarDias();
@@ -1110,6 +1227,7 @@ function configRec(){
   return{
     pesar:{activo:$('r-pesar').checked,hora:$('r-pesarHora').value,dias:diasPesar},
     agua:{activo:$('r-agua').checked,cadaHoras:Math.max(1,numero($('r-aguaCada').value)||2),desde:numero($('r-aguaDesde').value)??8,hasta:numero($('r-aguaHasta').value)??20},
+    pausa:{activo:$('r-pausa').checked,cadaMin:Math.max(15,numero($('r-pausaCada').value)||60),desde:numero($('r-pausaDesde').value)??8,hasta:numero($('r-pausaHasta').value)??17,dias:[1,2,3,4,5]},
     pasos:{activo:$('r-pasos').checked,hora:$('r-pasosHora').value},
     consejo:{activo:$('r-consejo').checked,hora:$('r-consejoHora').value}
   };
@@ -1121,7 +1239,8 @@ async function guardarRecordatorios(manual=true){
   if(manual)try{localStorage.setItem(CLAVE_REC,JSON.stringify(cfg));}catch{}
   try{
     const c=await caches.open('crcr-config');
-    await c.put('./__recordatorios',new Response(JSON.stringify({cfg:manual?cfg:leerRec(),consejo:consejoDelDia})));
+    await c.put('./__recordatorios',new Response(JSON.stringify({cfg:manual?cfg:leerRec(),consejo:consejoDelDia,
+      agua:{fecha:seg.hoy(),ml:bien.aguaHoy(),meta:metaAguaHoy()}})));
   }catch{}
   revisarRecordatorios();
 }
@@ -1132,7 +1251,7 @@ $('r-dias').addEventListener('click',e=>{
   if(!diasPesar.length)diasPesar=[d];
   pintarDias();guardarRecordatorios();
 });
-for(const id of ['r-pesar','r-pesarHora','r-agua','r-aguaCada','r-aguaDesde','r-aguaHasta','r-pasos','r-pasosHora','r-consejo','r-consejoHora'])
+for(const id of ['r-pausa','r-pausaCada','r-pausaDesde','r-pausaHasta','r-pesar','r-pesarHora','r-agua','r-aguaCada','r-aguaDesde','r-aguaHasta','r-pasos','r-pasosHora','r-consejo','r-consejoHora'])
   $(id).addEventListener('change',()=>guardarRecordatorios());
 $('btnNotif').addEventListener('click',async()=>{
   if(!('Notification' in window)){estado('notifStat','','⚠️ Este navegador no permite avisos. Usa 📅 Al calendario.');return;}
@@ -1142,7 +1261,7 @@ $('btnNotif').addEventListener('click',async()=>{
   try{
     const reg=await navigator.serviceWorker.ready;
     if('periodicSync' in reg)await reg.periodicSync.register('crcr-recordatorios',{minInterval:60*60*1000}).catch(()=>{});
-    reg.showNotification('Mi Nutrición',{body:'¡Listo! Así te llegarán los recordatorios.',icon:'./icon-nutricion.svg',tag:'prueba'});
+    reg.showNotification('Mi Bienestar',{body:'¡Listo! Así te llegarán los recordatorios.',icon:'./icon-nutricion.svg',tag:'prueba'});
   }catch{}
   estado('notifStat','listo','✅ Avisos activados. Para que lleguen aunque la app esté cerrada, agrégalos también al calendario.');
 });
@@ -1151,7 +1270,7 @@ $('btnICS').addEventListener('click',()=>{
   if(!/BEGIN:VEVENT/.test(ics)){estado('notifStat','','Activa al menos un recordatorio.');return;}
   const a=document.createElement('a');
   a.href=URL.createObjectURL(new Blob([ics],{type:'text/calendar'}));
-  a.download='recordatorios-mi-nutricion.ics';
+  a.download='recordatorios-mi-bienestar.ics';
   document.body.appendChild(a);a.click();a.remove();
   estado('notifStat','listo','📅 Abre el archivo descargado y agrégalo a tu calendario.');
 });
@@ -1191,7 +1310,7 @@ function pintarRecetas(){
       <div class="macros4" style="margin-top:8px;"><div><b>${r.total.k}</b>kcal</div><div><b>${r.total.p} g</b>proteína</div><div><b>${r.total.c} g</b>carbos</div><div><b>${r.total.g} g</b>grasa</div></div>
     </summary>
     <div class="lbl" style="margin-top:6px;">Ingredientes (1 porción)</div>
-    <div>${r.ingredientes.map(i=>`<div class="ing"><span>${i.deTuCompra?'★ ':''}${esc(i.nombre)}${i.choque?' <span class="tag no">evitar</span>':''}</span><span class="g">${i.gramos} g${i.unidades?` <span style="color:#7A8BA8;font-weight:400">(${String(i.unidades).replace('.',',')} ${i.unidad}${i.unidades>1?'s':''})</span>`:''}</span></div>`).join('')}</div>
+    <div>${r.ingredientes.map(i=>`<div class="ing"><span>${i.deTuCompra?'★ ':''}${esc(i.nombre)}${i.choque?' <span class="tag no">evitar</span>':''}</span><span class="g">${i.gramos} g${i.unidades?` <span style="color:#7F9C95;font-weight:400">(${String(i.unidades).replace('.',',')} ${i.unidad}${i.unidades>1?'s':''})</span>`:''}</span></div>`).join('')}</div>
     <div class="lbl">Preparación</div><ol class="pasos">${r.pasos.map(p=>`<li>${esc(p)}</li>`).join('')}</ol>
     <div class="nota">Fibra: ${r.total.f} g. ★ = datos de la etiqueta de tu producto; el resto, valores de referencia (USDA).</div>
   </details>`).join('');
@@ -1204,13 +1323,189 @@ $('chipsComida').addEventListener('click',e=>{
 });
 $('kcalReceta').addEventListener('input',()=>{$('kcalReceta').dataset.tocado=$('kcalReceta').value?'1':'';pintarRecetas();});
 
+
+// =================== Hoy: agua, pausas activas y tu día ===================
+const VASO=250;
+function pesoActual(){return [...seg.leerMediciones()].reverse().find(f=>f.peso)?.peso;}
+function metaAguaHoy(){return bien.metaAgua(pesoActual());}
+
+function dibujarVaso(frac){
+  // Vaso con agua que sube; la ola se mueve con transform para animar el cambio.
+  const f=Math.max(0,Math.min(1,frac)),alto=126,y=12+alto*(1-f);
+  $('vaso').innerHTML=`<svg viewBox="0 0 118 150"><defs><clipPath id="cv"><path d="M14 10h90l-9 132H23z"/></clipPath></defs>
+    <path d="M14 10h90l-9 132H23z" fill="#102221"/>
+    <g clip-path="url(#cv)"><g class="ola" style="transform:translateY(${y.toFixed(1)}px)">
+      <path d="M0 6 Q15 0 30 6 T60 6 T90 6 T120 6 V160 H0Z" fill="#5CC8E6"/>
+      <path d="M0 10 Q15 4 30 10 T60 10 T90 10 T120 10 V160 H0Z" fill="#3FA9C9" opacity=".6"/></g></g>
+    <path d="M14 10h90l-9 132H23z" fill="none" stroke="#5CC8E6" stroke-width="2.5" stroke-linejoin="round"/></svg>`;
+}
+function pintarAgua(){
+  const ml=bien.aguaHoy(),meta=metaAguaHoy(),vasos=Math.round(ml/VASO),metaV=Math.ceil(meta/VASO);
+  dibujarVaso(ml/meta);
+  $('aguaNum').innerHTML=`${vasos} <small>de ${metaV} vasos</small>`;
+  $('aguaMl').textContent=ml>=meta?`¡Meta cumplida! ${(ml/1000).toFixed(2).replace('.',',')} L hoy.`
+    :`${(ml/1000).toFixed(2).replace('.',',')} de ${(meta/1000).toFixed(1).replace('.',',')} L · vasos de ${VASO} ml`;
+}
+async function cambiarAgua(ml){
+  bien.sumarAgua(ml);
+  navigator.vibrate?.(25);
+  pintarAgua();pintarTuDia();
+  guardarRecordatorios(false);
+}
+$('aguaMas').addEventListener('click',()=>cambiarAgua(VASO));
+$('aguaMenos').addEventListener('click',()=>cambiarAgua(-VASO));
+// Vasos sumados desde la notificación ("+1 vaso") mientras la app estaba cerrada.
+async function aguaDesdeNotificacion(){
+  try{
+    const c=await caches.open('crcr-config'),r=await c.match('./__agua-pendiente');
+    if(!r)return;
+    const {fecha,vasos}=await r.json();
+    await c.delete('./__agua-pendiente');
+    if(fecha===seg.hoy()&&vasos>0){bien.sumarAgua(vasos*VASO);pintarAgua();pintarTuDia();}
+  }catch{}
+}
+
+const META_PAUSAS=4;
+function pintarPausaInfo(){
+  const n=bien.pausasHoy(),cfg=leerRec().pausa;
+  let prox='';
+  if(cfg?.activo){
+    const ahora=new Date(),hhmm=`${String(ahora.getHours()).padStart(2,'0')}:${String(ahora.getMinutes()).padStart(2,'0')}`;
+    const sig=[1,2,3,4,5].includes(ahora.getDay())?bien.horarios(cfg.desde,cfg.hasta,cfg.cadaMin).find(h=>h>hhmm):null;
+    prox=sig?` · próxima a las ${sig}`:'';
+  }
+  $('pausaInfo').textContent=`${n} de ${META_PAUSAS} hoy${prox}`;
+  $('rutinas').innerHTML=Object.entries(bien.RUTINAS).map(([id,r],i)=>
+    `<button class="rutina${i===0?' principal':''}" data-r="${id}">${r.n.replace('Pausa ','').replace(/^./,c=>c.toUpperCase())}<small>${Math.round(bien.duracionRutina(id)/60)||1} min</small></button>`).join('');
+}
+$('rutinas').addEventListener('click',e=>{const b=e.target.closest('button');if(b)iniciarPausa(b.dataset.r);});
+
+function pintarTuDia(){
+  const med=seg.leerMediciones(),h=med.find(f=>f.fecha===seg.hoy())||{};
+  const ayer=med.find(f=>f.fecha===seg.hoy(new Date(Date.now()-864e5)))||{};
+  const ml=bien.aguaHoy(),meta=metaAguaHoy(),pz=bien.pausasHoy();
+  const sueno=h.sueno??ayer.sueno,ultPeso=[...med].reverse().find(f=>f.peso);
+  const fila=(ic,tx,vl,frac,color)=>`<div class="dia-fila"><span class="ic">${ic}</span><div class="tx">${tx}${frac!==null?`<div class="pb"><div style="width:${Math.min(100,frac*100)}%;background:${color}"></div></div>`:''}</div><span class="vl">${vl}</span></div>`;
+  $('tuDia').innerHTML=
+    fila('💧','Agua',`${Math.round(ml/VASO)}/${Math.ceil(meta/VASO)}`,ml/meta,'#5CC8E6')+
+    fila('🧘','Pausas activas',`${pz}/${META_PAUSAS}`,pz/META_PAUSAS,'#8BD17C')+
+    fila('🚶','Pasos',h.pasos!==undefined?Math.round(h.pasos).toLocaleString('es'):'—',h.pasos!==undefined?h.pasos/8000:null,'#8BD17C')+
+    fila('😴','Sueño',sueno!==undefined?`${fmt1(sueno)} h`:'—',sueno!==undefined?sueno/8:null,'#A9C2BB')+
+    fila('⚖️','Peso',ultPeso?`${fmt1(ultPeso.peso)} kg`:'—',null);
+}
+function pintarHoy(){
+  const h=new Date().getHours();
+  const pf=perfil();
+  $('hoySaludo').textContent=h<12?'Buenos días':h<19?'Buenas tardes':'Buenas noches';
+  $('hoyFecha').textContent=new Date().toLocaleDateString('es',{weekday:'long',day:'numeric',month:'long'}).replace(/^./,c=>c.toUpperCase());
+  pintarAgua();pintarPausaInfo();pintarTuDia();
+  if(!consejoDelDia){
+    const recs=seg.recomendaciones(seg.leerMediciones(),pf,leerPlan()).filter(r=>r.nivel!=='info'||/proteína|pasos/.test(r.texto));
+    consejoDelDia=recs.length?recs[new Date().getDate()%recs.length].texto:'';
+  }
+  $('cardConsejo').hidden=!consejoDelDia;
+  $('consejo').textContent=consejoDelDia;
+}
+$('irRecordatorios').addEventListener('click',()=>{
+  irA('progreso');
+  const c=$('cardRecordatorios');c.open=true;
+  setTimeout(()=>c.scrollIntoView({behavior:'smooth',block:'start'}),50);
+});
+
+// --- Reproductor de pausa activa ---
+let pz=null;
+function sonido(){
+  try{
+    const ctx=pz.audio||(pz.audio=new (window.AudioContext||window.webkitAudioContext)());
+    const o=ctx.createOscillator(),g=ctx.createGain();
+    o.frequency.value=880;g.gain.setValueAtTime(0.15,ctx.currentTime);g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.35);
+    o.connect(g).connect(ctx.destination);o.start();o.stop(ctx.currentTime+0.35);
+  }catch{}
+  navigator.vibrate?.([80,60,80]);
+}
+function pasosRutina(id){
+  return bien.RUTINAS[id].pasos.map(k=>({...bien.EJERCICIOS[k],k}));
+}
+function pintarPaso(){
+  const p=pz.pasos[pz.i];
+  $('pausaProg').innerHTML=pz.pasos.map((_,j)=>`<i class="${j<pz.i?'ok':''}"></i>`).join('');
+  $('pausaE').textContent=p.e;
+  $('pausaN').textContent=p.n;
+  $('pausaX').textContent=p.txt+(p.lado?' Cambia de lado a la mitad.':'');
+  $('pausaT').textContent=pz.restante;
+  $('pausaPausar').textContent=pz.pausado?'Seguir':'Pausar';
+}
+function tic(){
+  if(!pz||pz.pausado)return;
+  pz.restante--;
+  const p=pz.pasos[pz.i];
+  if(p.lado&&pz.restante===Math.floor(p.s/2))sonido();
+  if(pz.restante<=0)return siguientePaso();
+  $('pausaT').textContent=pz.restante;
+}
+function siguientePaso(){
+  pz.i++;
+  if(pz.i>=pz.pasos.length)return terminarPausa(true);
+  pz.restante=pz.pasos[pz.i].s;
+  sonido();pintarPaso();
+}
+async function iniciarPausa(id){
+  if(pz)return;
+  pz={id,pasos:pasosRutina(id),i:0,pausado:false};
+  pz.restante=pz.pasos[0].s;
+  $('pausaOverlay').classList.add('on');
+  try{pz.wake=await navigator.wakeLock?.request('screen');}catch{}
+  pintarPaso();
+  pz.timer=setInterval(tic,1000);
+}
+function terminarPausa(completa){
+  clearInterval(pz.timer);
+  try{pz.wake?.release();}catch{}
+  if(completa){
+    const n=bien.sumarPausa();
+    sonido();
+    $('pausaProg').innerHTML=pz.pasos.map(()=>'<i class="ok"></i>').join('');
+    $('pausaE').textContent='🌿';$('pausaN').textContent='¡Pausa completa!';
+    $('pausaX').textContent=n>=META_PAUSAS?`Llevas ${n} pausas hoy. Tu cuerpo lo agradece.`:`Llevas ${n} de ${META_PAUSAS} pausas hoy. Toma un vaso de agua.`;
+    $('pausaT').textContent='';
+    setTimeout(cerrarPausa,2500);
+  }else cerrarPausa();
+}
+function cerrarPausa(){
+  $('pausaOverlay').classList.remove('on');
+  pz=null;
+  if(location.hash==='#pausa')history.replaceState(null,'',location.pathname+'#hoy');
+  pintarPausaInfo();pintarTuDia();
+}
+$('pausaSig').addEventListener('click',()=>pz&&siguientePaso());
+$('pausaPausar').addEventListener('click',()=>{if(!pz)return;pz.pausado=!pz.pausado;pintarPaso();});
+$('pausaSalir').addEventListener('click',()=>pz&&terminarPausa(false));
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&pz)terminarPausa(false);});
+
+aguaDesdeNotificacion();
+document.addEventListener('visibilitychange',()=>{if(!document.hidden){aguaDesdeNotificacion();if(!$('tab-hoy').hidden)pintarHoy();}});
+
+// Cada campo toma como nombre accesible el texto de su etiqueta visible.
+for(const f of document.querySelectorAll('.fld')){
+  const t=f.querySelector('.flbl'),c=f.querySelector('input,select,textarea');
+  if(t&&c&&!c.getAttribute('aria-label'))c.setAttribute('aria-label',t.textContent.trim());
+}
+for(const c of document.querySelectorAll('input:not([type=checkbox]):not([type=file]),textarea'))
+  if(!c.getAttribute('aria-label')&&c.placeholder)c.setAttribute('aria-label',c.placeholder.replace(/…$/,''));
+
 // =================== Arranque ===================
 if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').then(()=>revisarRecordatorios()).catch(()=>{});
-addEventListener('hashchange',()=>{if(!datosDeURL()&&TABS.includes(location.hash.slice(1)))irA(location.hash.slice(1));});
+addEventListener('hashchange',()=>{
+  if(datosDeURL())return;
+  const h=location.hash.slice(1);
+  if(h==='pausa'){irA('hoy');iniciarPausa('oficina');}
+  else if(TABS.includes(h))irA(h);
+});
 if(!datosDeURL()){
-  let inicial='escanear';
-  try{inicial=location.hash.slice(1)||localStorage.getItem('crcr-nutricion-tab')||'escanear';}catch{}
-  irA(inicial);
+  let inicial='hoy';
+  try{inicial=location.hash.slice(1)||localStorage.getItem('crcr-nutricion-tab')||'hoy';}catch{}
+  if(inicial==='pausa'){irA('hoy');iniciarPausa('oficina');}
+  else irA(inicial);
 }
 render();renderLista();
 </script>

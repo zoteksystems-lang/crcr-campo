@@ -1,7 +1,7 @@
 // Service Worker — precachea TODO (app + motor Whisper + OCR Tesseract) en la
 // primera visita con red, para que después la app funcione 100% sin conexión.
 // Subir la versión de CACHE_NAME cuando se publique una actualización real.
-const CACHE_NAME='crcr-campo-v5';
+const CACHE_NAME='crcr-campo-v6';
 const ARCHIVOS=[
   './',
   './index.html',
@@ -14,6 +14,7 @@ const ARCHIVOS=[
   './manifest.webmanifest',
   './icon.svg',
   './engine/bascula.js',
+  './engine/bienestar.js',
   './engine/chat.js',
   './engine/codigobarras.js',
   './engine/despacho.js',
@@ -32,6 +33,7 @@ const ARCHIVOS=[
   './engine/whisper.js',
   './vendor/ort-wasm-simd.wasm',
   './vendor/fflate.mjs',
+  './vendor/fonts/bricolage-grotesque-latin-wght-normal.woff2',
   './vendor/ort-wasm.wasm',
   './vendor/pdf.min.mjs',
   './vendor/pdf.worker.min.mjs',
@@ -89,7 +91,7 @@ self.addEventListener('fetch',(event)=>{
   );
 });
 
-// --- Recordatorios de Mi Nutrición (nutricion.html) -------------------------
+// --- Recordatorios de Mi Bienestar (nutricion.html) -------------------------
 // La página guarda la configuración en la caché 'crcr-config'; aquí se revisa
 // qué aviso toca (al abrir la app, cada minuto con la app abierta y, en Android
 // con la app instalada, con Periodic Background Sync). Todo sin internet.
@@ -114,9 +116,23 @@ async function revisarRecordatorios(){
   const ahora=new Date(),avisos=[];
   if(cfg.pesar&&cfg.pesar.activo&&(cfg.pesar.dias||[1]).includes(ahora.getDay()))
     avisos.push({id:'pesar',t:horaHoy(ahora,cfg.pesar.hora),titulo:'⚖️ Hora de pesarte',cuerpo:'En ayunas y después de ir al baño. Toca para registrar.',url:'./nutricion.html#progreso'});
-  if(cfg.agua&&cfg.agua.activo)
+  const hoyTxt=ahora.getFullYear()+'-'+String(ahora.getMonth()+1).padStart(2,'0')+'-'+String(ahora.getDate()).padStart(2,'0');
+  const agua=conf.agua&&conf.agua.fecha===hoyTxt?conf.agua:{ml:0,meta:2000};
+  const pendiente=await leerConfig('./__agua-pendiente');
+  const mlHoy=agua.ml+(pendiente&&pendiente.fecha===hoyTxt?pendiente.vasos*250:0);
+  // Si ya cumpliste la meta de agua, no se insiste.
+  if(cfg.agua&&cfg.agua.activo&&mlHoy<agua.meta)
     for(let h=cfg.agua.desde;h<=cfg.agua.hasta;h+=Math.max(1,cfg.agua.cadaHoras))
-      avisos.push({id:'agua-'+h,t:horaHoy(ahora,h+':00'),titulo:'💧 Toma un vaso de agua',cuerpo:'Hidratarte ayuda a controlar el hambre.',url:'./nutricion.html#progreso'});
+      avisos.push({id:'agua-'+h,t:horaHoy(ahora,h+':00'),titulo:'💧 Toma un vaso de agua',
+        cuerpo:`Llevas ${Math.round(mlHoy/250)} de ${Math.ceil(agua.meta/250)} vasos hoy.`,url:'./nutricion.html#hoy',
+        acciones:[{action:'vaso',title:'+1 vaso'}]});
+  if(cfg.pausa&&cfg.pausa.activo&&(cfg.pausa.dias||[1,2,3,4,5]).includes(ahora.getDay()))
+    for(let m=cfg.pausa.desde*60;m<=cfg.pausa.hasta*60;m+=Math.max(15,cfg.pausa.cadaMin)){
+      const hhmm=Math.floor(m/60)+':'+String(m%60).padStart(2,'0');
+      avisos.push({id:'pausa-'+hhmm,t:horaHoy(ahora,hhmm),titulo:'🧘 Pausa activa',
+        cuerpo:'Levántate 3 minutos: cuello, hombros y piernas. Toca para la rutina guiada.',url:'./nutricion.html#pausa',
+        acciones:[{action:'pausa',title:'Empezar'}]});
+    }
   if(cfg.pasos&&cfg.pasos.activo)
     avisos.push({id:'pasos',t:horaHoy(ahora,cfg.pasos.hora),titulo:'🚶 ¿Ya caminaste hoy?',cuerpo:'15–20 minutos suman unos 2 000 pasos.',url:'./nutricion.html#progreso'});
   if(cfg.consejo&&cfg.consejo.activo)
@@ -125,8 +141,10 @@ async function revisarRecordatorios(){
   for(const a of avisos){
     const atraso=ahora-a.t;
     // Solo si ya es la hora, no pasaron más de 2 h y no se mostró hoy.
-    if(atraso<0||atraso>2*3600*1000||(ultimo[a.id]||0)>=+a.t)continue;
-    await self.registration.showNotification(a.titulo,{body:a.cuerpo,tag:a.id,icon:'./icon-nutricion.svg',badge:'./icon-nutricion.svg',data:{url:a.url}});
+    // Pausas y agua: ventana corta (no tiene sentido avisar tarde); el resto, 2 h.
+    const ventana=/^(pausa|agua)/.test(a.id)?20*60*1000:2*3600*1000;
+    if(atraso<0||atraso>ventana||(ultimo[a.id]||0)>=+a.t)continue;
+    await self.registration.showNotification(a.titulo,{body:a.cuerpo,tag:a.id.replace(/-.*$/,''),renotify:true,icon:'./icon-nutricion.svg',badge:'./icon-nutricion.svg',data:{url:a.url},actions:a.acciones||[]});
     ultimo[a.id]=Date.now();cambio=true;
   }
   if(cambio)await escribirConfig('./__recordatorios-estado',ultimo);
@@ -139,6 +157,12 @@ self.addEventListener('periodicsync',(event)=>{
 });
 self.addEventListener('notificationclick',(event)=>{
   event.notification.close();
+  if(event.action==='vaso'){
+    // Se anota sin abrir la app; la página lo suma al abrirse.
+    const d=new Date(),f=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+    event.waitUntil(leerConfig('./__agua-pendiente').then(p=>escribirConfig('./__agua-pendiente',{fecha:f,vasos:(p&&p.fecha===f?p.vasos:0)+1})));
+    return;
+  }
   const url=(event.notification.data&&event.notification.data.url)||'./nutricion.html';
   event.waitUntil(self.clients.matchAll({type:'window',includeUncontrolled:true}).then(ventanas=>{
     const v=ventanas.find(w=>w.url.includes('nutricion.html'));

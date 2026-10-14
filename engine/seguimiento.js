@@ -372,14 +372,20 @@ export function generarICS(cfg,consejo=''){
   };
   if(cfg.pesar?.activo){
     const dias=(cfg.pesar.dias||[1]).map(d=>DIAS_ICS[d]).join(',');
-    evento('pesar',cfg.pesar.hora||'07:00','⚖️ Pésate','En ayunas y después de ir al baño. Abre Mi Nutrición para registrar.',
+    evento('pesar',cfg.pesar.hora||'07:00','⚖️ Pésate','En ayunas y después de ir al baño. Abre Mi Bienestar para registrar.',
       dias.split(',').length===7?'FREQ=DAILY':`FREQ=WEEKLY;BYDAY=${dias}`);
   }
   if(cfg.agua?.activo){
     for(let h=cfg.agua.desde??8;h<=(cfg.agua.hasta??20);h+=(cfg.agua.cadaHoras||2))
       evento(`agua-${h}`,`${h}:00`,'💧 Toma un vaso de agua','Mantenerte hidratado ayuda a controlar el hambre.','FREQ=DAILY');
   }
+  if(cfg.pausa?.activo){
+    for(let m=(cfg.pausa.desde??8)*60;m<=(cfg.pausa.hasta??17)*60;m+=Math.max(15,cfg.pausa.cadaMin||60)){
+      const hora=`${Math.floor(m/60)}:${String(m%60).padStart(2,'0')}`;
+      evento(`pausa-${hora.replace(':','')}`,hora,'🧘 Pausa activa','Levántate 3 minutos: estira cuello, hombros y piernas. Abre Mi Bienestar para la rutina guiada.','FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR');
+    }
+  }
   if(cfg.pasos?.activo)evento('pasos',cfg.pasos.hora||'18:00','🚶 ¿Ya caminaste hoy?','Una caminata de 15–20 minutos suma unos 2 000 pasos.','FREQ=DAILY');
-  if(cfg.consejo?.activo)evento('consejo',cfg.consejo.hora||'09:00','💡 Mi Nutrición',consejo||'Revisa tu progreso y tu plan.','FREQ=DAILY');
-  return['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//CRCR Campo//Mi Nutricion//ES','CALSCALE:GREGORIAN',...ev,'END:VCALENDAR'].join('\r\n')+'\r\n';
+  if(cfg.consejo?.activo)evento('consejo',cfg.consejo.hora||'09:00','💡 Mi Bienestar',consejo||'Revisa tu progreso y tu plan.','FREQ=DAILY');
+  return['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//CRCR Campo//Mi Bienestar//ES','CALSCALE:GREGORIAN',...ev,'END:VCALENDAR'].join('\r\n')+'\r\n';
 }

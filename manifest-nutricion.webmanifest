@@ -1,16 +1,35 @@
 {
   "id": "./nutricion.html",
-  "name": "Mi Nutrición",
-  "short_name": "Mi Nutrición",
-  "description": "Escanea alimentos, sigue tu peso y composición corporal, y cocina con porciones a tu medida. Funciona sin internet.",
+  "name": "Mi Bienestar",
+  "short_name": "Mi Bienestar",
+  "description": "Agua, pausas activas, escáner de alimentos, progreso con tu báscula y reloj, y recetas a tu medida. Funciona sin internet.",
   "start_url": "./nutricion.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#0B1220",
-  "theme_color": "#0B1220",
+  "background_color": "#0E1C1B",
+  "theme_color": "#0E1C1B",
   "lang": "es",
   "icons": [
-    {"src": "./icon-nutricion.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable"}
+    {
+      "src": "./icon-nutricion.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "+1 vaso de agua",
+      "url": "./nutricion.html#hoy"
+    },
+    {
+      "name": "Pausa activa",
+      "url": "./nutricion.html#pausa"
+    },
+    {
+      "name": "Escanear",
+      "url": "./nutricion.html#escanear"
+    }
   ]
 }

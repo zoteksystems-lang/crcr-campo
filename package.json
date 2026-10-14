@@ -9,6 +9,7 @@
     "tesseract.js": "7.0.0",
     "@zxing/library": "0.21.3",
     "pdfjs-dist": "4.10.38",
-    "fflate": "0.8.2"
+    "fflate": "0.8.2",
+    "@fontsource-variable/bricolage-grotesque": "5.2.8"
   }
 }

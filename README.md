@@ -15,9 +15,15 @@ dispositivo.
 - `vendor/` — transformers.js + Tesseract.js, vendorizados (no CDN).
 - `models/` — pesos de Whisper-tiny (cuantizado, multilingüe) y el idioma
   español de Tesseract, servidos desde el propio dominio.
-- `nutricion.html` — **Mi Nutrición**, app instalable aparte
-  (`manifest-nutricion.webmanifest`) con 4 pestañas: Escanear, Progreso,
-  Recetas y Plan. Funciona sin internet (solo buscar un código nuevo usa red).
+- `nutricion.html` — **Mi Bienestar**, app de bienestar instalable aparte
+  (`manifest-nutricion.webmanifest`) con 5 pestañas: Hoy, Escanear,
+  Progreso, Recetas y Plan. Funciona sin internet (solo buscar un código
+  nuevo usa red). **Hoy** (`engine/bienestar.js`): vaso de agua con meta
+  según el peso (~35 ml/kg), pausas activas guiadas con temporizador
+  (oficina, activa y express) y resumen del día; recordatorios de agua
+  (con botón "+1 vaso" en la notificación) y de pausas activas en horario
+  laboral. Tipografía Bricolage Grotesque vendorizada (OFL) en
+  `vendor/fonts/`.
   **Progreso** (`engine/seguimiento.js`, `engine/bascula.js`): peso,
   composición corporal y datos del reloj; báscula Bluetooth (Web Bluetooth:
   Xiaomi Mi Scale / Body Composition Scale 2 de Zepp Life y básculas con el

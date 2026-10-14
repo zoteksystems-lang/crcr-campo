@@ -49,54 +49,85 @@ a.back{color:#94A3B8;font-size:11px;text-decoration:none;}
 <div class="wrap"><div class="page">
   <div style="display:flex;justify-content:space-between;align-items:center;">
     <div><div style="font-size:15px;font-weight:800;">🚦 Semáforo Nutricional</div>
-    <div style="font-size:10px;color:#64748B;">Valores de la etiqueta por 100 g / 100 ml — nunca por porción</div></div>
+    <div style="font-size:10px;color:#64748B;">Escanea → mira si es apto para bajar de peso</div></div>
     <a class="back" href="./index.html">← CRCR Campo</a>
   </div>
 
   <div class="card">
-    <div class="lbl">📷 Leer la etiqueta con la cámara</div>
-    <div style="font-size:10px;color:#475569;">Toma la foto de frente, con buena luz y solo la tabla en el cuadro. Se lee en este dispositivo (Tesseract local, sin internet) y llena los campos de abajo. <b>Revisa los números en azul</b> antes de confiar en el resultado.</div>
+    <button class="btn-red" id="btnEscanear" style="font-size:15px;padding:14px;">▦ Escanear código de barras</button>
+    <div id="camara" style="display:none;position:relative;border-radius:8px;overflow:hidden;background:#000;">
+      <video id="video" muted playsinline style="width:100%;display:block;max-height:300px;object-fit:cover;"></video>
+      <div style="position:absolute;left:10%;right:10%;top:42%;height:16%;border:2px solid #DC2626;border-radius:6px;box-shadow:0 0 0 999px rgba(0,0,0,.35);"></div>
+      <button class="btn-gray" id="btnCancelar" style="position:absolute;bottom:8px;right:8px;padding:6px 10px;">Cancelar</button>
+    </div>
     <div style="display:flex;gap:6px;">
-      <label class="btn-red" style="flex:1;text-align:center;cursor:pointer;">📷 Tabla nutricional<input type="file" accept="image/*" capture="environment" id="fotoTabla" style="display:none;"></label>
+      <input id="codigo" inputmode="numeric" placeholder="…o escribe el número del código" style="flex:1;">
+      <button class="btn-blue" id="btnBuscar">Buscar</button>
+      <label class="btn-gray" title="Foto del código" style="cursor:pointer;display:flex;align-items:center;">🖼️<input type="file" accept="image/*" capture="environment" id="fotoCodigo" style="display:none;"></label>
+    </div>
+    <div id="scanStat" class="motor-status" style="display:none;"></div>
+  </div>
+
+  <div class="card" id="prodCard" style="display:none;flex-direction:row;align-items:center;gap:10px;">
+    <img id="prodImg" alt="" style="width:54px;height:54px;object-fit:contain;border-radius:6px;background:#fff;flex-shrink:0;display:none;">
+    <div style="flex:1;min-width:0;">
+      <div id="prodNombre" style="font-size:14px;font-weight:800;"></div>
+      <div id="prodInfo" style="font-size:10px;color:#64748B;"></div>
+    </div>
+  </div>
+
+  <div id="resultado"></div>
+
+  <div class="card" id="macros">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+      <div class="lbl">Macros</div>
+      <div style="display:flex;align-items:center;gap:5px;font-size:10px;color:#64748B;">Mi porción
+        <input id="porcionRef" inputmode="decimal" placeholder="g" style="width:64px;padding:4px 6px;"> <span id="uRef">g</span></div>
+    </div>
+    <div id="macrosBody"></div>
+  </div>
+
+  <div style="display:flex;gap:6px;">
+    <button class="btn-red" id="guardar">💾 Guardar</button>
+    <button class="btn-gray" id="limpiar" style="flex-shrink:0;">Nuevo</button>
+  </div>
+  <div style="font-size:10px;color:#475569;margin-top:-4px;">Guardar lo agrega a la lista para comparar y, si tiene código, a la base de este teléfono: la próxima vez sale al instante y sin internet.</div>
+
+  <div class="card" id="cardOCR">
+    <div class="lbl">📷 ¿No apareció o los datos están mal? Lee la etiqueta</div>
+    <div style="font-size:10px;color:#475569;">Toma la foto de frente, con buena luz y solo la tabla en el cuadro. Se lee en este dispositivo (sin internet) y llena los datos. <b>Revisa los números en azul.</b></div>
+    <div style="display:flex;gap:6px;">
+      <label class="btn-blue" style="flex:1;text-align:center;cursor:pointer;">📷 Tabla nutricional<input type="file" accept="image/*" capture="environment" id="fotoTabla" style="display:none;"></label>
       <label class="btn-gray" style="flex-shrink:0;cursor:pointer;display:flex;align-items:center;">📷 Ingredientes<input type="file" accept="image/*" capture="environment" id="fotoIng" style="display:none;"></label>
     </div>
     <div id="ocrStat" class="motor-status" style="display:none;"></div>
     <details id="ocrCrudo" style="display:none;"><summary style="font-size:10px;color:#64748B;cursor:pointer;">Ver texto leído</summary><pre id="ocrTexto" style="font-size:10px;color:#94A3B8;white-space:pre-wrap;margin-top:4px;"></pre></details>
   </div>
 
-  <div class="card">
-    <div class="lbl">Producto</div>
+  <details class="card" id="cardDatos">
+    <summary class="lbl" style="cursor:pointer;">✏️ Datos del producto (ver o corregir a mano)</summary>
     <input id="nombre" placeholder="Nombre (ej: Yogur griego 0%)">
     <div class="seg" id="segTipo">
       <button data-v="solido" class="on">Sólido · 100 g</button>
       <button data-v="bebida">Bebida · 100 ml</button>
     </div>
     <label class="chk"><input type="checkbox" id="bajarPeso" checked> Modo bajar de peso (criterios más estrictos de azúcar y sal)</label>
-  </div>
-
-  <div class="card">
-    <div class="lbl">Información nutricional <span id="unidad">por 100 g</span></div>
+    <div class="lbl" style="margin-top:4px;">Información nutricional <span id="unidad">por 100 g</span></div>
     <div class="fld"><div class="flbl">¿La etiqueta solo trae "por porción"? Escribe la porción en g/ml y copia los valores tal cual</div>
       <input id="porcion" inputmode="decimal" placeholder="Vacío = los valores ya son por 100 g / 100 ml"></div>
     <div class="g2">
       <div class="fld"><div class="flbl">Energía (kcal)</div><input id="kcal" inputmode="decimal"></div>
+      <div class="fld"><div class="flbl">Proteína (g)</div><input id="proteina" inputmode="decimal"></div>
+      <div class="fld"><div class="flbl">Carbohidratos (g)</div><input id="carbos" inputmode="decimal"></div>
+      <div class="fld"><div class="flbl">Azúcares (g)</div><input id="azucar" inputmode="decimal"></div>
       <div class="fld"><div class="flbl">Grasas totales (g)</div><input id="grasa" inputmode="decimal"></div>
       <div class="fld"><div class="flbl">Grasas saturadas (g)</div><input id="saturada" inputmode="decimal"></div>
-      <div class="fld"><div class="flbl">Azúcares (g)</div><input id="azucar" inputmode="decimal"></div>
       <div class="fld"><div class="flbl"><select id="salModo" style="padding:0;border:none;background:none;font-size:9px;font-weight:700;color:#475569;text-transform:uppercase;width:auto;"><option value="sal">Sal (g)</option><option value="sodio">Sodio (g)</option><option value="sodiomg">Sodio (mg)</option></select></div><input id="sal" inputmode="decimal"></div>
       <div class="fld"><div class="flbl">Fibra (g)</div><input id="fibra" inputmode="decimal"></div>
-      <div class="fld"><div class="flbl">Proteína (g)</div><input id="proteina" inputmode="decimal"></div>
     </div>
     <div class="fld"><div class="flbl">Ingredientes (opcional — detecta azúcares y sal ocultos)</div>
       <textarea id="ingredientes" rows="2" placeholder="Pega o escribe la lista de ingredientes"></textarea></div>
-  </div>
-
-  <div id="resultado"></div>
-
-  <div style="display:flex;gap:6px;">
-    <button class="btn-red" id="guardar">＋ Guardar para comparar</button>
-    <button class="btn-gray" id="limpiar" style="flex-shrink:0;">Limpiar</button>
-  </div>
+  </details>
 
   <div class="card" id="cardLista" style="display:none;">
     <div class="lbl">Comparados (mejor tipo arriba)</div>
@@ -106,7 +137,7 @@ a.back{color:#94A3B8;font-size:11px;text-decoration:none;}
   <details class="card" open>
     <summary class="lbl" style="cursor:pointer;">Guía de compra — Costa Rica</summary>
     <div style="font-size:11px;color:#94A3B8;line-height:1.55;">
-      <p><b style="color:#F1F5F9;">Antes de usarla:</b> en Costa Rica no hay sellos frontales obligatorios. La tabla nutricional suele venir <b>por porción</b> y con el sodio en <b>mg</b>; usa el campo "porción" de arriba y elige "Sodio (mg)". Algunos importados (sobre todo de México) traen octágonos negros ("EXCESO AZÚCARES", "EXCESO SODIO"…), que pueden quedarse puestos. Si un producto trae dos o más, casi siempre sale Tipo C o D.</p>
+      <p><b style="color:#F1F5F9;">Antes de usarla:</b> en Costa Rica no hay sellos frontales obligatorios. La tabla nutricional suele venir <b>por porción</b> y con el sodio en <b>mg</b>; la lectura por foto lo convierte sola; a mano, usa el campo "porción" en Datos del producto y elige "Sodio (mg)". Algunos importados (sobre todo de México) traen octágonos negros ("EXCESO AZÚCARES", "EXCESO SODIO"…), que pueden quedarse puestos. Si un producto trae dos o más, casi siempre sale Tipo C o D.</p>
       <p style="margin-top:6px;"><b style="color:#F1F5F9;">Por pasillo</b> (lo típico; confirma siempre con la etiqueta):</p>
       <p>🥛 <b>Lácteos:</b> yogur natural o griego "sin azúcar añadido" → suele dar A (alto en proteína). Yogures bebibles y de sabores → B–C por azúcar. Leche descremada o semidescremada sin sabor → A; leches saborizadas → C. Quesos frescos y maduros → a menudo C por sal o saturadas: elige cottage o requesón, o porciones pequeñas.</p>
       <p>🍞 <b>Pan y cereales:</b> avena en hojuelas natural → A (mucha fibra, casi sin azúcar). Pan 100% integral con ≥ 6 g de fibra/100 g → B (la sal ronda 1 g). Cereales de caja azucarados, granolas con miel y "pan dulce" → C–D.</p>
@@ -150,105 +181,198 @@ a.back{color:#94A3B8;font-size:11px;text-decoration:none;}
 
 <script type="module">
 import {evaluar,parsearTablaNutricional} from './engine/nutricion.js';
+import {buscarProducto,guardarLocal,normalizarCodigo,codigoValido} from './engine/codigobarras.js';
 
 const $=id=>document.getElementById(id);
-const CAMPOS=['kcal','grasa','saturada','azucar','sal','fibra','proteina'];
+const CAMPOS=['kcal','grasa','saturada','azucar','sal','fibra','proteina','carbos'];
 const CLAVE='crcr-nutricion-comparados';
 let tipo='solido';
+let actual={codigo:'',imagen:'',marca:'',fuente:''}; // producto en pantalla
 
 function leerLista(){try{return JSON.parse(localStorage.getItem(CLAVE))||[];}catch{return[];}}
 function escribirLista(l){try{localStorage.setItem(CLAVE,JSON.stringify(l));}catch{}}
-function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
-function fmt(n){return n===null?'—':String(Math.round(n*100)/100).replace('.',',');}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function fmt(n){return n===null||n===undefined||isNaN(n)?'—':String(Math.round(n*10)/10).replace('.',',');}
+function numero(v){const n=parseFloat(String(v??'').replace(',','.'));return isNaN(n)?null:n;}
+function estado(id,clase,texto){const st=$(id);st.style.display=texto?'flex':'none';st.className='motor-status '+clase;st.textContent=texto;}
 
+// Valores del formulario llevados a 100 g / 100 ml.
 function producto(){
   const p={tipo,ingredientes:$('ingredientes').value};
   for(const c of CAMPOS)p[c]=$(c).value;
   const modo=$('salModo').value;
   if(modo!=='sal'){
-    const v=parseFloat(String(p.sal).replace(',','.'));
-    p.sodio=isNaN(v)?'':(modo==='sodiomg'?v/1000:v);
+    const v=numero(p.sal);
+    p.sodio=v===null?'':(modo==='sodiomg'?v/1000:v);
     p.sal='';
   }
   // Etiquetas por porción (comunes en Costa Rica): se llevan a 100 g / 100 ml.
-  const porcion=parseFloat($('porcion').value.replace(',','.'));
+  const porcion=numero($('porcion').value);
   if(porcion>0){
     for(const c of [...CAMPOS,'sodio']){
-      const v=parseFloat(String(p[c]??'').replace(',','.'));
-      if(!isNaN(v))p[c]=v*100/porcion;
+      const v=numero(p[c]);
+      if(v!==null)p[c]=v*100/porcion;
     }
   }
   return p;
 }
 
 function render(){
-  const r=evaluar(producto(),{bajarPeso:$('bajarPeso').checked});
+  const p=producto();
+  const r=evaluar(p,{bajarPeso:$('bajarPeso').checked});
   const u=tipo==='bebida'?'ml':'g';
-  let h=`<div class="tipo t-${r.color}"><div class="letra">${r.clase||'?'}</div>
-    <div class="tit">${esc(r.titulo)}</div><div class="det">${esc(r.detalle)}</div></div>`;
-  h+=`<div class="card"><div class="lbl">Semáforo por 100 ${u}</div>`;
-  for(const n of Object.values(r.nutrientes)){
-    h+=`<div class="fila"><span class="luz ${n.color||''}"></span><span class="n">${n.nombre}${n.estricto?' <span style="color:#64748B;font-size:10px;">(estricto)</span>':''}</span>
-      <span class="v">${fmt(n.valor)} g</span><span class="p">${n.pctIR===null?'':n.pctIR+'% IR'}</span></div>`;
+  let h=r.clase?`<div class="tipo t-${r.color}">
+    <div style="font-size:22px;font-weight:900;">${esc(r.veredicto)}</div>
+    <div class="tit">Tipo ${r.clase} · ${esc(r.titulo.replace(/^Tipo . — /,''))}</div>
+    <div class="det">${esc(r.detalle)}</div></div>`
+    :`<div class="tipo t-null"><div class="tit">Escanea un producto para saber si es apto para bajar de peso</div></div>`;
+  if(r.clase){
+    h+=`<div class="card"><div class="lbl">Semáforo por 100 ${u}</div>`;
+    for(const n of Object.values(r.nutrientes)){
+      h+=`<div class="fila"><span class="luz ${n.color||''}"></span><span class="n">${n.nombre}${n.estricto?' <span style="color:#64748B;font-size:10px;">(estricto)</span>':''}</span>
+        <span class="v">${fmt(n.valor)} g</span><span class="p">${n.pctIR===null?'':n.pctIR+'% IR'}</span></div>`;
+    }
+    h+='</div>';
+    const msgs=[
+      ...r.alertas.map(a=>`<div class="msg alerta">⚠️ ${esc(a)}</div>`),
+      ...r.positivos.map(a=>`<div class="msg ok">✅ ${esc(a)}</div>`)
+    ];
+    const ing=r.ingredientes;
+    if(ing.azucares.length&&!ing.azucarPrincipal)msgs.push(`<div class="msg info">🍬 Azúcares en ingredientes: ${esc(ing.azucares.join(', '))}</div>`);
+    if(ing.sales.length)msgs.push(`<div class="msg info">🧂 Sal/sodio en ingredientes: ${esc(ing.sales.join(', '))}</div>`);
+    if(actual.nova===4)msgs.push(`<div class="msg alerta">🏭 Ultraprocesado (NOVA 4).</div>`);
+    if(r.faltan.length)msgs.push(`<div class="msg info">Falta: ${esc(r.faltan.join(', '))} — el resultado puede cambiar al completarlo.</div>`);
+    if(msgs.length)h+=`<div class="card">${msgs.join('')}</div>`;
   }
-  if(r.kcal!==null)h+=`<div class="fila"><span class="luz" style="background:none;">🔥</span><span class="n">Energía</span><span class="v">${Math.round(r.kcal)} kcal</span><span class="p">${r.pctKcal}% IR</span></div>`;
-  h+='</div>';
-  const msgs=[
-    ...r.alertas.map(a=>`<div class="msg alerta">⚠️ ${esc(a)}</div>`),
-    ...r.positivos.map(a=>`<div class="msg ok">✅ ${esc(a)}</div>`)
-  ];
-  const ing=r.ingredientes;
-  if(ing.azucares.length&&!ing.azucarPrincipal)msgs.push(`<div class="msg info">🍬 Azúcares en ingredientes: ${esc(ing.azucares.join(', '))}</div>`);
-  if(ing.sales.length)msgs.push(`<div class="msg info">🧂 Sal/sodio en ingredientes: ${esc(ing.sales.join(', '))}</div>`);
-  if(r.clase&&r.faltan.length)msgs.push(`<div class="msg info">Falta: ${esc(r.faltan.join(', '))} — el tipo puede cambiar al completarlo.</div>`);
-  if(msgs.length)h+=`<div class="card">${msgs.join('')}</div>`;
   $('resultado').innerHTML=h;
+  renderMacros(p);
   return r;
 }
 
-function renderLista(){
-  const l=leerLista().sort((a,b)=>(a.clase||'Z').localeCompare(b.clase||'Z')||a.puntos-b.puntos);
-  $('cardLista').style.display=l.length?'flex':'none';
-  $('lista').innerHTML=l.map(it=>`<div class="item">
-    <span class="badge t-${it.color}">${it.clase}</span>
-    <span style="flex:1;">${esc(it.nombre)}<div style="font-size:10px;color:#64748B;">🟢${it.conteo.verdes} 🟡${it.conteo.ambar} 🔴${it.conteo.rojos} · ${it.tipo==='bebida'?'bebida':'sólido'}</div></span>
-    <button class="x" data-id="${it.id}" aria-label="Quitar">✕</button></div>`).join('');
+// Macros estilo MyFitnessPal: por 100 g/ml y por la porción que vas a comer.
+function renderMacros(p){
+  const u=tipo==='bebida'?'ml':'g';
+  $('uRef').textContent=u;
+  const filas=[['🔥 Calorías','kcal','kcal'],['Proteína','proteina','g'],['Carbohidratos','carbos','g'],
+    ['  · azúcares','azucar','g'],['  · fibra','fibra','g'],['Grasa','grasa','g']];
+  const hay=filas.some(([,k])=>numero(p[k])!==null);
+  $('macros').style.display=hay?'flex':'none';
+  if(!hay)return;
+  const porc=numero($('porcionRef').value);
+  let h=`<table><tr><th></th><th style="text-align:right">100 ${u}</th>${porc?`<th style="text-align:right">Porción ${fmt(porc)} ${u}</th>`:''}</tr>`;
+  for(const [nom,k,un] of filas){
+    const v=numero(p[k]);
+    const f=x=>k==='kcal'?Math.round(x):fmt(x);
+    h+=`<tr><td style="white-space:pre">${nom}</td><td style="text-align:right">${v===null?'—':f(v)+' '+un}</td>${porc?`<td style="text-align:right;font-weight:700;color:#F1F5F9">${v===null?'—':f(v*porc/100)+' '+un}</td>`:''}</tr>`;
+  }
+  $('macrosBody').innerHTML=h+'</table>';
 }
 
-$('segTipo').addEventListener('click',e=>{
-  const b=e.target.closest('button');if(!b)return;
-  tipo=b.dataset.v;
-  for(const x of $('segTipo').children)x.classList.toggle('on',x===b);
+function ponerTipo(t){
+  tipo=t==='bebida'?'bebida':'solido';
+  for(const x of $('segTipo').children)x.classList.toggle('on',x.dataset.v===tipo);
   $('unidad').textContent=tipo==='bebida'?'por 100 ml':'por 100 g';
+}
+
+function limpiarFormulario(){
+  for(const c of [...CAMPOS,'nombre','ingredientes','porcion','porcionRef']){$(c).value='';$(c).classList.remove('auto-field');}
+  $('salModo').value='sal';
+  actual={codigo:'',imagen:'',marca:'',fuente:''};
+  $('prodCard').style.display='none';
+}
+
+function mostrarCabecera(){
+  const nombre=$('nombre').value||'Producto sin nombre';
+  $('prodCard').style.display='flex';
+  $('prodNombre').textContent=nombre;
+  $('prodInfo').textContent=[actual.marca,actual.cantidad,actual.codigo&&('Código '+actual.codigo),actual.fuente&&('Datos: '+actual.fuente)].filter(Boolean).join(' · ');
+  $('prodImg').style.display=actual.imagen?'block':'none';
+  if(actual.imagen)$('prodImg').src=actual.imagen;
+}
+
+// Carga en pantalla un producto de la base (valores ya por 100 g/ml).
+function cargarProducto(prod){
+  limpiarFormulario();
+  actual={codigo:prod.codigo,imagen:prod.imagen||'',marca:prod.marca||'',cantidad:prod.cantidad||'',fuente:prod.fuente||'',nova:prod.nova};
+  $('nombre').value=prod.nombre||'';
+  ponerTipo(prod.tipo);
+  for(const c of CAMPOS){const v=prod.datos?.[c];if(v!==undefined&&v!==null)$(c).value=String(Math.round(v*100)/100);}
+  $('ingredientes').value=prod.ingredientes||'';
+  if(prod.porcion)$('porcionRef').value=String(prod.porcion);
+  mostrarCabecera();
   render();
-});
-document.querySelectorAll('input,textarea,select').forEach(el=>el.addEventListener('input',render));
-$('guardar').addEventListener('click',()=>{
-  const r=render();
-  if(!r.clase){alert('Ingresa al menos un nutriente.');return;}
-  const l=leerLista();
-  l.push({id:Date.now(),nombre:$('nombre').value.trim()||'Sin nombre',clase:r.clase,color:r.color,conteo:r.conteo,puntos:r.puntos,tipo:r.tipo});
-  escribirLista(l);renderLista();
-});
-$('limpiar').addEventListener('click',()=>{
-  for(const c of [...CAMPOS,'nombre','ingredientes','porcion']){$(c).value='';$(c).classList.remove('auto-field');}
+  $('resultado').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+async function buscar(codigoCrudo){
+  const codigo=normalizarCodigo(codigoCrudo);
+  if(!codigo){estado('scanStat','','Escribe o escanea un código.');return;}
+  $('codigo').value=codigo;
+  if(!codigoValido(codigo))estado('scanStat','cargando',`⚠️ El código ${codigo} no parece válido (dígito verificador). Busco igual…`);
+  else estado('scanStat','cargando',`🔎 Buscando ${codigo}…`);
+  const {producto:prod,origen,sinRed,parcial}=await buscarProducto(codigo);
+  if(prod){
+    cargarProducto(prod);
+    estado('scanStat','listo',origen==='local'?'✅ Encontrado en este teléfono.':`✅ Encontrado en ${prod.fuente}. Toca Guardar para tenerlo sin internet.`);
+    return;
+  }
+  limpiarFormulario();
+  actual.codigo=codigo;
+  if(parcial){$('nombre').value=parcial.nombre;actual.marca=parcial.marca;}
+  mostrarCabecera();
   render();
+  $('cardDatos').open=true;
+  estado('scanStat','',(sinRed&&!parcial)
+    ?'📴 Sin internet y no está guardado en este teléfono. Toma foto de la tabla nutricional (abajo) y toca Guardar.'
+    :'🤷 Este producto no tiene datos nutricionales en las bases abiertas. Toma foto de la tabla (abajo) y toca Guardar: queda registrado con su código.');
+  $('cardOCR').scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+// --- Escáner ---
+let escaner=null,detener=null;
+async function cargarEscaner(){if(!escaner)escaner=await import('./engine/escaner.js');return escaner;}
+$('btnEscanear').addEventListener('click',async()=>{
+  try{
+    const esc=await cargarEscaner();
+    $('camara').style.display='block';$('btnEscanear').style.display='none';
+    estado('scanStat','cargando','Apunta al código de barras, dentro del recuadro.');
+    detener=await esc.escanear($('video'),cod=>{
+      detener=null;
+      $('camara').style.display='none';$('btnEscanear').style.display='block';
+      navigator.vibrate?.(80);
+      buscar(cod);
+    });
+  }catch(err){
+    $('camara').style.display='none';$('btnEscanear').style.display='block';
+    estado('scanStat','','⚠️ No se pudo abrir la cámara ('+err.message+'). Usa 🖼️ para tomar una foto del código o escribe el número.');
+  }
 });
-$('lista').addEventListener('click',e=>{
-  const b=e.target.closest('button.x');if(!b)return;
-  escribirLista(leerLista().filter(it=>String(it.id)!==b.dataset.id));renderLista();
+$('btnCancelar').addEventListener('click',()=>{
+  detener?.();detener=null;
+  $('camara').style.display='none';$('btnEscanear').style.display='block';estado('scanStat','','');
+});
+$('btnBuscar').addEventListener('click',()=>buscar($('codigo').value));
+$('codigo').addEventListener('keydown',e=>{if(e.key==='Enter')buscar($('codigo').value);});
+$('fotoCodigo').addEventListener('change',async e=>{
+  const file=e.target.files[0];e.target.value='';if(!file)return;
+  estado('scanStat','cargando','🔍 Buscando el código en la foto…');
+  try{
+    const cod=await (await cargarEscaner()).leerDeImagen(file);
+    if(cod)buscar(cod);
+    else estado('scanStat','','⚠️ No encontré un código en la foto. Acércate más, que salga recto y nítido, o escribe el número.');
+  }catch(err){estado('scanStat','','⚠️ '+err.message);}
 });
 
-// --- Lectura por foto (OCR local) ---
+// --- Lectura de la etiqueta por foto (OCR local) ---
 let ocr=null;
 // Escala de grises + contraste + tamaño razonable: Tesseract lee mucho mejor así.
 function prepararImagen(file){
   return new Promise((ok,mal)=>{
     const img=new Image();
     img.onload=()=>{
-      const esc=Math.min(1,2000/Math.max(img.width,img.height));
+      const k=Math.min(1,2000/Math.max(img.width,img.height));
       const c=document.createElement('canvas');
-      c.width=Math.round(img.width*esc);c.height=Math.round(img.height*esc);
+      c.width=Math.round(img.width*k);c.height=Math.round(img.height*k);
       const ctx=c.getContext('2d');
       ctx.filter='grayscale(1) contrast(1.6)';
       ctx.drawImage(img,0,0,c.width,c.height);
@@ -260,9 +384,7 @@ function prepararImagen(file){
   });
 }
 async function leerFoto(file){
-  const st=$('ocrStat');
-  st.style.display='flex';st.className='motor-status cargando';
-  st.textContent='🔍 Leyendo la foto en este dispositivo… (la primera vez tarda más)';
+  estado('ocrStat','cargando','🔍 Leyendo la foto en este dispositivo… (la primera vez tarda más)');
   if(!ocr)ocr=await import('./engine/ocr.js');
   const texto=await ocr.leerTexto(await prepararImagen(file));
   $('ocrTexto').textContent=texto;$('ocrCrudo').style.display='block';
@@ -273,43 +395,83 @@ function marcar(id,valor){
   el.value=String(Math.round(valor*100)/100);
   el.classList.add('auto-field');
 }
-function ponerTipo(t){
-  for(const x of $('segTipo').children)if(x.dataset.v===t)x.click();
-}
 $('fotoTabla').addEventListener('change',async e=>{
   const file=e.target.files[0];e.target.value='';if(!file)return;
-  const st=$('ocrStat');
   try{
     const r=parsearTablaNutricional(await leerFoto(file));
-    for(const c of CAMPOS)$(c).classList.remove('auto-field');
+    for(const c of CAMPOS){$(c).value='';$(c).classList.remove('auto-field');}
     let n=0;
-    for(const c of ['kcal','grasa','saturada','azucar','fibra','proteina'])if(r[c]!==undefined){marcar(c,r[c]);n++;}
+    for(const c of ['kcal','grasa','saturada','azucar','fibra','proteina','carbos'])if(r[c]!==undefined){marcar(c,r[c]);n++;}
     if(r.sal!==undefined){$('salModo').value='sal';marcar('sal',r.sal);n++;}
     else if(r.sodioMg!==undefined){$('salModo').value='sodiomg';marcar('sal',r.sodioMg);n++;}
     $('porcion').value=r.porcion?String(r.porcion):'';
     $('porcion').classList.toggle('auto-field',!!r.porcion);
+    if(r.porcion&&!$('porcionRef').value)$('porcionRef').value=String(r.porcion);
     ponerTipo(r.tipo);
+    actual.fuente='foto de la etiqueta';
+    mostrarCabecera();
     render();
-    st.className=n?'motor-status listo':'motor-status';
-    st.textContent=n
-      ?`✅ Leí ${n} valores ${r.por100?'de la columna por 100':'por porción'+(r.porcion?` (${r.porcion} ${r.tipo==='bebida'?'ml':'g'})`:' — escribe la porción')}. Revisa los campos en azul.`
-      :'⚠️ No pude reconocer la tabla. Prueba otra foto más cerca y derecha, o escribe los valores.';
-  }catch(err){
-    st.className='motor-status';st.textContent='⚠️ Error al leer la foto: '+err.message;
-  }
+    if(n)$('cardDatos').open=true;
+    estado('ocrStat',n?'listo':'',n
+      ?`✅ Leí ${n} valores ${r.por100?'de la columna por 100':'por porción'+(r.porcion?` (${r.porcion} ${r.tipo==='bebida'?'ml':'g'})`:' — escribe la porción')}. Revisa los campos en azul y toca Guardar.`
+      :'⚠️ No pude reconocer la tabla. Prueba otra foto más cerca y derecha, o escribe los valores.');
+    if(n)$('resultado').scrollIntoView({behavior:'smooth',block:'start'});
+  }catch(err){estado('ocrStat','','⚠️ Error al leer la foto: '+err.message);}
 });
 $('fotoIng').addEventListener('change',async e=>{
   const file=e.target.files[0];e.target.value='';if(!file)return;
-  const st=$('ocrStat');
   try{
     const t=await leerFoto(file);
     $('ingredientes').value=t.replace(/\s+/g,' ').trim();
     $('ingredientes').classList.add('auto-field');
     render();
-    st.className='motor-status listo';st.textContent='✅ Ingredientes leídos. Revisa el texto.';
-  }catch(err){
-    st.className='motor-status';st.textContent='⚠️ Error al leer la foto: '+err.message;
+    estado('ocrStat','listo','✅ Ingredientes leídos. Revisa el texto.');
+  }catch(err){estado('ocrStat','','⚠️ Error al leer la foto: '+err.message);}
+});
+
+// --- Guardar / comparar ---
+function renderLista(){
+  const l=leerLista().sort((a,b)=>(a.clase||'Z').localeCompare(b.clase||'Z')||a.puntos-b.puntos);
+  $('cardLista').style.display=l.length?'flex':'none';
+  $('lista').innerHTML=l.map(it=>`<div class="item">
+    <span class="badge t-${it.color}">${it.clase}</span>
+    <span style="flex:1;">${esc(it.nombre)}<div style="font-size:10px;color:#64748B;">🟢${it.conteo.verdes} 🟡${it.conteo.ambar} 🔴${it.conteo.rojos} · ${it.tipo==='bebida'?'bebida':'sólido'}</div></span>
+    <button class="x" data-id="${it.id}" aria-label="Quitar">✕</button></div>`).join('');
+}
+
+$('segTipo').addEventListener('click',e=>{
+  const b=e.target.closest('button');if(!b)return;
+  ponerTipo(b.dataset.v);render();
+});
+document.querySelectorAll('#cardDatos input,#cardDatos textarea,#cardDatos select,#porcionRef').forEach(el=>el.addEventListener('input',()=>{
+  render();
+  if(el.id==='nombre'&&$('prodCard').style.display!=='none')mostrarCabecera();
+}));
+$('guardar').addEventListener('click',()=>{
+  const r=render();
+  if(!r.clase){alert('Primero escanea un producto o ingresa al menos un nutriente.');return;}
+  const nombre=$('nombre').value.trim()||'Sin nombre';
+  const l=leerLista().filter(it=>!actual.codigo||it.codigo!==actual.codigo);
+  l.push({id:Date.now(),codigo:actual.codigo,nombre,clase:r.clase,color:r.color,conteo:r.conteo,puntos:r.puntos,tipo:r.tipo});
+  escribirLista(l);renderLista();
+  if(actual.codigo){
+    const p=producto(),datos={};
+    for(const c of CAMPOS){const v=numero(p[c]);if(v!==null)datos[c]=v;}
+    if(datos.sal===undefined&&r.nutrientes.sal.valor!==null)datos.sal=r.nutrientes.sal.valor;
+    guardarLocal({codigo:actual.codigo,nombre,marca:actual.marca,cantidad:actual.cantidad,imagen:actual.imagen,
+      ingredientes:$('ingredientes').value,porcion:numero($('porcionRef').value),nova:actual.nova,
+      tipo,datos,fuente:actual.fuente&&actual.fuente!=='este teléfono'?actual.fuente+' (guardado)':'este teléfono'});
+    estado('scanStat','listo',`💾 Guardado. La próxima vez que escanees ${actual.codigo} sale al instante, aun sin internet.`);
   }
+});
+$('limpiar').addEventListener('click',()=>{
+  limpiarFormulario();$('codigo').value='';
+  estado('scanStat','','');estado('ocrStat','','');
+  render();window.scrollTo({top:0,behavior:'smooth'});
+});
+$('lista').addEventListener('click',e=>{
+  const b=e.target.closest('button.x');if(!b)return;
+  escribirLista(leerLista().filter(it=>String(it.id)!==b.dataset.id));renderLista();
 });
 render();renderLista();
 </script>

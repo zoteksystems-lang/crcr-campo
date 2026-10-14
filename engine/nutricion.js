@@ -54,10 +54,10 @@ const SALES=['sal','sodio','glutamato','glutamato monosodico','bicarbonato de so
   'citrato de sodio','caldo','extracto de levadura','salsa de soya','salsa de soja'];
 
 export const TIPOS={
-  A:{titulo:'Tipo A — Apto',detalle:'Cumple los parámetros: compra habitual en dieta para bajar de peso.',color:'verde'},
-  B:{titulo:'Tipo B — Permitido con moderación',detalle:'Sin rojos, pero con varios ámbar o alguna alerta de dieta. Porciones controladas.',color:'ambar'},
-  C:{titulo:'Tipo C — Ocasional',detalle:'Un nutriente en rojo. Solo de vez en cuando; mejor buscar alternativa.',color:'naranja'},
-  D:{titulo:'Tipo D — Evitar',detalle:'Dos o más nutrientes en rojo. Busca otra opción.',color:'rojo'}
+  A:{veredicto:'✅ APTO',titulo:'Tipo A — Apto',detalle:'Cumple los parámetros: compra habitual en dieta para bajar de peso.',color:'verde'},
+  B:{veredicto:'🟡 APTO CON MODERACIÓN',titulo:'Tipo B — Permitido con moderación',detalle:'Sin rojos, pero con varios ámbar o alguna alerta de dieta. Porciones controladas.',color:'ambar'},
+  C:{veredicto:'⚠️ NO APTO PARA EL DÍA A DÍA',titulo:'Tipo C — Ocasional',detalle:'Un nutriente en rojo. Solo de vez en cuando; mejor buscar alternativa.',color:'naranja'},
+  D:{veredicto:'❌ NO APTO',titulo:'Tipo D — Evitar',detalle:'Dos o más nutrientes en rojo. Busca otra opción.',color:'rojo'}
 };
 
 function num(v){
@@ -202,6 +202,7 @@ const REGLAS_TABLA=[
   {campo:'azucar',re:/azucar|sugar/},
   {campo:'fibra',re:/fibra|fiber|fibre/},
   {campo:'proteina',re:/protein/},
+  {campo:'carbos',re:/carbohidrat|hidratos de carbono|carbohydrate/},
   {campo:'sodio',re:/sodio|sodium/},
   {campo:'sal',re:/^sal\b|\bsal\b|\bsalt\b/},
   {campo:'kcal',re:/calori|energ|kcal|\bkj\b/}

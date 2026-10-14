@@ -15,12 +15,17 @@ dispositivo.
 - `vendor/` — transformers.js + Tesseract.js, vendorizados (no CDN).
 - `models/` — pesos de Whisper-tiny (cuantizado, multilingüe) y el idioma
   español de Tesseract, servidos desde el propio dominio.
-- `nutricion.html` + `engine/nutricion.js` — semáforo nutricional para
-  alimentos envasados: con los valores por 100 g / 100 ml de la etiqueta
-  marca cada nutriente en verde/ámbar/rojo (umbrales FSA) y clasifica el
-  producto en Tipo A (apto) · B (moderación) · C (ocasional) · D (evitar)
-  para una dieta de bajar de peso. Lee la tabla nutricional con una foto
-  (OCR local) y permite guardar productos y compararlos.
+- `nutricion.html` — escáner de alimentos para bajar de peso (estilo
+  MyFitnessPal): se escanea el código de barras (`engine/escaner.js`, con
+  BarcodeDetector nativo o ZXing vendorizado), se buscan los datos
+  (`engine/codigobarras.js`: memoria del teléfono → Open Food Facts → USDA
+  FoodData Central) y se muestran macros por 100 g y por porción, el
+  semáforo (umbrales FSA) y el veredicto: Tipo A apto · B con moderación ·
+  C no apto para el día a día · D no apto (`engine/nutricion.js`). Si el
+  producto no está en ninguna base, se le toma foto a la tabla nutricional
+  (OCR local) y queda guardado con su código para la próxima vez, aun sin
+  internet. Es la única parte de la app que usa red (solo para buscar
+  códigos nuevos).
 - `sw.js` / `manifest.webmanifest` — Service Worker que precachea todo
   (~70MB la primera vez) para que después funcione sin conexión.
 

@@ -1,7 +1,7 @@
 // Service Worker — precachea TODO (app + motor Whisper + OCR Tesseract) en la
 // primera visita con red, para que después la app funcione 100% sin conexión.
 // Subir la versión de CACHE_NAME cuando se publique una actualización real.
-const CACHE_NAME='crcr-campo-v2';
+const CACHE_NAME='crcr-campo-v3';
 const ARCHIVOS=[
   './',
   './index.html',
@@ -12,10 +12,12 @@ const ARCHIVOS=[
   './manifest.webmanifest',
   './icon.svg',
   './engine/chat.js',
+  './engine/codigobarras.js',
   './engine/despacho.js',
   './engine/diagnostico.js',
   './engine/documentacion.js',
   './engine/entrevista.js',
+  './engine/escaner.js',
   './engine/nutricion.js',
   './engine/ocr.js',
   './engine/store.js',
@@ -29,6 +31,7 @@ const ARCHIVOS=[
   './vendor/tesseract-worker.min.js',
   './vendor/tesseract.esm.min.js',
   './vendor/transformers.min.js',
+  './vendor/zxing.min.js',
   './models/tesseract/spa.traineddata.gz',
   './models/whisper-tiny/added_tokens.json',
   './models/whisper-tiny/config.json',
@@ -61,6 +64,8 @@ self.addEventListener('activate',(event)=>{
 // Cache-first: si ya está descargado, ni se intenta tocar la red.
 self.addEventListener('fetch',(event)=>{
   if(event.request.method!=='GET')return;
+  // APIs externas (Open Food Facts, USDA): siempre a la red, nunca a la caché.
+  if(!event.request.url.startsWith(self.location.origin))return;
   event.respondWith(
     caches.match(event.request).then(cached=>{
       if(cached)return cached;

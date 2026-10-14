@@ -15,7 +15,22 @@ dispositivo.
 - `vendor/` — transformers.js + Tesseract.js, vendorizados (no CDN).
 - `models/` — pesos de Whisper-tiny (cuantizado, multilingüe) y el idioma
   español de Tesseract, servidos desde el propio dominio.
-- `nutricion.html` — escáner de alimentos para bajar de peso (estilo
+- `nutricion.html` — **Mi Nutrición**, app instalable aparte
+  (`manifest-nutricion.webmanifest`) con 4 pestañas: Escanear, Progreso,
+  Recetas y Plan. Funciona sin internet (solo buscar un código nuevo usa red).
+  **Progreso** (`engine/seguimiento.js`, `engine/bascula.js`): peso,
+  composición corporal y datos del reloj; báscula Bluetooth (Web Bluetooth:
+  Xiaomi Mi Scale / Body Composition Scale 2 de Zepp Life y básculas con el
+  estándar Bluetooth, solo Chrome/Android), importación de Zepp Life (ZIP o
+  CSV), Apple Salud (exportar.zip, leído por trozos con fflate), Samsung
+  Health, Garmin, openScale y CSV genéricos, y un Atajo de iPhone que abre
+  `nutricion.html#datos?peso=…&pasos=…`. Gráficos, recomendaciones y
+  recordatorios (notificaciones del Service Worker con Periodic Background
+  Sync donde exista, y archivo .ics para el calendario del teléfono).
+  **Recetas** (`engine/recetas.js`): gramos por porción calculados para las
+  calorías de un tiempo de comida del plan o del perfil, usando los datos de
+  los productos guardados.
+  Escáner de alimentos para bajar de peso (estilo
   MyFitnessPal): se escanea el código de barras (`engine/escaner.js`, con
   BarcodeDetector nativo o ZXing vendorizado), se buscan los datos
   (`engine/codigobarras.js`: memoria del teléfono → Open Food Facts → USDA

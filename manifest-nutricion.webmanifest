@@ -1,0 +1,16 @@
+{
+  "id": "./nutricion.html",
+  "name": "Mi Nutrición",
+  "short_name": "Mi Nutrición",
+  "description": "Escanea alimentos, sigue tu peso y composición corporal, y cocina con porciones a tu medida. Funciona sin internet.",
+  "start_url": "./nutricion.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0B1220",
+  "theme_color": "#0B1220",
+  "lang": "es",
+  "icons": [
+    {"src": "./icon-nutricion.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable"}
+  ]
+}

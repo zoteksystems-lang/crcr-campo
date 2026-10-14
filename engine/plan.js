@@ -277,3 +277,16 @@ export const VEREDICTO_PLAN={
   cuidado:{texto:'🟡 CON CUIDADO EN TU PLAN',color:'ambar'},
   no:{texto:'❌ NO APTO PARA TU PLAN',color:'rojo'}
 };
+
+// ¿Este texto (nombre de alimento/receta) choca con la lista "evitar" del plan?
+// Devuelve el elemento de la lista con el que choca, o null.
+export function chocaConPlan(texto,plan){
+  const t=norm(texto);
+  for(const it of plan?.evitar||[])if(coincide(it,t))return it;
+  return null;
+}
+export function recomendadoPorPlan(texto,plan){
+  const t=norm(texto);
+  for(const it of plan?.preferir||[])if(coincide(it,t))return it;
+  return null;
+}

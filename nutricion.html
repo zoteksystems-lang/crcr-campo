@@ -3,10 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#DC2626">
-<link rel="manifest" href="./manifest.webmanifest">
+<meta name="theme-color" content="#0B1220">
+<link rel="manifest" href="./manifest-nutricion.webmanifest">
+<link rel="icon" href="./icon-nutricion.svg">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Mi Nutrición">
+<link rel="apple-touch-icon" href="./icon-nutricion.svg">
 <link rel="stylesheet" href="./styles.css">
-<title>Semáforo Nutricional</title>
+<title>Mi Nutrición</title>
 <style>
 html,body{overflow:auto;height:auto;}
 .wrap{max-width:560px;margin:0 auto;}
@@ -43,60 +47,95 @@ td.verde{color:#4ADE80;}td.ambar{color:#FBBF24;}td.rojo{color:#F87171;}
 .badge{width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:900;flex-shrink:0;border:1px solid;}
 .x{background:none;color:#64748B;font-size:15px;padding:0 4px;}
 a.back{color:#94A3B8;font-size:11px;text-decoration:none;}
+
+/* --- Mi Nutrición: estilo app --- */
+body{background:#0B1220;font-size:14px;}
+.wrap{padding-bottom:84px;}
+.page{gap:12px;padding:12px 14px 24px;}
+.card{background:#111A2E;border:1px solid #1C2742;border-radius:16px;padding:14px;gap:10px;}
+.lbl{font-size:12px;letter-spacing:.4px;color:#9FB0CC;text-transform:none;font-weight:800;}
+details.card>summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;}
+details.card>summary::after{content:'›';font-size:18px;color:#64748B;transition:transform .2s;}
+details.card[open]>summary::after{transform:rotate(90deg);}
+details.card>summary::-webkit-details-marker{display:none;}
+input,select,textarea{font-size:15px;padding:10px 12px;border-radius:10px;background:#0E1626;border-color:#22304D;}
+.flbl{font-size:11px;color:#7A8BA8;text-transform:none;font-weight:600;}
+.btn-pri{background:#10B981;color:#04130D;border-radius:12px;padding:13px;font-size:15px;font-weight:800;width:100%;}
+.btn-blue{border-radius:12px;padding:11px 14px;font-size:14px;}
+.btn-gray{border-radius:12px;padding:11px 14px;font-size:14px;}
+.top{display:flex;align-items:center;gap:10px;padding:14px 14px 4px;max-width:560px;margin:0 auto;}
+.logo{width:40px;height:40px;border-radius:12px;background:#10B981;display:flex;align-items:center;justify-content:center;font-size:22px;}
+.app-t{font-size:18px;font-weight:900;}
+.app-s{font-size:12px;color:#7A8BA8;}
+.pill{font-size:11px;padding:4px 9px;border-radius:20px;background:#1C2742;color:#9FB0CC;white-space:nowrap;}
+.pill.on{color:#4ADE80;}
+.tab[hidden]{display:none!important;}
+.tab{display:flex;flex-direction:column;gap:12px;}
+nav.tabs{position:fixed;left:0;right:0;bottom:0;display:flex;background:rgba(11,18,32,.96);backdrop-filter:blur(8px);border-top:1px solid #1C2742;padding:6px 6px calc(6px + env(safe-area-inset-bottom));z-index:10;}
+nav.tabs button{flex:1;background:none;color:#7A8BA8;font-size:11px;font-weight:700;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0;border-radius:12px;}
+nav.tabs button span{font-size:20px;line-height:1.1;}
+nav.tabs button.on{color:#F1F5F9;background:#1C2742;}
+.tipo{border-radius:16px;padding:18px 14px;}
+.msg{font-size:13px;padding:9px 11px;border-radius:10px;line-height:1.4;}
+.fila{font-size:14px;padding:8px 0;}
+.fila .p{font-size:11px;}
+table{font-size:12px;}
+.nota,.ayuda{font-size:12px;color:#7A8BA8;line-height:1.5;}
+.ayuda p{margin-bottom:8px;}
+.ayuda code{font-size:10px;word-break:break-all;color:#9FB0CC;}
+.motor-status{font-size:12px;}
+.hero{text-align:center;padding:18px;}
+.hero .big{font-size:40px;font-weight:900;letter-spacing:-1px;}
+.hero .sub{font-size:13px;color:#9FB0CC;}
+.barra{height:8px;border-radius:8px;background:#1C2742;overflow:hidden;margin-top:6px;}
+.barra>div{height:100%;background:#10B981;border-radius:8px;}
+.acciones{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.accion{background:#111A2E;border:1px solid #1C2742;border-radius:16px;padding:14px 4px;color:#E2E8F0;font-size:13px;font-weight:700;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;}
+.accion span{font-size:24px;}
+.chips{display:flex;gap:6px;overflow-x:auto;}
+.chips button{background:#0E1626;border:1px solid #22304D;color:#9FB0CC;border-radius:20px;padding:7px 13px;font-size:13px;font-weight:700;white-space:nowrap;}
+.chips button.on{background:#10B981;border-color:#10B981;color:#04130D;}
+.mini{width:52px;padding:6px 8px;font-size:14px;display:inline-block;}
+.hora{width:auto;padding:6px 8px;font-size:14px;display:inline-block;}
+.dias{display:flex;gap:4px;padding-left:24px;}
+.dias button{width:32px;height:32px;border-radius:50%;background:#0E1626;border:1px solid #22304D;color:#7A8BA8;font-size:12px;font-weight:800;}
+.dias button.on{background:#10B981;border-color:#10B981;color:#04130D;}
+.rec{display:flex;gap:9px;font-size:13px;line-height:1.45;padding:8px 0;border-bottom:1px solid #1C2742;color:#CBD5E1;}
+.rec:last-child{border-bottom:none;}
+.chart{position:relative;}
+.chart svg{width:100%;height:auto;display:block;overflow:visible;}
+.tip{position:absolute;pointer-events:none;background:#0B1220;border:1px solid #2A3A5C;border-radius:8px;padding:6px 8px;font-size:12px;color:#F1F5F9;white-space:nowrap;transform:translate(-50%,-110%);display:none;z-index:2;}
+.leyenda{display:flex;gap:14px;font-size:11px;color:#9FB0CC;}
+.leyenda i{display:inline-block;width:14px;height:2px;background:#3987E5;vertical-align:middle;margin-right:5px;}
+.leyenda b{display:inline-block;width:8px;height:8px;border-radius:50%;background:#64748B;vertical-align:middle;margin-right:5px;}
+.vacio{font-size:13px;color:#64748B;text-align:center;padding:18px 0;}
+.receta{display:flex;flex-direction:column;gap:8px;}
+.receta h3{font-size:16px;font-weight:800;}
+.tags{display:flex;gap:6px;flex-wrap:wrap;}
+.tag{font-size:11px;font-weight:700;padding:3px 8px;border-radius:20px;background:#1C2742;color:#9FB0CC;}
+.tag.ok{background:#052E16;color:#4ADE80;}.tag.no{background:#2D0A0A;color:#F87171;}
+.macros4{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;text-align:center;}
+.macros4 div{background:#0E1626;border-radius:10px;padding:7px 2px;font-size:11px;color:#7A8BA8;}
+.macros4 b{display:block;font-size:16px;color:#F1F5F9;}
+.ing{display:flex;justify-content:space-between;gap:8px;font-size:14px;padding:6px 0;border-bottom:1px solid #1C2742;}
+.ing:last-child{border-bottom:none;}
+.ing .g{font-weight:800;white-space:nowrap;}
+details.receta>summary::after{content:'Ver ingredientes y preparación ›';display:block;margin-top:8px;font-size:13px;font-weight:700;color:#10B981;transform:none!important;}
+details.receta[open]>summary::after{content:'Ocultar ‹';}
+ol.pasos{padding-left:20px;font-size:13px;color:#CBD5E1;line-height:1.5;}
 </style>
 </head>
 <body>
 <div class="wrap"><div class="page">
-  <div style="display:flex;justify-content:space-between;align-items:center;">
-    <div><div style="font-size:15px;font-weight:800;">🚦 Semáforo Nutricional</div>
-    <div style="font-size:10px;color:#64748B;">Escanea → mira si es apto para bajar de peso</div></div>
-    <a class="back" href="./index.html">← CRCR Campo</a>
-  </div>
+<header class="top">
+  <div class="logo">🥗</div>
+  <div style="flex:1;min-width:0;"><div class="app-t">Mi Nutrición</div><div class="app-s" id="subtitulo">Escanea, mide y cocina para tu meta</div></div>
+  <span id="redEstado" class="pill">● sin conexión</span>
+</header>
 
-  <div class="card" id="planCard">
-    <div style="display:flex;align-items:center;gap:8px;">
-      <div style="flex:1;min-width:0;">
-        <div class="lbl">🎯 Mi plan de nutrición</div>
-        <div id="planResumen" style="font-size:11px;color:#94A3B8;margin-top:2px;"></div>
-      </div>
-      <button class="btn-blue" id="btnPlan" style="flex-shrink:0;padding:7px 10px;">Cargar plan</button>
-    </div>
-    <label class="chk" id="usarPlanFila" style="display:none;"><input type="checkbox" id="usarPlan" checked> Juzgar los productos según mi plan</label>
-    <div id="planEditor" style="display:none;flex-direction:column;gap:7px;">
-      <div style="font-size:10px;color:#475569;">Sube el plan que te dio tu nutricionista (PDF, fotos o texto) y reviso cada producto contra él. También puedes llenarlo a mano: tu propio plan personalizado. Todo queda solo en este teléfono.</div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;">
-        <label class="btn-blue" style="flex:1;text-align:center;cursor:pointer;">📄 PDF o texto<input type="file" accept=".pdf,.txt,application/pdf,text/plain" id="planArchivo" style="display:none;"></label>
-        <label class="btn-blue" style="flex:1;text-align:center;cursor:pointer;">📷 Fotos del plan<input type="file" accept="image/*" multiple id="planFotos" style="display:none;"></label>
-      </div>
-      <textarea id="planTexto" rows="3" placeholder="…o pega aquí el texto del plan"></textarea>
-      <button class="btn-gray" id="btnAnalizarPlan">Analizar texto</button>
-      <div id="planStat" class="motor-status" style="display:none;"></div>
-      <div class="lbl" style="margin-top:4px;">Metas del día (revisa y corrige)</div>
-      <div class="g2">
-        <div class="fld"><div class="flbl">Calorías (kcal/día)</div><input id="pl-kcal" inputmode="numeric"></div>
-        <div class="fld"><div class="flbl">Tiempos de comida</div><input id="pl-comidas" inputmode="numeric" placeholder="ej: 5"></div>
-        <div class="fld"><div class="flbl">Proteína (g/día)</div><input id="pl-proteina" inputmode="numeric"></div>
-        <div class="fld"><div class="flbl">Carbohidratos (g/día)</div><input id="pl-carbos" inputmode="numeric"></div>
-        <div class="fld"><div class="flbl">Grasa (g/día)</div><input id="pl-grasa" inputmode="numeric"></div>
-        <div class="fld"><div class="flbl">Fibra (g/día)</div><input id="pl-fibra" inputmode="numeric"></div>
-        <div class="fld"><div class="flbl">Azúcar máx. (g/día)</div><input id="pl-azucarMax" inputmode="decimal"></div>
-        <div class="fld"><div class="flbl">Sal máx. (g/día)</div><input id="pl-salMax" inputmode="decimal" placeholder="sodio mg × 2,5 ÷ 1000"></div>
-      </div>
-      <div class="lbl" style="margin-top:4px;">Condiciones</div>
-      <div id="pl-condiciones" style="display:grid;grid-template-columns:1fr 1fr;gap:4px;"></div>
-      <div class="fld"><div class="flbl">Mi plan dice evitar (separado por comas)</div><textarea id="pl-evitar" rows="2" placeholder="gaseosas, embutidos, galletas…"></textarea></div>
-      <div class="fld"><div class="flbl">Mi plan recomienda (separado por comas)</div><textarea id="pl-preferir" rows="2" placeholder="avena, yogurt griego, atún en agua…"></textarea></div>
-      <div style="display:flex;gap:6px;">
-        <button class="btn-red" id="btnGuardarPlan">Guardar mi plan</button>
-        <button class="btn-gray" id="btnBorrarPlan" style="flex-shrink:0;">Borrar</button>
-        <button class="btn-gray" id="btnCerrarPlan" style="flex-shrink:0;">Cerrar</button>
-      </div>
-      <div style="font-size:10px;color:#475569;">Esta herramienta te ayuda a aplicar tu plan en el súper; ante cualquier duda manda lo que diga tu nutricionista.</div>
-    </div>
-  </div>
-
+<section class="tab" id="tab-escanear">
   <div class="card">
-    <button class="btn-red" id="btnEscanear" style="font-size:15px;padding:14px;">▦ Escanear código de barras</button>
+    <button class="btn-pri" id="btnEscanear" style="font-size:15px;padding:14px;">▦ Escanear código de barras</button>
     <div id="camara" style="display:none;position:relative;border-radius:8px;overflow:hidden;background:#000;">
       <video id="video" muted playsinline style="width:100%;display:block;max-height:300px;object-fit:cover;"></video>
       <div style="position:absolute;left:10%;right:10%;top:42%;height:16%;border:2px solid #DC2626;border-radius:6px;box-shadow:0 0 0 999px rgba(0,0,0,.35);"></div>
@@ -130,7 +169,7 @@ a.back{color:#94A3B8;font-size:11px;text-decoration:none;}
   </div>
 
   <div style="display:flex;gap:6px;">
-    <button class="btn-red" id="guardar">💾 Guardar</button>
+    <button class="btn-pri" id="guardar">💾 Guardar</button>
     <button class="btn-gray" id="limpiar" style="flex-shrink:0;">Nuevo</button>
   </div>
   <div style="font-size:10px;color:#475569;margin-top:-4px;">Guardar lo agrega a la lista para comparar y, si tiene código, a la base de este teléfono: la próxima vez sale al instante y sin internet.</div>
@@ -172,8 +211,142 @@ a.back{color:#94A3B8;font-size:11px;text-decoration:none;}
   </details>
 
   <div class="card" id="cardLista" style="display:none;">
-    <div class="lbl">Comparados (mejor tipo arriba)</div>
+    <div class="lbl">🛒 Mis productos (los mejores arriba)</div><div class="nota">Las recetas usan los datos de estos productos.</div>
     <div id="lista"></div>
+  </div>
+
+</section>
+
+<section class="tab" id="tab-progreso" hidden>
+  <div class="card hero" id="heroPeso"></div>
+
+  <div class="acciones">
+    <button class="accion" id="btnBascula"><span>⚖️</span>Báscula</button>
+    <button class="accion" id="btnRegistrar"><span>✏️</span>Registrar</button>
+    <label class="accion"><span>⬆️</span>Importar<input type="file" id="importar" multiple accept=".csv,.zip,.xml,.txt,text/csv,application/zip,text/xml" style="display:none;"></label>
+  </div>
+  <div id="segStat" class="motor-status" style="display:none;"></div>
+
+  <div class="card" id="cardRegistro" hidden>
+    <div class="lbl">Registrar medición</div>
+    <div class="g2">
+      <div class="fld"><div class="flbl">Fecha</div><input id="m-fecha" type="date"></div>
+      <div class="fld"><div class="flbl">Peso (kg)</div><input id="m-peso" inputmode="decimal"></div>
+      <div class="fld"><div class="flbl">Grasa (%)</div><input id="m-grasa" inputmode="decimal"></div>
+      <div class="fld"><div class="flbl">Músculo (kg)</div><input id="m-musculo" inputmode="decimal"></div>
+      <div class="fld"><div class="flbl">Agua (%)</div><input id="m-agua" inputmode="decimal"></div>
+      <div class="fld"><div class="flbl">Grasa visceral</div><input id="m-visceral" inputmode="decimal"></div>
+      <div class="fld"><div class="flbl">Cintura (cm)</div><input id="m-cintura" inputmode="decimal"></div>
+      <div class="fld"><div class="flbl">Pasos</div><input id="m-pasos" inputmode="numeric"></div>
+      <div class="fld"><div class="flbl">Sueño (h)</div><input id="m-sueno" inputmode="decimal"></div>
+      <div class="fld"><div class="flbl">FC reposo (lpm)</div><input id="m-fcReposo" inputmode="numeric"></div>
+    </div>
+    <div class="flbl">Copia los números que te muestra Zepp Life (u otra app de tu báscula) o tu reloj.</div>
+    <button class="btn-pri" id="btnGuardarMedicion">Guardar medición</button>
+  </div>
+
+  <div class="card" id="cardRecs"><div class="lbl">Recomendaciones para ti</div><div id="recs"></div></div>
+
+  <div class="card"><div class="lbl">Peso</div><div class="chart" id="chPeso"></div></div>
+  <div class="card" id="cardGrasa"><div class="lbl">Grasa corporal</div><div class="chart" id="chGrasa"></div></div>
+  <div class="card" id="cardPasos"><div class="lbl">Pasos (últimos 14 días)</div><div class="chart" id="chPasos"></div></div>
+
+  <details class="card">
+    <summary class="lbl">🔔 Recordatorios</summary>
+    <label class="chk"><input type="checkbox" id="r-pesar"> ⚖️ Pesarme a las <input id="r-pesarHora" type="time" value="07:00" class="hora"></label>
+    <div class="dias" id="r-dias"></div>
+    <label class="chk"><input type="checkbox" id="r-agua"> 💧 Agua cada <input id="r-aguaCada" inputmode="numeric" value="2" class="mini"> h, de <input id="r-aguaDesde" inputmode="numeric" value="8" class="mini"> a <input id="r-aguaHasta" inputmode="numeric" value="20" class="mini"> h</label>
+    <label class="chk"><input type="checkbox" id="r-pasos"> 🚶 Caminar a las <input id="r-pasosHora" type="time" value="18:00" class="hora"></label>
+    <label class="chk"><input type="checkbox" id="r-consejo"> 💡 Consejo del día a las <input id="r-consejoHora" type="time" value="09:00" class="hora"></label>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <button class="btn-pri" id="btnNotif" style="flex:1;">🔔 Activar avisos</button>
+      <button class="btn-gray" id="btnICS" style="flex:1;">📅 Al calendario</button>
+    </div>
+    <div class="nota">Los avisos de la app salen sin internet mientras la app esté abierta o instalada (Android). Para que te avisen <b>siempre</b>, aunque la app esté cerrada (también en iPhone), usa <b>📅 Al calendario</b>: tu calendario hace los recordatorios.</div>
+    <div id="notifStat" class="motor-status" style="display:none;"></div>
+  </details>
+
+  <details class="card">
+    <summary class="lbl">👤 Mi perfil</summary>
+    <div class="g2">
+      <div class="fld"><div class="flbl">Sexo</div><select id="p-sexo"><option value="">—</option><option value="m">Mujer</option><option value="h">Hombre</option></select></div>
+      <div class="fld"><div class="flbl">Edad</div><input id="p-edad" inputmode="numeric"></div>
+      <div class="fld"><div class="flbl">Estatura (cm)</div><input id="p-estatura" inputmode="numeric"></div>
+      <div class="fld"><div class="flbl">Peso meta (kg)</div><input id="p-meta" inputmode="decimal"></div>
+    </div>
+  </details>
+
+  <details class="card">
+    <summary class="lbl">🔗 Conectar Zepp Life, reloj y otras apps</summary>
+    <div class="ayuda">
+      <p><b>Báscula por Bluetooth</b> (Android con Chrome): toca ⚖️ Báscula, elige tu báscula y súbete descalzo. Funciona con Xiaomi Mi Scale / Body Composition Scale 2 (las de Zepp Life) y básculas con Bluetooth estándar. <b>Cierra Zepp Life antes</b>: si está abierta, se queda con la báscula.</p>
+      <p><b>Zepp Life:</b> en la web de privacidad de Zepp/Huami pide "Exportar datos"; te llega un ZIP con BODY, ACTIVITY y SLEEP en CSV. Súbelo con ⬆️ Importar (si el ZIP trae contraseña, descomprímelo y sube los CSV).</p>
+      <p><b>iPhone / Apple Watch (Apple Salud):</b> Salud → tu foto → <i>Exportar todos los datos de salud</i> → guarda el ZIP en Archivos y súbelo con ⬆️ Importar. Si Zepp Life está conectada a Salud, también trae tu báscula.</p>
+      <p><b>Atajo diario (iPhone, sin exportar):</b> crea un Atajo que busque en Salud tu último peso, % de grasa, pasos de hoy, energía activa y horas de sueño, y que abra esta dirección con los valores:<br><code id="urlAtajo"></code><br>Ponlo en una automatización diaria y tus datos llegan solos.</p>
+      <p><b>Samsung Health / Galaxy Watch:</b> Ajustes → Descargar datos personales; sube los CSV de peso, pasos y sueño. <b>Garmin:</b> Garmin Connect → Peso → Exportar CSV. <b>Fitbit, Amazfit, Huawei y otras:</b> sus CSV o la app <i>openScale</i> (lee muchas básculas por Bluetooth y exporta CSV). En Android, <i>Health Sync</i> exporta Health Connect a CSV.</p>
+      <p>Todo se guarda solo en este teléfono.</p>
+    </div>
+  </details>
+
+  <details class="card" id="cardHistorial">
+    <summary class="lbl">📋 Historial</summary>
+    <div id="historial"></div>
+  </details>
+</section>
+
+<section class="tab" id="tab-recetas" hidden>
+  <div class="card">
+    <div class="lbl">Recetas a tu medida</div>
+    <div class="nota" id="recetasNota"></div>
+    <div class="chips" id="chipsComida">
+      <button data-c="" class="on">Todas</button><button data-c="desayuno">Desayuno</button><button data-c="almuerzo">Almuerzo</button><button data-c="merienda">Merienda</button><button data-c="cena">Cena</button>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:#CBD5E1;">Porción de <input id="kcalReceta" inputmode="numeric" class="mini" style="width:70px;"> kcal</div>
+  </div>
+  <div id="listaRecetas"></div>
+</section>
+
+<section class="tab" id="tab-plan" hidden>
+  <div class="card" id="planCard">
+    <div style="display:flex;align-items:center;gap:8px;">
+      <div style="flex:1;min-width:0;">
+        <div class="lbl">🎯 Mi plan de nutrición</div>
+        <div id="planResumen" style="font-size:11px;color:#94A3B8;margin-top:2px;"></div>
+      </div>
+      <button class="btn-blue" id="btnPlan" style="flex-shrink:0;padding:7px 10px;">Cargar plan</button>
+    </div>
+    <label class="chk" id="usarPlanFila" style="display:none;"><input type="checkbox" id="usarPlan" checked> Juzgar los productos según mi plan</label>
+    <div id="planEditor" style="display:none;flex-direction:column;gap:7px;">
+      <div style="font-size:10px;color:#475569;">Sube el plan que te dio tu nutricionista (PDF, fotos o texto) y reviso cada producto contra él. También puedes llenarlo a mano: tu propio plan personalizado. Todo queda solo en este teléfono.</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <label class="btn-blue" style="flex:1;text-align:center;cursor:pointer;">📄 PDF o texto<input type="file" accept=".pdf,.txt,application/pdf,text/plain" id="planArchivo" style="display:none;"></label>
+        <label class="btn-blue" style="flex:1;text-align:center;cursor:pointer;">📷 Fotos del plan<input type="file" accept="image/*" multiple id="planFotos" style="display:none;"></label>
+      </div>
+      <textarea id="planTexto" rows="3" placeholder="…o pega aquí el texto del plan"></textarea>
+      <button class="btn-gray" id="btnAnalizarPlan">Analizar texto</button>
+      <div id="planStat" class="motor-status" style="display:none;"></div>
+      <div class="lbl" style="margin-top:4px;">Metas del día (revisa y corrige)</div>
+      <div class="g2">
+        <div class="fld"><div class="flbl">Calorías (kcal/día)</div><input id="pl-kcal" inputmode="numeric"></div>
+        <div class="fld"><div class="flbl">Tiempos de comida</div><input id="pl-comidas" inputmode="numeric" placeholder="ej: 5"></div>
+        <div class="fld"><div class="flbl">Proteína (g/día)</div><input id="pl-proteina" inputmode="numeric"></div>
+        <div class="fld"><div class="flbl">Carbohidratos (g/día)</div><input id="pl-carbos" inputmode="numeric"></div>
+        <div class="fld"><div class="flbl">Grasa (g/día)</div><input id="pl-grasa" inputmode="numeric"></div>
+        <div class="fld"><div class="flbl">Fibra (g/día)</div><input id="pl-fibra" inputmode="numeric"></div>
+        <div class="fld"><div class="flbl">Azúcar máx. (g/día)</div><input id="pl-azucarMax" inputmode="decimal"></div>
+        <div class="fld"><div class="flbl">Sal máx. (g/día)</div><input id="pl-salMax" inputmode="decimal" placeholder="sodio mg × 2,5 ÷ 1000"></div>
+      </div>
+      <div class="lbl" style="margin-top:4px;">Condiciones</div>
+      <div id="pl-condiciones" style="display:grid;grid-template-columns:1fr 1fr;gap:4px;"></div>
+      <div class="fld"><div class="flbl">Mi plan dice evitar (separado por comas)</div><textarea id="pl-evitar" rows="2" placeholder="gaseosas, embutidos, galletas…"></textarea></div>
+      <div class="fld"><div class="flbl">Mi plan recomienda (separado por comas)</div><textarea id="pl-preferir" rows="2" placeholder="avena, yogurt griego, atún en agua…"></textarea></div>
+      <div style="display:flex;gap:6px;">
+        <button class="btn-pri" id="btnGuardarPlan">Guardar mi plan</button>
+        <button class="btn-gray" id="btnBorrarPlan" style="flex-shrink:0;">Borrar</button>
+        <button class="btn-gray" id="btnCerrarPlan" style="flex-shrink:0;">Cerrar</button>
+      </div>
+      <div style="font-size:10px;color:#475569;">Esta herramienta te ayuda a aplicar tu plan en el súper; ante cualquier duda manda lo que diga tu nutricionista.</div>
+    </div>
   </div>
 
   <details class="card" open>
@@ -219,12 +392,21 @@ a.back{color:#94A3B8;font-size:11px;text-decoration:none;}
     </table>
     <div style="font-size:10px;color:#64748B;">% IR = % de la ingesta de referencia diaria (2000 kcal · 70 g grasa · 20 g saturadas · 90 g azúcares · 6 g sal). Sal = sodio × 2,5.</div>
   </div>
+</section>
 </div></div>
+<nav class="tabs">
+  <button data-tab="escanear" class="on"><span>▦</span>Escanear</button>
+  <button data-tab="progreso"><span>📈</span>Progreso</button>
+  <button data-tab="recetas"><span>🍳</span>Recetas</button>
+  <button data-tab="plan"><span>🎯</span>Plan</button>
+</nav>
 
 <script type="module">
 import {evaluar,parsearTablaNutricional} from './engine/nutricion.js';
 import {buscarProducto,guardarLocal,normalizarCodigo,codigoValido} from './engine/codigobarras.js';
 import {parsearPlan,evaluarConPlan,leerPlan,guardarPlan,borrarPlan,resumenPlan,CONDICIONES,VEREDICTO_PLAN} from './engine/plan.js';
+import * as seg from './engine/seguimiento.js';
+import {sugerirRecetas} from './engine/recetas.js';
 
 const $=id=>document.getElementById(id);
 const CAMPOS=['kcal','grasa','saturada','azucar','sal','fibra','proteina','carbos'];
@@ -513,8 +695,12 @@ $('guardar').addEventListener('click',()=>{
   if(!r.clase){alert('Primero escanea un producto o ingresa al menos un nutriente.');return;}
   const nombre=$('nombre').value.trim()||'Sin nombre';
   const l=leerLista().filter(it=>!actual.codigo||it.codigo!==actual.codigo);
-  l.push({id:Date.now(),codigo:actual.codigo,nombre,clase:r.clase,color:r.color,conteo:r.conteo,puntos:r.puntos,tipo:r.tipo});
+  const p100=producto(),datos100={};
+  for(const c of CAMPOS){const v=numero(p100[c]);if(v!==null)datos100[c]=v;}
+  if(r.nutrientes.sal.valor!==null)datos100.sal=r.nutrientes.sal.valor;
+  l.push({id:Date.now(),codigo:actual.codigo,nombre,clase:r.clase,color:r.color,conteo:r.conteo,puntos:r.puntos,tipo:r.tipo,datos:datos100});
   escribirLista(l);renderLista();
+  pintarRecetas();
   if(actual.codigo){
     const p=producto(),datos={};
     for(const c of CAMPOS){const v=numero(p[c]);if(v!==null)datos[c]=v;}
@@ -532,7 +718,7 @@ $('limpiar').addEventListener('click',()=>{
 });
 $('lista').addEventListener('click',e=>{
   const b=e.target.closest('button.x');if(!b)return;
-  escribirLista(leerLista().filter(it=>String(it.id)!==b.dataset.id));renderLista();
+  escribirLista(leerLista().filter(it=>String(it.id)!==b.dataset.id));renderLista();pintarRecetas();
 });
 
 // --- Mi plan de nutrición ---
@@ -622,7 +808,7 @@ $('btnGuardarPlan').addEventListener('click',()=>{
   }
   p.guardado=Date.now();
   guardarPlan(p);$('usarPlan').checked=true;
-  mostrarPlan();$('planEditor').style.display='none';render();
+  mostrarPlan();$('planEditor').style.display='none';render();pintarRecetas();
 });
 $('btnBorrarPlan').addEventListener('click',()=>{
   if(!confirm('¿Borrar tu plan de este teléfono?'))return;
@@ -631,6 +817,401 @@ $('btnBorrarPlan').addEventListener('click',()=>{
 });
 $('usarPlan').addEventListener('change',render);
 mostrarPlan();
+
+// =================== Pestañas ===================
+const TABS=['escanear','progreso','recetas','plan'];
+function irA(tab){
+  if(!TABS.includes(tab))tab='escanear';
+  for(const t of TABS)$('tab-'+t).hidden=t!==tab;
+  for(const b of document.querySelectorAll('nav.tabs button'))b.classList.toggle('on',b.dataset.tab===tab);
+  if(tab==='progreso')pintarProgreso();
+  if(tab==='recetas')pintarRecetas();
+  window.scrollTo({top:0});
+  try{localStorage.setItem('crcr-nutricion-tab',tab);}catch{}
+}
+document.querySelector('nav.tabs').addEventListener('click',e=>{const b=e.target.closest('button');if(b)irA(b.dataset.tab);});
+
+// Indicador de red (todo funciona sin ella, salvo buscar códigos nuevos).
+function pintarRed(){
+  const on=navigator.onLine;
+  $('redEstado').textContent=on?'● en línea':'● sin internet';
+  $('redEstado').classList.toggle('on',on);
+}
+addEventListener('online',pintarRed);addEventListener('offline',pintarRed);pintarRed();
+
+// =================== Progreso ===================
+const fmt1=(v,d=1)=>v===null||v===undefined?'—':Number(v).toFixed(d).replace('.',',');
+function perfil(){return seg.leerPerfil();}
+
+function pintarHero(med){
+  const t=seg.tendencia(med,'peso');
+  const h=$('heroPeso');
+  if(!t.length){h.innerHTML=`<div class="lbl">Tu progreso</div><div class="vacio">Aún no hay mediciones.<br>Conecta tu báscula, registra tu peso o importa tus datos.</div>`;return;}
+  const ult=t[t.length-1],pf=perfil();
+  const hace=(dias)=>{const t0=new Date(ult.fecha)-dias*864e5;return [...t].reverse().find(p=>new Date(p.fecha)<=t0);};
+  const s7=hace(7),s30=hace(30),ini=t[0];
+  const delta=(a)=>a?`${ult.media-a.media>0?'+':''}${fmt1(ult.media-a.media)} kg`:'—';
+  let meta='';
+  if(pf.meta){
+    const total=ini.media-pf.meta,hecho=ini.media-ult.media;
+    const pct=total>0?Math.max(0,Math.min(100,hecho/total*100)):0;
+    meta=`<div class="sub" style="margin-top:10px;">Meta ${fmt1(pf.meta)} kg · faltan ${fmt1(Math.max(0,ult.media-pf.meta))} kg</div><div class="barra"><div style="width:${pct}%"></div></div>`;
+  }
+  const ultimoDe=k=>[...med].reverse().find(f=>f[k]!==undefined)?.[k];
+  const comp=[['grasa','% grasa'],['musculo','kg músculo'],['visceral','visceral']].filter(([k])=>ultimoDe(k)!==undefined)
+    .map(([k,n])=>`<span><b style="color:#F1F5F9">${fmt1(ultimoDe(k),k==='visceral'?0:1)}</b> ${n}</span>`).join(' · ');
+  h.innerHTML=`<div class="sub">Peso (promedio 7 días)</div><div class="big">${fmt1(ult.media)} <span style="font-size:18px">kg</span></div>
+    <div class="sub">7 días: <b>${delta(s7)}</b> · 30 días: <b>${delta(s30)}</b></div>
+    ${comp?`<div class="sub" style="margin-top:6px;">${comp}</div>`:''}${meta}`;
+}
+
+// --- Gráficos (SVG simple, con tooltip y tabla) ---
+function escalas(xs,ys,W,H,m){
+  const x0=Math.min(...xs),x1=Math.max(...xs),y0=Math.min(...ys),y1=Math.max(...ys);
+  const pad=(y1-y0)*0.15||1;
+  return{x:v=>m.l+(x1===x0?0.5:(v-x0)/(x1-x0))*(W-m.l-m.r),y:v=>m.t+(1-(v-(y0-pad))/((y1+pad)-(y0-pad)))*(H-m.t-m.b),y0:y0-pad,y1:y1+pad};
+}
+function fechaCorta(f){const d=new Date(f+'T12:00');return d.toLocaleDateString('es',{day:'numeric',month:'short'});}
+function tablaHTML(filas,cols){
+  return `<details><summary class="nota" style="cursor:pointer;margin-top:6px;">Ver tabla</summary><table><tr>${cols.map(c=>`<th>${c[0]}</th>`).join('')}</tr>${
+    filas.slice().reverse().map(f=>`<tr>${cols.map(c=>`<td>${c[1](f)}</td>`).join('')}</tr>`).join('')}</table></details>`;
+}
+function chartLinea(el,serie,{unidad,dec=1,leyenda=true}){
+  if(serie.length<2){el.innerHTML=`<div class="vacio">${serie.length?'Necesito al menos 2 días de datos para dibujar la tendencia.':'Sin datos todavía.'}</div>`;return;}
+  const W=340,H=150,m={l:34,r:8,t:10,b:20};
+  const xs=serie.map(p=>+new Date(p.fecha)),ys=serie.flatMap(p=>[p.valor,p.media]);
+  const e=escalas(xs,ys,W,H,m);
+  const grid=[0,0.5,1].map(t=>{const v=e.y0+(e.y1-e.y0)*t,y=e.y(v);
+    return `<line x1="${m.l}" x2="${W-m.r}" y1="${y}" y2="${y}" stroke="#1C2742" stroke-width="1"/><text x="${m.l-5}" y="${y+3}" text-anchor="end" font-size="9" fill="#7A8BA8">${fmt1(v,dec)}</text>`;}).join('');
+  const linea=serie.map((p,i)=>`${i?'L':'M'}${e.x(xs[i]).toFixed(1)},${e.y(p.media).toFixed(1)}`).join('');
+  const puntos=serie.map((p,i)=>`<circle cx="${e.x(xs[i]).toFixed(1)}" cy="${e.y(p.valor).toFixed(1)}" r="3.5" fill="#64748B" stroke="#111A2E" stroke-width="2"/>`).join('');
+  const ej=`<text x="${m.l}" y="${H-4}" font-size="9" fill="#7A8BA8">${fechaCorta(serie[0].fecha)}</text><text x="${W-m.r}" y="${H-4}" font-size="9" fill="#7A8BA8" text-anchor="end">${fechaCorta(serie[serie.length-1].fecha)}</text>`;
+  el.innerHTML=`${leyenda?`<div class="leyenda"><span><b></b>cada día</span><span><i></i>promedio 7 días</span></div>`:''}
+    <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Tendencia">${grid}${puntos}<path d="${linea}" fill="none" stroke="#3987E5" stroke-width="2" stroke-linejoin="round"/>
+    <line class="cruz" y1="${m.t}" y2="${H-m.b}" stroke="#9FB0CC" stroke-width="1" style="display:none"/><circle class="foco" r="5" fill="#3987E5" stroke="#111A2E" stroke-width="2" style="display:none"/>${ej}
+    <rect x="${m.l}" y="0" width="${W-m.l-m.r}" height="${H}" fill="transparent" class="hit"/></svg><div class="tip"></div>
+    ${tablaHTML(serie,[['Fecha',f=>fechaCorta(f.fecha)],['Valor',f=>fmt1(f.valor,dec)+' '+unidad],['Promedio',f=>fmt1(f.media,dec)+' '+unidad]])}`;
+  const svg=el.querySelector('svg'),tip=el.querySelector('.tip'),cruz=el.querySelector('.cruz'),foco=el.querySelector('.foco');
+  const mover=ev=>{
+    const r=svg.getBoundingClientRect(),px=(ev.clientX-r.left)/r.width*W;
+    let i=0;for(let k=1;k<xs.length;k++)if(Math.abs(e.x(xs[k])-px)<Math.abs(e.x(xs[i])-px))i=k;
+    const x=e.x(xs[i]),y=e.y(serie[i].media);
+    cruz.setAttribute('x1',x);cruz.setAttribute('x2',x);cruz.style.display='';
+    foco.setAttribute('cx',x);foco.setAttribute('cy',y);foco.style.display='';
+    tip.style.display='block';tip.style.left=(x/W*r.width)+'px';tip.style.top=(y/H*r.height+20)+'px';
+    tip.innerHTML=`<b>${fechaCorta(serie[i].fecha)}</b><br>${fmt1(serie[i].valor,dec)} ${unidad} · prom. ${fmt1(serie[i].media,dec)}`;
+  };
+  const salir=()=>{tip.style.display='none';cruz.style.display='none';foco.style.display='none';};
+  svg.querySelector('.hit').addEventListener('pointermove',mover);
+  svg.querySelector('.hit').addEventListener('pointerdown',mover);
+  svg.addEventListener('pointerleave',salir);
+}
+function chartBarras(el,serie,{unidad,meta}){
+  if(!serie.length){el.innerHTML='<div class="vacio">Sin datos de pasos. Importa los de tu reloj o regístralos.</div>';return;}
+  const W=340,H=140,m={l:34,r:8,t:10,b:20};
+  const max=Math.max(...serie.map(p=>p.valor),meta||0)*1.1;
+  const banda=(W-m.l-m.r)/serie.length,ancho=Math.min(24,banda*0.6);
+  const y=v=>m.t+(1-v/max)*(H-m.t-m.b),base=H-m.b;
+  const barras=serie.map((p,i)=>{
+    const x=m.l+banda*i+(banda-ancho)/2,yt=y(p.valor),r=Math.min(4,ancho/2,base-yt);
+    return `<path d="M${x},${base}V${yt+r}Q${x},${yt} ${x+r},${yt}H${x+ancho-r}Q${x+ancho},${yt} ${x+ancho},${yt+r}V${base}Z" fill="#3987E5"/>
+      <rect x="${m.l+banda*i}" y="${m.t}" width="${banda}" height="${base-m.t}" fill="transparent" data-i="${i}" class="hit"/>`;}).join('');
+  const lineaMeta=meta?`<line x1="${m.l}" x2="${W-m.r}" y1="${y(meta)}" y2="${y(meta)}" stroke="#9FB0CC" stroke-width="1"/>`:'';
+  el.innerHTML=`${meta?`<div class="leyenda"><span><i style="background:#9FB0CC;height:1px"></i>meta ${meta.toLocaleString('es')} pasos</span></div>`:''}<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Pasos por día"><line x1="${m.l}" x2="${W-m.r}" y1="${base}" y2="${base}" stroke="#1C2742"/>${lineaMeta}${barras}
+    <text x="${m.l}" y="${H-4}" font-size="9" fill="#7A8BA8">${fechaCorta(serie[0].fecha)}</text><text x="${W-m.r}" y="${H-4}" font-size="9" fill="#7A8BA8" text-anchor="end">${fechaCorta(serie[serie.length-1].fecha)}</text></svg><div class="tip"></div>
+    ${tablaHTML(serie,[['Fecha',f=>fechaCorta(f.fecha)],['Pasos',f=>Math.round(f.valor).toLocaleString('es')]])}`;
+  const svg=el.querySelector('svg'),tip=el.querySelector('.tip');
+  svg.querySelectorAll('.hit').forEach(h=>{
+    const ver=()=>{const i=+h.dataset.i,r=svg.getBoundingClientRect(),p=serie[i];
+      tip.style.display='block';tip.style.left=((m.l+banda*(i+0.5))/W*r.width)+'px';tip.style.top=(y(p.valor)/H*r.height+20)+'px';
+      tip.innerHTML=`<b>${fechaCorta(p.fecha)}</b><br>${Math.round(p.valor).toLocaleString('es')} ${unidad}`;};
+    h.addEventListener('pointerenter',ver);h.addEventListener('pointerdown',ver);
+  });
+  svg.addEventListener('pointerleave',()=>{tip.style.display='none';});
+}
+
+function pintarProgreso(){
+  const med=seg.leerMediciones(),pf=perfil(),plan=leerPlan();
+  pintarHero(med);
+  chartLinea($('chPeso'),seg.tendencia(med,'peso'),{unidad:'kg'});
+  const grasa=seg.tendencia(med,'grasa');
+  $('cardGrasa').hidden=!grasa.length;
+  if(grasa.length)chartLinea($('chGrasa'),grasa,{unidad:'%'});
+  const corte=seg.hoy(new Date(Date.now()-13*864e5));
+  const pasos=med.filter(f=>f.pasos!==undefined&&f.fecha>=corte).map(f=>({fecha:f.fecha,valor:f.pasos}));
+  $('cardPasos').hidden=!pasos.length;
+  if(pasos.length)chartBarras($('chPasos'),pasos,{unidad:'pasos',meta:8000});
+  const recs=seg.recomendaciones(med,pf,plan);
+  const ico={bien:'✅',atencion:'⚠️',info:'💡'};
+  $('recs').innerHTML=recs.map(r=>`<div class="rec"><span>${ico[r.nivel]}</span><span>${esc(r.texto)}</span></div>`).join('');
+  $('historial').innerHTML=med.length?`<table><tr><th>Fecha</th><th>Peso</th><th>Grasa</th><th>Pasos</th><th></th></tr>${
+    med.slice(-60).reverse().map(f=>`<tr><td>${fechaCorta(f.fecha)}</td><td>${fmt1(f.peso)}</td><td>${fmt1(f.grasa)}</td><td>${f.pasos!==undefined?Math.round(f.pasos).toLocaleString('es'):'—'}</td><td><button class="x" data-f="${f.fecha}" aria-label="Borrar">✕</button></td></tr>`).join('')}</table>`
+    :'<div class="vacio">Sin mediciones.</div>';
+  // Consejo del día para la notificación: rota entre las recomendaciones.
+  const utiles=recs.filter(r=>r.nivel!=='info'||/proteína|pasos/.test(r.texto));
+  consejoDelDia=(utiles.length?utiles:recs)[new Date().getDate()%Math.max(1,(utiles.length?utiles:recs).length)]?.texto||'';
+  guardarRecordatorios(false);
+}
+$('historial').addEventListener('click',e=>{
+  const b=e.target.closest('button.x');if(!b)return;
+  if(!confirm('¿Borrar la medición del '+fechaCorta(b.dataset.f)+'?'))return;
+  seg.borrarMedicion(b.dataset.f);pintarProgreso();
+});
+
+function msgSeg(clase,t){estado('segStat',clase,t);}
+function importadas(n,origen){
+  pintarProgreso();
+  msgSeg(n?'listo':'',n?`✅ ${n} día${n===1?'':'s'} de datos agregados desde ${origen}.`:`⚠️ No encontré datos de peso, composición, pasos o sueño en ${origen}.`);
+}
+
+// Registro manual
+const CAMPOS_MED=['peso','grasa','musculo','agua','visceral','cintura','pasos','sueno','fcReposo'];
+$('btnRegistrar').addEventListener('click',()=>{
+  const c=$('cardRegistro');c.hidden=!c.hidden;
+  if(!c.hidden){$('m-fecha').value=seg.hoy();c.scrollIntoView({behavior:'smooth',block:'start'});$('m-peso').focus();}
+});
+$('btnGuardarMedicion').addEventListener('click',()=>{
+  const fila={fecha:$('m-fecha').value||seg.hoy()};
+  for(const k of CAMPOS_MED){const v=numero($('m-'+k).value);if(v!==null)fila[k]=v;}
+  if(Object.keys(fila).length<2){msgSeg('','Escribe al menos un dato.');return;}
+  seg.agregarMediciones([fila]);
+  for(const k of CAMPOS_MED)$('m-'+k).value='';
+  $('cardRegistro').hidden=true;
+  importadas(1,'el registro');
+});
+
+// Báscula Bluetooth
+$('btnBascula').addEventListener('click',async()=>{
+  try{
+    const b=await import('./engine/bascula.js');
+    if(!b.soportado()){msgSeg('','⚠️ Este navegador no tiene Bluetooth web (iPhone no lo permite). Registra el peso a mano, importa tus datos o usa el Atajo de iPhone (ver "Conectar Zepp Life…").');return;}
+    msgSeg('cargando','Elige tu báscula en la lista…');
+    const r=await b.medir(t=>msgSeg('cargando','⚖️ '+t));
+    const fila={fecha:seg.hoy(),peso:r.peso};
+    for(const k of ['grasa','musculo','agua','metabolismo'])if(r[k]!==undefined)fila[k]=r[k];
+    seg.agregarMediciones([fila]);
+    pintarProgreso();
+    // Las Xiaomi solo mandan peso e impedancia; el % de grasa lo calcula Zepp Life.
+    const est=r.grasa===undefined?seg.grasaEstimada(r.peso,perfil()):null;
+    msgSeg('listo',`✅ ${fmt1(r.peso,2)} kg guardados desde ${r.dispositivo}.${r.grasa===undefined?` Tu báscula no envía el % de grasa${est?` (estimado por IMC: ~${fmt1(est)} %)`:''}: copia el de Zepp Life en ✏️ Registrar.`:''}`);
+  }catch(err){
+    if(err.name==='NotFoundError')msgSeg('','No se eligió ninguna báscula.');
+    else msgSeg('','⚠️ '+err.message);
+  }
+});
+
+// Importar archivos (CSV, ZIP de Zepp Life / Apple Salud, export.xml)
+async function leerXMLApple(stream){
+  const lector=seg.crearLectorApple(),dec=new TextDecoder(),r=stream.getReader();
+  let n=0;
+  for(;;){
+    const {done,value}=await r.read();
+    if(done)break;
+    lector.agregar(dec.decode(value,{stream:true}));
+    if(++n%200===0)msgSeg('cargando',`🍎 Leyendo Apple Salud… ${Math.round(n*64/1024)} MB`);
+  }
+  return lector.terminar().filas;
+}
+async function leerZIP(file){
+  const {Unzip,UnzipInflate}=await import('./vendor/fflate.mjs');
+  const filas=[];let error=null;
+  const uz=new Unzip();uz.register(UnzipInflate);
+  uz.onfile=f=>{
+    const nombre=f.name;
+    if(/\.xml$/i.test(nombre)&&!/cda/i.test(nombre)){
+      const lector=seg.crearLectorApple(),dec=new TextDecoder();
+      f.ondata=(err,chunk,final)=>{
+        if(err){error=err;return;}
+        lector.agregar(dec.decode(chunk,{stream:!final}));
+        if(final)filas.push(...lector.terminar().filas);
+      };
+      f.start();
+    }else if(/\.csv$/i.test(nombre)){
+      const partes=[];
+      f.ondata=(err,chunk,final)=>{
+        if(err){error=err;return;}
+        partes.push(chunk);
+        if(final){
+          const todo=new Uint8Array(partes.reduce((n,p)=>n+p.length,0));
+          let o=0;for(const p of partes){todo.set(p,o);o+=p.length;}
+          const txt=new TextDecoder().decode(todo);
+          filas.push(...seg.parsearCSV(txt,nombre.split('/').pop()));
+        }
+      };
+      f.start();
+    }
+  };
+  const r=file.stream().getReader();
+  let leidos=0;
+  for(;;){
+    const {done,value}=await r.read();
+    if(done){uz.push(new Uint8Array(0),true);break;}
+    uz.push(value);leidos+=value.length;
+    if(leidos>20e6)msgSeg('cargando',`📦 Leyendo ZIP… ${Math.round(leidos/1e6)} MB`);
+  }
+  if(error&&!filas.length)throw new Error('el ZIP está protegido con contraseña o dañado. Descomprímelo en el teléfono y sube los archivos CSV.');
+  return filas;
+}
+$('importar').addEventListener('change',async e=>{
+  const files=[...e.target.files];e.target.value='';if(!files.length)return;
+  let total=0;
+  for(const f of files){
+    try{
+      msgSeg('cargando',`⬆️ Leyendo ${f.name}…`);
+      let filas;
+      if(/\.zip$/i.test(f.name))filas=await leerZIP(f);
+      else if(/\.xml$/i.test(f.name))filas=await leerXMLApple(f.stream());
+      else filas=seg.parsearCSV(await f.text(),f.name);
+      total+=seg.agregarMediciones(filas);
+    }catch(err){msgSeg('',`⚠️ ${f.name}: ${err.message}`);return;}
+  }
+  importadas(total,files.length>1?`${files.length} archivos`:files[0].name);
+});
+
+// Datos que llegan por el Atajo de iPhone (#datos?peso=…)
+function datosDeURL(){
+  const fila=seg.filaDesdeURL(location.hash);
+  if(!fila)return false;
+  seg.agregarMediciones([fila]);
+  history.replaceState(null,'',location.pathname+'#progreso');
+  irA('progreso');
+  msgSeg('listo','✅ Datos de Salud recibidos: '+Object.keys(fila).filter(k=>k!=='fecha').map(k=>seg.METRICAS[k].nombre.toLowerCase()).join(', ')+'.');
+  return true;
+}
+$('urlAtajo').textContent=location.origin+location.pathname+'#datos?peso=[Peso]&grasa=[Grasa]&pasos=[Pasos]&kcal=[Energía activa]&sueno=[Horas de sueño]';
+
+// Perfil
+const PERFIL=['sexo','edad','estatura','meta'];
+function cargarPerfil(){const p=perfil();for(const k of PERFIL)$('p-'+k).value=p[k]??'';}
+for(const k of PERFIL)$('p-'+k).addEventListener('change',()=>{
+  const p={};for(const x of PERFIL){const v=$('p-'+x).value;p[x]=x==='sexo'?v:numero(v);}
+  seg.guardarPerfil(p);pintarProgreso();pintarRecetas();
+});
+cargarPerfil();
+
+// =================== Recordatorios ===================
+const CLAVE_REC='crcr-recordatorios';
+let consejoDelDia='';
+const NOMBRES_DIAS=['D','L','K','M','J','V','S'];
+let diasPesar=[1];
+function leerRec(){try{return JSON.parse(localStorage.getItem(CLAVE_REC))||{};}catch{return{};}}
+function pintarDias(){
+  $('r-dias').innerHTML=NOMBRES_DIAS.map((d,i)=>`<button data-d="${i}" class="${diasPesar.includes(i)?'on':''}" aria-label="día ${i}">${d}</button>`).join('');
+}
+function cargarRec(){
+  const c=leerRec();
+  $('r-pesar').checked=!!c.pesar?.activo;$('r-pesarHora').value=c.pesar?.hora||'07:00';diasPesar=c.pesar?.dias||[1];
+  $('r-agua').checked=!!c.agua?.activo;$('r-aguaCada').value=c.agua?.cadaHoras||2;$('r-aguaDesde').value=c.agua?.desde??8;$('r-aguaHasta').value=c.agua?.hasta??20;
+  $('r-pasos').checked=!!c.pasos?.activo;$('r-pasosHora').value=c.pasos?.hora||'18:00';
+  $('r-consejo').checked=!!c.consejo?.activo;$('r-consejoHora').value=c.consejo?.hora||'09:00';
+  pintarDias();
+}
+function configRec(){
+  return{
+    pesar:{activo:$('r-pesar').checked,hora:$('r-pesarHora').value,dias:diasPesar},
+    agua:{activo:$('r-agua').checked,cadaHoras:Math.max(1,numero($('r-aguaCada').value)||2),desde:numero($('r-aguaDesde').value)??8,hasta:numero($('r-aguaHasta').value)??20},
+    pasos:{activo:$('r-pasos').checked,hora:$('r-pasosHora').value},
+    consejo:{activo:$('r-consejo').checked,hora:$('r-consejoHora').value}
+  };
+}
+// Se guarda en localStorage y en la caché, donde el Service Worker lo puede leer
+// para avisar aunque la pestaña no esté al frente.
+async function guardarRecordatorios(manual=true){
+  const cfg=configRec();
+  if(manual)try{localStorage.setItem(CLAVE_REC,JSON.stringify(cfg));}catch{}
+  try{
+    const c=await caches.open('crcr-config');
+    await c.put('./__recordatorios',new Response(JSON.stringify({cfg:manual?cfg:leerRec(),consejo:consejoDelDia})));
+  }catch{}
+  revisarRecordatorios();
+}
+function revisarRecordatorios(){navigator.serviceWorker?.controller?.postMessage({tipo:'revisar-recordatorios'});}
+$('r-dias').addEventListener('click',e=>{
+  const b=e.target.closest('button');if(!b)return;
+  const d=+b.dataset.d;diasPesar=diasPesar.includes(d)?diasPesar.filter(x=>x!==d):[...diasPesar,d].sort();
+  if(!diasPesar.length)diasPesar=[d];
+  pintarDias();guardarRecordatorios();
+});
+for(const id of ['r-pesar','r-pesarHora','r-agua','r-aguaCada','r-aguaDesde','r-aguaHasta','r-pasos','r-pasosHora','r-consejo','r-consejoHora'])
+  $(id).addEventListener('change',()=>guardarRecordatorios());
+$('btnNotif').addEventListener('click',async()=>{
+  if(!('Notification' in window)){estado('notifStat','','⚠️ Este navegador no permite avisos. Usa 📅 Al calendario.');return;}
+  const p=await Notification.requestPermission();
+  if(p!=='granted'){estado('notifStat','','⚠️ No diste permiso de avisos. Usa 📅 Al calendario.');return;}
+  await guardarRecordatorios();
+  try{
+    const reg=await navigator.serviceWorker.ready;
+    if('periodicSync' in reg)await reg.periodicSync.register('crcr-recordatorios',{minInterval:60*60*1000}).catch(()=>{});
+    reg.showNotification('Mi Nutrición',{body:'¡Listo! Así te llegarán los recordatorios.',icon:'./icon-nutricion.svg',tag:'prueba'});
+  }catch{}
+  estado('notifStat','listo','✅ Avisos activados. Para que lleguen aunque la app esté cerrada, agrégalos también al calendario.');
+});
+$('btnICS').addEventListener('click',()=>{
+  const ics=seg.generarICS(configRec(),consejoDelDia);
+  if(!/BEGIN:VEVENT/.test(ics)){estado('notifStat','','Activa al menos un recordatorio.');return;}
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([ics],{type:'text/calendar'}));
+  a.download='recordatorios-mi-nutricion.ics';
+  document.body.appendChild(a);a.click();a.remove();
+  estado('notifStat','listo','📅 Abre el archivo descargado y agrégalo a tu calendario.');
+});
+cargarRec();
+setInterval(revisarRecordatorios,60*1000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)revisarRecordatorios();});
+
+// =================== Recetas ===================
+let comidaSel='';
+function kcalPorComida(){
+  const plan=leerPlan();
+  if(plan?.kcal)return{k:Math.round(plan.kcal/(plan.comidas||4)),de:`tu plan (${plan.kcal} kcal ÷ ${plan.comidas||4} comidas)`};
+  const pf=perfil(),med=seg.leerMediciones(),peso=[...med].reverse().find(f=>f.peso)?.peso;
+  if(pf.sexo&&pf.edad&&pf.estatura&&peso){
+    // Mifflin-St Jeor × 1,4 (poca actividad) − 500 para bajar de peso, en 4 comidas.
+    const bmr=10*peso+6.25*pf.estatura-5*pf.edad+(pf.sexo==='h'?5:-161);
+    const dia=Math.max(pf.sexo==='h'?1500:1200,Math.round(bmr*1.4-500));
+    return{k:Math.round(dia/4),de:`tu perfil (~${dia} kcal/día para bajar de peso, 4 comidas)`};
+  }
+  return{k:400,de:'un valor estándar; completa tu perfil o tu plan para ajustarlo'};
+}
+function pintarRecetas(){
+  if($('tab-recetas').hidden&&!pintarRecetas.forzar)return;
+  const def=kcalPorComida();
+  if(!$('kcalReceta').dataset.tocado)$('kcalReceta').value=def.k;
+  const kcal=numero($('kcalReceta').value)||def.k;
+  const despensa=leerLista().filter(i=>i.datos);
+  const plan=planActivo();
+  $('recetasNota').innerHTML=`Porciones calculadas para <b>${kcal} kcal</b> según ${$('kcalReceta').dataset.tocado?'lo que escribiste':def.de}. `+
+    (despensa.length?`Uso los datos de tus ${despensa.length} producto${despensa.length===1?'':'s'} guardados (★).`:'Guarda los productos que compras (pestaña Escanear) para que las recetas usen sus datos reales.');
+  const lista=sugerirRecetas({comida:comidaSel||null,kcalObjetivo:kcal,despensa,plan});
+  $('listaRecetas').innerHTML=lista.map(r=>`<details class="card receta">
+    <summary style="display:block;"><h3>${esc(r.n)}</h3>
+      <div class="tags" style="margin-top:6px;"><span class="tag">${r.comida}</span><span class="tag">⏱ ${r.min} min</span>
+      ${r.deTuCompra?`<span class="tag ok">★ ${r.deTuCompra} de tu compra</span>`:''}
+      ${r.choques.length?`<span class="tag no">✕ tu plan evita: ${esc(r.choques[0].choque)}</span>`:''}</div>
+      <div class="macros4" style="margin-top:8px;"><div><b>${r.total.k}</b>kcal</div><div><b>${r.total.p} g</b>proteína</div><div><b>${r.total.c} g</b>carbos</div><div><b>${r.total.g} g</b>grasa</div></div>
+    </summary>
+    <div class="lbl" style="margin-top:6px;">Ingredientes (1 porción)</div>
+    <div>${r.ingredientes.map(i=>`<div class="ing"><span>${i.deTuCompra?'★ ':''}${esc(i.nombre)}${i.choque?' <span class="tag no">evitar</span>':''}</span><span class="g">${i.gramos} g${i.unidades?` <span style="color:#7A8BA8;font-weight:400">(${String(i.unidades).replace('.',',')} ${i.unidad}${i.unidades>1?'s':''})</span>`:''}</span></div>`).join('')}</div>
+    <div class="lbl">Preparación</div><ol class="pasos">${r.pasos.map(p=>`<li>${esc(p)}</li>`).join('')}</ol>
+    <div class="nota">Fibra: ${r.total.f} g. ★ = datos de la etiqueta de tu producto; el resto, valores de referencia (USDA).</div>
+  </details>`).join('');
+}
+$('chipsComida').addEventListener('click',e=>{
+  const b=e.target.closest('button');if(!b)return;
+  comidaSel=b.dataset.c;
+  for(const x of $('chipsComida').children)x.classList.toggle('on',x===b);
+  pintarRecetas();
+});
+$('kcalReceta').addEventListener('input',()=>{$('kcalReceta').dataset.tocado=$('kcalReceta').value?'1':'';pintarRecetas();});
+
+// =================== Arranque ===================
+if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').then(()=>revisarRecordatorios()).catch(()=>{});
+addEventListener('hashchange',()=>{if(!datosDeURL()&&TABS.includes(location.hash.slice(1)))irA(location.hash.slice(1));});
+if(!datosDeURL()){
+  let inicial='escanear';
+  try{inicial=location.hash.slice(1)||localStorage.getItem('crcr-nutricion-tab')||'escanear';}catch{}
+  irA(inicial);
+}
 render();renderLista();
 </script>
 </body>

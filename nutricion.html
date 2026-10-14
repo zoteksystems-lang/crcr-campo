@@ -71,6 +71,14 @@ input,select,textarea{font-size:15px;padding:10px 12px;border-radius:10px;backgr
 .pill{font-size:11px;padding:4px 9px;border-radius:20px;background:#21393A;color:#A9C2BB;white-space:nowrap;}
 .pill.on{color:#4ADE80;}
 .tab[hidden]{display:none!important;}
+html{background:#0E1C1B;}
+.fila .v{font-family:inherit;font-variant-numeric:tabular-nums;}
+.sin-codigo .enlace{flex:1;text-align:center;background:#15292A;border:1px solid #21393A;border-radius:12px;padding:12px 8px;font-size:14px;}
+.como{display:flex;flex-direction:column;gap:12px;padding:6px 2px;}
+.como div{display:flex;gap:12px;align-items:center;font-size:14px;color:var(--suave);}
+.como b{width:30px;height:30px;border-radius:50%;background:#1A3330;color:var(--hoja);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px;}
+.vacio-hero{display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 0;text-align:center;}
+.vacio-hero .e{font-size:40px;}
 .tab{display:flex;flex-direction:column;gap:12px;}
 nav.tabs{position:fixed;left:0;right:0;bottom:0;display:flex;background:rgba(14,28,27,.96);backdrop-filter:blur(8px);border-top:1px solid #21393A;padding:6px 6px calc(6px + env(safe-area-inset-bottom));z-index:10;}
 nav.tabs button{flex:1;background:none;color:#7F9C95;font-size:11px;font-weight:700;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0;border-radius:12px;}
@@ -180,20 +188,121 @@ button:active,.accion:active,.rutina:active{filter:brightness(.92);}
 .hoy-h,.pausa-n,.receta h3{text-wrap:balance;}
 .msg,.rec,.consejo,.pausa-x{text-wrap:pretty;}
 .tx,.dia-fila .tx{min-width:0;}
+
+/* ===== Revisión de diseño: sencillo, claro y que invite ===== */
+[hidden]{display:none!important;}
+.top{padding:14px 16px 2px;}
+.logo{width:34px;height:34px;border-radius:10px;font-size:18px;}
+.page{gap:14px;padding:6px 16px 28px;}
+.intro{display:flex;flex-direction:column;gap:2px;padding:6px 2px 0;}
+.hoy-h{margin:0;}
+.hoy-sub{margin:0;}
+.seccion-t{font-family:'Bricolage',system-ui,sans-serif;font-size:17px;font-weight:700;margin:6px 2px -4px;}
+.prod-n{font-weight:800;font-size:16px;line-height:1.3;}
+.nota{display:block;}
+.ic{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
+.enlace{background:none;color:var(--hoja);font-size:14px;font-weight:700;padding:8px 2px;text-align:left;}
+.enlace.centro{text-align:center;width:100%;}
+.btn-hero{display:flex;align-items:center;justify-content:center;gap:10px;font-size:17px;padding:18px;border-radius:16px;}
+.btn-icono{display:flex;align-items:center;justify-content:center;padding:0 12px;}
+.fila-codigo{display:flex;gap:8px;}
+.fila-codigo input{flex:1;min-width:0;}
+.fila-botones{display:flex;gap:8px;}
+.fila-botones>*{flex:1;}
+.fila-botones .btn-gray{flex:0 0 auto;}
+.sin-codigo{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;}
+#camara{position:relative;border-radius:16px;overflow:hidden;background:#000;}
+#camara video{width:100%;display:block;max-height:320px;object-fit:cover;}
+#camara .mira{position:absolute;left:10%;right:10%;top:40%;height:20%;border:3px solid var(--hoja);border-radius:10px;box-shadow:0 0 0 999px rgba(0,0,0,.4);}
+#camara #btnCancelar{position:absolute;bottom:10px;right:10px;}
+.prod{flex-direction:row;align-items:center;gap:12px;}
+.prod img{width:56px;height:56px;object-fit:contain;border-radius:10px;background:#fff;flex-shrink:0;}
+.macros-cab{display:flex;justify-content:space-between;align-items:center;gap:8px;}
+.porcion{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--suave);}
+.porcion input{width:72px;padding:6px 8px;font-size:14px;}
+.seg button{background:#102221;border:1px solid #2A4544;color:var(--suave);border-radius:10px;padding:10px;font-size:14px;}
+.seg button.on{background:var(--hoja);border-color:var(--hoja);color:#0E1C1B;}
+.sel-mini{width:auto;padding:0;border:none;background:none;font-size:11px;font-weight:600;color:#7F9C95;}
+.chk{font-size:14px;color:var(--tinta);gap:10px;line-height:1.4;}
+.chk input{width:20px;height:20px;accent-color:var(--hoja);flex-shrink:0;}
+.tipo{display:flex;flex-direction:column;gap:4px;}
+/* Listas en lugar de tarjetas repetidas */
+.acordeones{padding:4px 14px;gap:0;}
+.acordeon{border-bottom:1px solid #21393A;}
+.acordeon:last-child{border-bottom:none;}
+.acordeon>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:10px;padding:14px 0;font-size:15px;font-weight:700;}
+.acordeon>summary::-webkit-details-marker{display:none;}
+.acordeon>summary::after{content:'›';margin-left:auto;font-size:20px;color:#7F9C95;transition:transform .2s;}
+.acordeon[open]>summary::after{transform:rotate(90deg);}
+.acordeon>*:not(summary){margin-bottom:12px;}
+.acordeon p{font-size:14px;color:var(--suave);line-height:1.55;}
+.acordeon .chk,.acordeon .dias,.acordeon .g2,.acordeon .nota{margin-bottom:10px;}
+.ac-ic{width:26px;text-align:center;font-size:18px;}
+.lista-prod{padding:4px 14px;gap:0;}
+.item{display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid #21393A;}
+.item:last-child{border-bottom:none;}
+.item-abrir{flex:1;min-width:0;display:flex;align-items:center;gap:12px;background:none;color:var(--tinta);text-align:left;padding:8px 0;}
+.item-tx{display:flex;flex-direction:column;min-width:0;}
+.item-n{font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.badge{width:34px;height:34px;border-radius:10px;font-size:15px;}
+.x{min-width:40px;min-height:40px;font-size:16px;color:#7F9C95;}
+/* Hoy */
+.dia-fila{width:100%;background:none;color:var(--tinta);text-align:left;}
+.dia-fila .tx{display:flex;flex-direction:column;}
+.dia-fila .pb{display:block;}
+.dia-fila .pb>span{display:block;height:100%;border-radius:4px;}
+.dia-fila .vl.falta{color:var(--hoja);font-weight:700;font-size:13px;}
+.bienvenida{border-color:#2F5A3C;background:linear-gradient(180deg,#183324,#15292A);}
+.paso{display:flex;align-items:center;gap:12px;width:100%;background:none;color:var(--tinta);text-align:left;padding:10px 0;border-bottom:1px solid #21393A;}
+.paso:last-child{border-bottom:none;}
+.paso .tx{display:flex;flex-direction:column;}
+.paso-t{font-size:15px;font-weight:700;}
+.paso-c{width:26px;height:26px;border-radius:50%;border:2px solid var(--hoja);display:flex;align-items:center;justify-content:center;font-weight:900;color:#0E1C1B;flex-shrink:0;}
+.paso.ok .paso-c{background:var(--hoja);}
+.paso.ok .paso-t{text-decoration:line-through;color:var(--suave);}
+.proxima{flex-direction:row;align-items:center;gap:12px;width:100%;text-align:left;color:var(--tinta);}
+.proxima .tx{flex:1;min-width:0;display:flex;flex-direction:column;}
+.flecha{font-size:24px;color:#7F9C95;}
+/* Recetas */
+.kcal-in{width:64px;padding:4px 8px;font-size:15px;font-weight:700;}
+.chips{flex-wrap:wrap;}
+.lista-recetas{padding:2px 14px;gap:0;}
+.receta{border-bottom:1px solid #21393A;}
+.receta:last-child{border-bottom:none;}
+.receta>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:10px;padding:14px 0;}
+.receta>summary::-webkit-details-marker{display:none;}
+details.receta>summary::after{content:none!important;}
+.receta[open] .flecha{transform:rotate(90deg);}
+.flecha{transition:transform .2s;}
+.receta .tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;}
+.receta-n{font-family:'Bricolage',system-ui,sans-serif;font-size:16px;font-weight:700;line-height:1.3;}
+.receta .tags{margin-top:4px;}
+.receta-cuerpo{display:flex;flex-direction:column;gap:10px;padding-bottom:14px;}
+/* Navegación */
+nav.tabs button{gap:3px;font-size:11px;}
+nav.tabs svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;}
+nav.tabs button.on{color:var(--hoja);background:#1A3330;}
+.pill{background:#3A2E1F;color:#F5C26B;}
 </style>
 </head>
 <body>
 <div class="wrap"><div class="page">
 <header class="top">
   <div class="logo">🌿</div>
-  <div style="flex:1;min-width:0;"><div class="app-t">Mi Bienestar</div><div class="app-s" id="subtitulo">Agua, movimiento, comida y progreso</div></div>
-  <span id="redEstado" class="pill">● sin conexión</span>
+  <div style="flex:1;min-width:0;"><div class="app-t">Mi Bienestar</div></div>
+  <span id="redEstado" class="pill" hidden>Sin internet</span>
 </header>
 
 <section class="tab" id="tab-hoy">
-  <div>
-    <div class="hoy-h" id="hoySaludo">Hola</div>
-    <div class="hoy-sub" id="hoyFecha"></div>
+  <div class="intro">
+    <h2 class="hoy-h" id="hoySaludo">Hola</h2>
+    <p class="hoy-sub" id="hoyFecha"></p>
+  </div>
+
+  <div class="card bienvenida" id="bienvenida" hidden>
+    <div class="prod-n">Empecemos en 3 pasos</div>
+    <div id="pasosInicio"></div>
+    <button class="enlace" id="cerrarBienvenida">Ocultar</button>
   </div>
 
   <div class="card agua" id="cardAgua">
@@ -211,10 +320,12 @@ button:active,.accion:active,.rutina:active{filter:brightness(.92);}
   <div class="card pausa">
     <div class="pausa-fila">
       <div class="pausa-ico">🧘</div>
-      <div style="flex:1;"><div style="font-weight:800;font-size:16px;">Pausa activa</div><div class="hoy-sub" id="pausaInfo"></div></div>
+      <div style="flex:1;min-width:0;"><div class="prod-n">Pausa activa</div><div class="hoy-sub" id="pausaInfo"></div></div>
     </div>
     <div class="rutinas" id="rutinas"></div>
   </div>
+
+  <button class="card proxima" id="proximaComida" hidden></button>
 
   <div class="card">
     <div class="lbl">Tu día</div>
@@ -226,91 +337,104 @@ button:active,.accion:active,.rutina:active{filter:brightness(.92);}
     <div class="consejo" id="consejo"></div>
   </div>
 
-  <button class="btn-gray" id="irRecordatorios">🔔 Recordatorios de agua y pausas</button>
+  <button class="enlace centro" id="irRecordatorios">🔔 Recordatorios de agua y pausas</button>
 </section>
 
 <section class="tab" id="tab-escanear" hidden>
-  <div class="card">
-    <button class="btn-pri" id="btnEscanear" style="font-size:15px;padding:14px;">▦ Escanear código de barras</button>
-    <div id="camara" style="display:none;position:relative;border-radius:8px;overflow:hidden;background:#000;">
-      <video id="video" muted playsinline style="width:100%;display:block;max-height:300px;object-fit:cover;"></video>
-      <div style="position:absolute;left:10%;right:10%;top:42%;height:16%;border:2px solid #DC2626;border-radius:6px;box-shadow:0 0 0 999px rgba(0,0,0,.35);"></div>
-      <button class="btn-gray" id="btnCancelar" style="position:absolute;bottom:8px;right:8px;padding:6px 10px;">Cancelar</button>
+  <div class="intro">
+    <h2 class="hoy-h">¿Es bueno para ti?</h2>
+    <p class="hoy-sub">Escanea el código de barras y te digo si te conviene.</p>
+  </div>
+  <button class="btn-pri btn-hero" id="btnEscanear"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2M7 8v8M10 8v8M13 8v8M16 8v8"/></svg>Escanear producto</button>
+  <div id="camara" hidden>
+    <video id="video" muted playsinline></video>
+    <div class="mira"></div>
+    <button class="btn-gray" id="btnCancelar">Cancelar</button>
+  </div>
+  <div class="fila-codigo">
+    <input id="codigo" inputmode="numeric" placeholder="O escribe el número del código…" aria-label="Número del código de barras">
+    <button class="btn-blue" id="btnBuscar">Buscar</button>
+    <label class="btn-gray btn-icono" title="Foto del código" aria-label="Leer el código desde una foto"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="15" rx="3"/><circle cx="12" cy="12.5" r="3.5"/><path d="M8 5l1.5-2h5L16 5"/></svg><input type="file" accept="image/*" capture="environment" id="fotoCodigo" hidden></label>
+  </div>
+  <div id="scanStat" class="motor-status" role="status" style="display:none;"></div>
+
+  <div id="sinCodigo">
+    <div class="sin-codigo">
+      <button class="enlace" id="irEtiqueta">📷 Leer la etiqueta</button>
+      <button class="enlace" id="irManual">✏️ Escribir los datos</button>
     </div>
-    <div style="display:flex;gap:6px;">
-      <input id="codigo" inputmode="numeric" placeholder="…o escribe el número del código" style="flex:1;">
-      <button class="btn-blue" id="btnBuscar">Buscar</button>
-      <label class="btn-gray" title="Foto del código" aria-label="Leer el código desde una foto" style="cursor:pointer;display:flex;align-items:center;">🖼️<input type="file" accept="image/*" capture="environment" id="fotoCodigo" style="display:none;"></label>
+    <div class="como" id="comoFunciona">
+      <div><b>1</b>Escanea el código o tómale foto a la tabla nutricional.</div>
+      <div><b>2</b>Te digo si es apto para ti y por qué.</div>
+      <div><b>3</b>Guárdalo: la próxima vez sale al instante y lo usan tus recetas.</div>
     </div>
-    <div id="scanStat" class="motor-status" role="status" style="display:none;"></div>
   </div>
 
-  <div class="card" id="prodCard" style="display:none;flex-direction:row;align-items:center;gap:10px;">
-    <img id="prodImg" alt="" style="width:54px;height:54px;object-fit:contain;border-radius:6px;background:#fff;flex-shrink:0;display:none;">
-    <div style="flex:1;min-width:0;">
-      <div id="prodNombre" style="font-size:14px;font-weight:800;"></div>
-      <div id="prodInfo" style="font-size:10px;color:#64748B;"></div>
+  <div id="zonaProducto" class="tab" hidden>
+    <div class="card prod" id="prodCard" style="display:none;">
+      <img id="prodImg" alt="" width="56" height="56" style="display:none;">
+      <div style="flex:1;min-width:0;">
+        <div id="prodNombre" class="prod-n"></div>
+        <div id="prodInfo" class="nota"></div>
+      </div>
     </div>
+
+    <div id="resultado"></div>
+
+    <div class="card" id="macros">
+      <div class="macros-cab">
+        <div class="lbl">Macros</div>
+        <label class="porcion">Mi porción <input id="porcionRef" inputmode="decimal" placeholder="—"> <span id="uRef">g</span></label>
+      </div>
+      <div id="macrosBody"></div>
+    </div>
+
+    <div class="fila-botones">
+      <button class="btn-pri" id="guardar">Guardar en mis productos</button>
+      <button class="btn-gray" id="limpiar">Escanear otro</button>
+    </div>
+    <p class="nota">Lo que guardas sale al instante la próxima vez, aun sin internet, y lo usan tus recetas.</p>
+
+    <details class="card" id="cardOCR">
+      <summary class="lbl">📷 Leer la etiqueta con la cámara</summary>
+      <p class="nota">Foto de frente, con buena luz y solo la tabla en el cuadro. Se lee en este teléfono, sin internet. Revisa los números en azul.</p>
+      <div class="fila-botones">
+        <label class="btn-blue" style="text-align:center;">Tabla nutricional<input type="file" accept="image/*" capture="environment" id="fotoTabla" hidden></label>
+        <label class="btn-gray" style="text-align:center;">Ingredientes<input type="file" accept="image/*" capture="environment" id="fotoIng" hidden></label>
+      </div>
+      <div id="ocrStat" class="motor-status" role="status" style="display:none;"></div>
+      <details id="ocrCrudo" style="display:none;"><summary class="nota">Ver texto leído</summary><pre id="ocrTexto" class="nota" style="white-space:pre-wrap;"></pre></details>
+    </details>
+
+    <details class="card" id="cardDatos">
+      <summary class="lbl">✏️ Ver o corregir los datos</summary>
+      <div class="fld"><div class="flbl">Nombre</div><input id="nombre" placeholder="Ej.: yogur griego natural…"></div>
+      <div class="seg" id="segTipo" role="group" aria-label="Tipo de producto">
+        <button data-v="solido" class="on">Sólido · 100 g</button>
+        <button data-v="bebida">Bebida · 100 ml</button>
+      </div>
+      <div class="flbl" style="margin-top:4px;">Información nutricional <span id="unidad">por 100 g</span></div>
+      <div class="fld"><div class="flbl">Si la etiqueta solo trae “por porción”, escribe aquí la porción (g o ml) y copia los valores tal cual</div>
+        <input id="porcion" inputmode="decimal" placeholder="Vacío: ya son por 100 g o 100 ml…"></div>
+      <div class="g2">
+        <div class="fld"><div class="flbl">Energía (kcal)</div><input id="kcal" inputmode="decimal"></div>
+        <div class="fld"><div class="flbl">Proteína (g)</div><input id="proteina" inputmode="decimal"></div>
+        <div class="fld"><div class="flbl">Carbohidratos (g)</div><input id="carbos" inputmode="decimal"></div>
+        <div class="fld"><div class="flbl">Azúcares (g)</div><input id="azucar" inputmode="decimal"></div>
+        <div class="fld"><div class="flbl">Grasas totales (g)</div><input id="grasa" inputmode="decimal"></div>
+        <div class="fld"><div class="flbl">Grasas saturadas (g)</div><input id="saturada" inputmode="decimal"></div>
+        <div class="fld"><div class="flbl"><select id="salModo" class="sel-mini" aria-label="Unidad de sal o sodio"><option value="sal">Sal (g)</option><option value="sodio">Sodio (g)</option><option value="sodiomg">Sodio (mg)</option></select></div><input id="sal" inputmode="decimal" aria-label="Sal o sodio"></div>
+        <div class="fld"><div class="flbl">Fibra (g)</div><input id="fibra" inputmode="decimal"></div>
+      </div>
+      <div class="fld"><div class="flbl">Ingredientes (opcional: detecta azúcares y sal ocultos)</div>
+        <textarea id="ingredientes" rows="2" placeholder="Pega o escribe la lista de ingredientes…"></textarea></div>
+    </details>
   </div>
 
-  <div id="resultado"></div>
-
-  <div class="card" id="macros">
-    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
-      <div class="lbl">Macros</div>
-      <div style="display:flex;align-items:center;gap:5px;font-size:10px;color:#64748B;">Mi porción
-        <input id="porcionRef" inputmode="decimal" placeholder="g" style="width:64px;padding:4px 6px;"> <span id="uRef">g</span></div>
-    </div>
-    <div id="macrosBody"></div>
+  <div id="cardLista" style="display:none;">
+    <div class="seccion-t">Tus productos</div>
+    <div class="card lista-prod" id="lista"></div>
   </div>
-
-  <div style="display:flex;gap:6px;">
-    <button class="btn-pri" id="guardar">💾 Guardar</button>
-    <button class="btn-gray" id="limpiar" style="flex-shrink:0;">Nuevo</button>
-  </div>
-  <div style="font-size:10px;color:#475569;margin-top:-4px;">Guardar lo agrega a la lista para comparar y, si tiene código, a la base de este teléfono: la próxima vez sale al instante y sin internet.</div>
-
-  <div class="card" id="cardOCR">
-    <div class="lbl">📷 ¿No apareció o los datos están mal? Lee la etiqueta</div>
-    <div style="font-size:10px;color:#475569;">Toma la foto de frente, con buena luz y solo la tabla en el cuadro. Se lee en este dispositivo (sin internet) y llena los datos. <b>Revisa los números en azul.</b></div>
-    <div style="display:flex;gap:6px;">
-      <label class="btn-blue" style="flex:1;text-align:center;cursor:pointer;">📷 Tabla nutricional<input type="file" accept="image/*" capture="environment" id="fotoTabla" style="display:none;"></label>
-      <label class="btn-gray" style="flex-shrink:0;cursor:pointer;display:flex;align-items:center;">📷 Ingredientes<input type="file" accept="image/*" capture="environment" id="fotoIng" style="display:none;"></label>
-    </div>
-    <div id="ocrStat" class="motor-status" role="status" style="display:none;"></div>
-    <details id="ocrCrudo" style="display:none;"><summary style="font-size:10px;color:#64748B;cursor:pointer;">Ver texto leído</summary><pre id="ocrTexto" style="font-size:10px;color:#94A3B8;white-space:pre-wrap;margin-top:4px;"></pre></details>
-  </div>
-
-  <details class="card" id="cardDatos">
-    <summary class="lbl" style="cursor:pointer;">✏️ Datos del producto (ver o corregir a mano)</summary>
-    <input id="nombre" placeholder="Nombre (ej: Yogur griego 0%)">
-    <div class="seg" id="segTipo">
-      <button data-v="solido" class="on">Sólido · 100 g</button>
-      <button data-v="bebida">Bebida · 100 ml</button>
-    </div>
-    <label class="chk"><input type="checkbox" id="bajarPeso" checked> Modo bajar de peso (criterios más estrictos de azúcar y sal)</label>
-    <div class="lbl" style="margin-top:4px;">Información nutricional <span id="unidad">por 100 g</span></div>
-    <div class="fld"><div class="flbl">¿La etiqueta solo trae "por porción"? Escribe la porción en g/ml y copia los valores tal cual</div>
-      <input id="porcion" inputmode="decimal" placeholder="Vacío = los valores ya son por 100 g / 100 ml"></div>
-    <div class="g2">
-      <div class="fld"><div class="flbl">Energía (kcal)</div><input id="kcal" inputmode="decimal"></div>
-      <div class="fld"><div class="flbl">Proteína (g)</div><input id="proteina" inputmode="decimal"></div>
-      <div class="fld"><div class="flbl">Carbohidratos (g)</div><input id="carbos" inputmode="decimal"></div>
-      <div class="fld"><div class="flbl">Azúcares (g)</div><input id="azucar" inputmode="decimal"></div>
-      <div class="fld"><div class="flbl">Grasas totales (g)</div><input id="grasa" inputmode="decimal"></div>
-      <div class="fld"><div class="flbl">Grasas saturadas (g)</div><input id="saturada" inputmode="decimal"></div>
-      <div class="fld"><div class="flbl"><select id="salModo" style="padding:0;border:none;background:none;font-size:9px;font-weight:700;color:#475569;text-transform:uppercase;width:auto;"><option value="sal">Sal (g)</option><option value="sodio">Sodio (g)</option><option value="sodiomg">Sodio (mg)</option></select></div><input id="sal" inputmode="decimal"></div>
-      <div class="fld"><div class="flbl">Fibra (g)</div><input id="fibra" inputmode="decimal"></div>
-    </div>
-    <div class="fld"><div class="flbl">Ingredientes (opcional — detecta azúcares y sal ocultos)</div>
-      <textarea id="ingredientes" rows="2" placeholder="Pega o escribe la lista de ingredientes"></textarea></div>
-  </details>
-
-  <div class="card" id="cardLista" style="display:none;">
-    <div class="lbl">🛒 Mis productos (los mejores arriba)</div><div class="nota">Las recetas usan los datos de estos productos.</div>
-    <div id="lista"></div>
-  </div>
-
 </section>
 
 <section class="tab" id="tab-progreso" hidden>
@@ -341,14 +465,16 @@ button:active,.accion:active,.rutina:active{filter:brightness(.92);}
     <button class="btn-pri" id="btnGuardarMedicion">Guardar medición</button>
   </div>
 
-  <div class="card" id="cardRecs"><div class="lbl">Recomendaciones para ti</div><div id="recs"></div></div>
+  <div class="card" id="cardRecs"><div class="lbl">Para ti</div><div id="recs"></div><button class="enlace" id="recsMas" hidden>Ver más</button></div>
 
-  <div class="card"><div class="lbl">Peso</div><div class="chart" id="chPeso"></div></div>
+  <div class="card" id="cardPeso"><div class="lbl">Peso</div><div class="chart" id="chPeso"></div></div>
   <div class="card" id="cardGrasa"><div class="lbl">Grasa corporal</div><div class="chart" id="chGrasa"></div></div>
   <div class="card" id="cardPasos"><div class="lbl">Pasos (últimos 14 días)</div><div class="chart" id="chPasos"></div></div>
 
-  <details class="card" id="cardRecordatorios">
-    <summary class="lbl">🔔 Recordatorios</summary>
+  <div class="seccion-t">Ajustes y datos</div>
+  <div class="card acordeones">
+  <details class="acordeon" id="cardRecordatorios">
+    <summary><span class="ac-ic">🔔</span>Recordatorios</summary>
     <label class="chk"><input type="checkbox" id="r-pesar"> ⚖️ Pesarme a las <input id="r-pesarHora" type="time" value="07:00" class="hora"></label>
     <div class="dias" id="r-dias"></div>
     <label class="chk"><input type="checkbox" id="r-agua"> 💧 Agua cada <input id="r-aguaCada" inputmode="numeric" value="2" class="mini"> h, de <input id="r-aguaDesde" inputmode="numeric" value="8" class="mini"> a <input id="r-aguaHasta" inputmode="numeric" value="20" class="mini"> h</label>
@@ -363,8 +489,8 @@ button:active,.accion:active,.rutina:active{filter:brightness(.92);}
     <div id="notifStat" class="motor-status" role="status" style="display:none;"></div>
   </details>
 
-  <details class="card">
-    <summary class="lbl">👤 Mi perfil</summary>
+  <details class="acordeon" id="cardPerfil">
+    <summary><span class="ac-ic">👤</span>Mi perfil</summary>
     <div class="g2">
       <div class="fld"><div class="flbl">Sexo</div><select id="p-sexo"><option value="">—</option><option value="m">Mujer</option><option value="h">Hombre</option></select></div>
       <div class="fld"><div class="flbl">Edad</div><input id="p-edad" inputmode="numeric"></div>
@@ -373,8 +499,8 @@ button:active,.accion:active,.rutina:active{filter:brightness(.92);}
     </div>
   </details>
 
-  <details class="card">
-    <summary class="lbl">🔗 Conectar Zepp Life, reloj y otras apps</summary>
+  <details class="acordeon" id="cardConectar">
+    <summary><span class="ac-ic">🔗</span>Conectar báscula, Zepp Life y reloj</summary>
     <div class="ayuda">
       <p><b>Báscula por Bluetooth</b> (Android con Chrome): toca ⚖️ Báscula, elige tu báscula y súbete descalzo. Funciona con Xiaomi Mi Scale / Body Composition Scale 2 (las de Zepp Life) y básculas con Bluetooth estándar. <b>Cierra Zepp Life antes</b>: si está abierta, se queda con la báscula.</p>
       <p><b>Zepp Life:</b> en la web de privacidad de Zepp/Huami pide "Exportar datos"; te llega un ZIP con BODY, ACTIVITY y SLEEP en CSV. Súbelo con ⬆️ Importar (si el ZIP trae contraseña, descomprímelo y sube los CSV).</p>
@@ -385,44 +511,48 @@ button:active,.accion:active,.rutina:active{filter:brightness(.92);}
     </div>
   </details>
 
-  <details class="card" id="cardHistorial">
-    <summary class="lbl">📋 Historial</summary>
+  <details class="acordeon" id="cardHistorial">
+    <summary><span class="ac-ic">📋</span>Historial</summary>
     <div id="historial"></div>
   </details>
+  </div>
 </section>
 
 <section class="tab" id="tab-recetas" hidden>
-  <div class="card">
-    <div class="lbl">Recetas a tu medida</div>
-    <div class="nota" id="recetasNota"></div>
-    <div class="chips" id="chipsComida">
-      <button data-c="" class="on">Todas</button><button data-c="desayuno">Desayuno</button><button data-c="almuerzo">Almuerzo</button><button data-c="merienda">Merienda</button><button data-c="cena">Cena</button>
-    </div>
-    <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:#CBD5E1;">Porción de <input id="kcalReceta" inputmode="numeric" class="mini" style="width:70px;"> kcal</div>
+  <div class="intro">
+    <h2 class="hoy-h">Recetas a tu medida</h2>
+    <p class="hoy-sub">Porciones de <input id="kcalReceta" inputmode="numeric" class="mini kcal-in" aria-label="Calorías por porción"> kcal. <span id="recetasNota"></span></p>
   </div>
-  <div id="listaRecetas"></div>
+  <div class="chips" id="chipsComida" role="group" aria-label="Tiempo de comida">
+    <button data-c="" class="on">Todas</button><button data-c="desayuno">Desayuno</button><button data-c="almuerzo">Almuerzo</button><button data-c="merienda">Merienda</button><button data-c="cena">Cena</button>
+  </div>
+  <div class="card lista-recetas" id="listaRecetas"></div>
 </section>
 
 <section class="tab" id="tab-plan" hidden>
+  <div class="intro">
+    <h2 class="hoy-h">Tu plan</h2>
+    <p class="hoy-sub">Con el plan de tu nutricionista, cada producto y receta se ajusta a ti.</p>
+  </div>
   <div class="card" id="planCard">
-    <div style="display:flex;align-items:center;gap:8px;">
+    <div class="plan-cab">
       <div style="flex:1;min-width:0;">
-        <div class="lbl">🎯 Mi plan de nutrición</div>
-        <div id="planResumen" style="font-size:11px;color:#94A3B8;margin-top:2px;"></div>
+        <div class="prod-n" id="planTitulo">Sin plan todavía</div>
+        <div id="planResumen" class="nota"></div>
       </div>
-      <button class="btn-blue" id="btnPlan" style="flex-shrink:0;padding:7px 10px;">Cargar plan</button>
+      <button class="btn-pri" id="btnPlan" style="width:auto;padding:11px 16px;">Subir mi plan</button>
     </div>
     <label class="chk" id="usarPlanFila" style="display:none;"><input type="checkbox" id="usarPlan" checked> Juzgar los productos según mi plan</label>
     <div id="planEditor" style="display:none;flex-direction:column;gap:7px;">
-      <div style="font-size:10px;color:#475569;">Sube el plan que te dio tu nutricionista (PDF, fotos o texto) y reviso cada producto contra él. También puedes llenarlo a mano: tu propio plan personalizado. Todo queda solo en este teléfono.</div>
+      <p class="nota">Sube el PDF o fotos del plan, o escribe tus metas a mano. Se queda solo en este teléfono.</p>
       <div style="display:flex;gap:6px;flex-wrap:wrap;">
         <label class="btn-blue" style="flex:1;text-align:center;cursor:pointer;">📄 PDF o texto<input type="file" accept=".pdf,.txt,application/pdf,text/plain" id="planArchivo" style="display:none;"></label>
         <label class="btn-blue" style="flex:1;text-align:center;cursor:pointer;">📷 Fotos del plan<input type="file" accept="image/*" multiple id="planFotos" style="display:none;"></label>
       </div>
-      <textarea id="planTexto" rows="3" placeholder="…o pega aquí el texto del plan"></textarea>
+      <textarea id="planTexto" rows="3" placeholder="O pega aquí el texto del plan…"></textarea>
       <button class="btn-gray" id="btnAnalizarPlan">Analizar texto</button>
       <div id="planStat" class="motor-status" role="status" style="display:none;"></div>
-      <div class="lbl" style="margin-top:4px;">Metas del día (revisa y corrige)</div>
+      <div class="lbl" style="margin-top:4px;">Metas del día</div>
       <div class="g2">
         <div class="fld"><div class="flbl">Calorías (kcal/día)</div><input id="pl-kcal" inputmode="numeric"></div>
         <div class="fld"><div class="flbl">Tiempos de comida</div><input id="pl-comidas" inputmode="numeric" placeholder="ej: 5"></div>
@@ -446,36 +576,27 @@ button:active,.accion:active,.rutina:active{filter:brightness(.92);}
     </div>
   </div>
 
-  <details class="card" open>
-    <summary class="lbl" style="cursor:pointer;">Guía de compra — Costa Rica</summary>
-    <div style="font-size:11px;color:#94A3B8;line-height:1.55;">
-      <p><b style="color:#F1F5F9;">Antes de usarla:</b> en Costa Rica no hay sellos frontales obligatorios. La tabla nutricional suele venir <b>por porción</b> y con el sodio en <b>mg</b>; la lectura por foto lo convierte sola; a mano, usa el campo "porción" en Datos del producto y elige "Sodio (mg)". Algunos importados (sobre todo de México) traen octágonos negros ("EXCESO AZÚCARES", "EXCESO SODIO"…), que pueden quedarse puestos. Si un producto trae dos o más, casi siempre sale Tipo C o D.</p>
-      <p style="margin-top:6px;"><b style="color:#F1F5F9;">Por pasillo</b> (lo típico; confirma siempre con la etiqueta):</p>
-      <p>🥛 <b>Lácteos:</b> yogur natural o griego "sin azúcar añadido" → suele dar A (alto en proteína). Yogures bebibles y de sabores → B–C por azúcar. Leche descremada o semidescremada sin sabor → A; leches saborizadas → C. Quesos frescos y maduros → a menudo C por sal o saturadas: elige cottage o requesón, o porciones pequeñas.</p>
-      <p>🍞 <b>Pan y cereales:</b> avena en hojuelas natural → A (mucha fibra, casi sin azúcar). Pan 100% integral con ≥ 6 g de fibra/100 g → B (la sal ronda 1 g). Cereales de caja azucarados, granolas con miel y "pan dulce" → C–D.</p>
-      <p>🥫 <b>Despensa:</b> atún en agua → A–B (proteína alta; mira la sal). Frijoles enteros o molidos en lata o bolsa → buena fibra, pero revisa el sodio. Salsas tipo inglesa, salsas listas, consomés y sopas instantáneas → sal en rojo: úsalas en cantidades mínimas.</p>
-      <p>🥓 <b>Embutidos:</b> jamón de pavo o pollo → suele dar C por sal. Salchichas, mortadela, chorizo y salami → D. Mejor pollo, pescado o huevo frescos.</p>
-      <p>🍪 <b>Snacks y galletas:</b> casi todos salen C–D (azúcar, grasa saturada o sal). Palomitas naturales hechas en casa y maní o almendras sin sal salen rojo en grasa por naturaleza, pero son buena opción en porción pequeña (un puño): el semáforo penaliza la grasa, no distingue la buena.</p>
-      <p>🥤 <b>Bebidas:</b> agua, agua con gas, café y té sin azúcar, refrescos "zero" → A. Jugos, néctares, tés fríos y bebidas deportivas → con más de 6,25 g de azúcar/100 ml son C.</p>
-      <p style="margin-top:6px;"><b style="color:#F1F5F9;">Dónde comprar:</b> Palí y Maxi Palí (marcas propias baratas; compara la etiqueta, no la marca). Masxmenos y Walmart (también tienen tienda en línea). Megasuper. Auto Mercado y Fresh Market (más importados, algunos con octágonos). PriceSmart (avena, atún y frutos secos en presentación grande). <b>Feria del agricultor</b> para frutas, verduras, huevos y granos: sin etiqueta, y lo mejor para bajar de peso.</p>
-    </div>
-  </details>
-
   <div class="card">
-    <div class="lbl">Cómo se calcula el tipo</div>
-    <div style="font-size:11px;color:#94A3B8;line-height:1.5;">
-      <b style="color:#4ADE80;">A — Apto:</b> sin rojos, como mucho un ámbar (sin contar los que compensen fibra, proteína o calorías bajas) y sin alertas de dieta.<br>
+    <div class="lbl">Cómo juzgo los productos</div>
+    <label class="chk"><input type="checkbox" id="bajarPeso" checked> Criterios para bajar de peso (más estrictos con azúcar y sal)</label>
+  </div>
+
+  <div class="seccion-t">Guía para el súper</div>
+  <div class="card acordeones">
+    <details class="acordeon"><summary><span class="ac-ic">🏷️</span>Cómo leer etiquetas en Costa Rica</summary><p>en Costa Rica no hay sellos frontales obligatorios. La tabla nutricional suele venir <b>por porción</b> y con el sodio en <b>mg</b>; la lectura por foto lo convierte sola; a mano, usa el campo "porción" en Datos del producto y elige "Sodio (mg)". Algunos importados (sobre todo de México) traen octágonos negros ("EXCESO AZÚCARES", "EXCESO SODIO"…), que pueden quedarse puestos. Si un producto trae dos o más, casi siempre sale Tipo C o D.</p></details>
+    <details class="acordeon"><summary><span class="ac-ic">🥛</span>Lácteos</summary><p>yogur natural o griego "sin azúcar añadido" → suele dar A (alto en proteína). Yogures bebibles y de sabores → B–C por azúcar. Leche descremada o semidescremada sin sabor → A; leches saborizadas → C. Quesos frescos y maduros → a menudo C por sal o saturadas: elige cottage o requesón, o porciones pequeñas.</p></details>
+    <details class="acordeon"><summary><span class="ac-ic">🍞</span>Pan y cereales</summary><p>avena en hojuelas natural → A (mucha fibra, casi sin azúcar). Pan 100% integral con ≥ 6 g de fibra/100 g → B (la sal ronda 1 g). Cereales de caja azucarados, granolas con miel y "pan dulce" → C–D.</p></details>
+    <details class="acordeon"><summary><span class="ac-ic">🥫</span>Despensa</summary><p>atún en agua → A–B (proteína alta; mira la sal). Frijoles enteros o molidos en lata o bolsa → buena fibra, pero revisa el sodio. Salsas tipo inglesa, salsas listas, consomés y sopas instantáneas → sal en rojo: úsalas en cantidades mínimas.</p></details>
+    <details class="acordeon"><summary><span class="ac-ic">🥓</span>Embutidos</summary><p>jamón de pavo o pollo → suele dar C por sal. Salchichas, mortadela, chorizo y salami → D. Mejor pollo, pescado o huevo frescos.</p></details>
+    <details class="acordeon"><summary><span class="ac-ic">🍪</span>Snacks y galletas</summary><p>casi todos salen C–D (azúcar, grasa saturada o sal). Palomitas naturales hechas en casa y maní o almendras sin sal salen rojo en grasa por naturaleza, pero son buena opción en porción pequeña (un puño): el semáforo penaliza la grasa, no distingue la buena.</p></details>
+    <details class="acordeon"><summary><span class="ac-ic">🥤</span>Bebidas</summary><p>agua, agua con gas, café y té sin azúcar, refrescos "zero" → A. Jugos, néctares, tés fríos y bebidas deportivas → con más de 6,25 g de azúcar/100 ml son C.</p></details>
+    <details class="acordeon"><summary><span class="ac-ic">🛒</span>Dónde comprar</summary><p>Palí y Maxi Palí (marcas propias baratas; compara la etiqueta, no la marca). Masxmenos y Walmart (también tienen tienda en línea). Megasuper. Auto Mercado y Fresh Market (más importados, algunos con octágonos). PriceSmart (avena, atún y frutos secos en presentación grande). <b>Feria del agricultor</b> para frutas, verduras, huevos y granos: sin etiqueta, y lo mejor para bajar de peso.</p></details>
+    <details class="acordeon"><summary><span class="ac-ic">🚦</span>Cómo decide la app</summary><p><b style="color:#4ADE80;">A — Apto:</b> sin rojos, como mucho un ámbar (sin contar los que compensen fibra, proteína o calorías bajas) y sin alertas de dieta.<br>
       <b style="color:#FBBF24;">B — Moderación:</b> sin rojos, pero con varios ámbar o alguna alerta.<br>
       <b style="color:#FB923C;">C — Ocasional:</b> un nutriente en rojo.<br>
       <b style="color:#F87171;">D — Evitar:</b> dos o más nutrientes en rojo.<br>
       Fibra (≥3 g / ≥6 g), proteína (≥10 g) y calorías bajas (≤40 kcal sólidos, ≤20 kcal bebidas) compensan ámbar, pero nunca un rojo.
-      En modo bajar de peso, azúcares &gt;12,5 g (sólidos) o &gt;6,25 g (bebidas) cuentan como rojo; sal &gt;1 g y azúcar como ingrediente principal son alertas.
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="lbl">Umbrales del semáforo</div>
-    <table>
+      En modo bajar de peso, azúcares &gt;12,5 g (sólidos) o &gt;6,25 g (bebidas) cuentan como rojo; sal &gt;1 g y azúcar como ingrediente principal son alertas.</p><table>
       <tr><th>Por 100 g</th><th>Bajo</th><th>Medio</th><th>Alto</th></tr>
       <tr><td>Grasas</td><td class="verde">≤ 3</td><td class="ambar">3,1–17,5</td><td class="rojo">&gt; 17,5</td></tr>
       <tr><td>Saturadas</td><td class="verde">≤ 1,5</td><td class="ambar">1,6–5</td><td class="rojo">&gt; 5</td></tr>
@@ -487,7 +608,7 @@ button:active,.accion:active,.rutina:active{filter:brightness(.92);}
       <tr><td>Azúcares</td><td class="verde">≤ 2,5</td><td class="ambar">2,6–11,25</td><td class="rojo">&gt; 11,25</td></tr>
       <tr><td>Sal</td><td class="verde">≤ 0,3</td><td class="ambar">0,31–0,75</td><td class="rojo">&gt; 0,75</td></tr>
     </table>
-    <div style="font-size:10px;color:#64748B;">% IR = % de la ingesta de referencia diaria (2000 kcal · 70 g grasa · 20 g saturadas · 90 g azúcares · 6 g sal). Sal = sodio × 2,5.</div>
+    <div style="font-size:10px;color:#64748B;">% IR = % de la ingesta de referencia diaria (2000 kcal · 70 g grasa · 20 g saturadas · 90 g azúcares · 6 g sal). Sal = sodio × 2,5.</div></details>
   </div>
 </section>
 </div></div>
@@ -507,12 +628,12 @@ button:active,.accion:active,.rutina:active{filter:brightness(.92);}
   </div>
   <div class="nota">Muévete sin dolor. Si algo molesta, sáltalo.</div>
 </div>
-<nav class="tabs">
-  <button data-tab="hoy" class="on"><span>🌿</span>Hoy</button>
-  <button data-tab="escanear"><span>▦</span>Escanear</button>
-  <button data-tab="progreso"><span>📈</span>Progreso</button>
-  <button data-tab="recetas"><span>🍳</span>Recetas</button>
-  <button data-tab="plan"><span>🎯</span>Plan</button>
+<nav class="tabs" aria-label="Secciones">
+  <button data-tab="hoy" class="on"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19c8 1 14-5 14-14-9 0-15 6-14 14z"/><path d="M5 19c3-4 6-7 10-10"/></svg>Hoy</button>
+  <button data-tab="escanear"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2M7 8v8M10 8v8M13 8v8M16 8v8"/></svg>Escanear</button>
+  <button data-tab="progreso"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17l5-5 4 3 8-8"/><path d="M15 7h5v5"/></svg>Progreso</button>
+  <button data-tab="recetas"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11h16a8 8 0 0 1-16 0z"/><path d="M8 7c0-2 2-2 2-4M12 7c0-2 2-2 2-4"/></svg>Recetas</button>
+  <button data-tab="plan"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="1" fill="currentColor"/></svg>Plan</button>
 </nav>
 
 <script type="module">
@@ -648,8 +769,12 @@ function mostrarCabecera(){
   if(actual.imagen)$('prodImg').src=actual.imagen;
 }
 
+// Lo del producto se muestra solo cuando hay uno en pantalla.
+function mostrarZona(v){$('zonaProducto').hidden=!v;$('sinCodigo').hidden=v;}
+
 // Carga en pantalla un producto de la base (valores ya por 100 g/ml).
 function cargarProducto(prod){
+  mostrarZona(true);
   limpiarFormulario();
   actual={codigo:prod.codigo,imagen:prod.imagen||'',marca:prod.marca||'',cantidad:prod.cantidad||'',fuente:prod.fuente||'',nova:prod.nova,categorias:prod.categorias||[]};
   $('nombre').value=prod.nombre||'';
@@ -677,14 +802,26 @@ async function buscar(codigoCrudo){
   limpiarFormulario();
   actual.codigo=codigo;
   if(parcial){$('nombre').value=parcial.nombre;actual.marca=parcial.marca;}
+  mostrarZona(true);
   mostrarCabecera();
   render();
-  $('cardDatos').open=true;
+  $('cardOCR').open=true;$('cardDatos').open=true;
   estado('scanStat','',(sinRed&&!parcial)
-    ?'📴 Sin internet y no está guardado en este teléfono. Toma foto de la tabla nutricional (abajo) y toca Guardar.'
-    :'🤷 Este producto no tiene datos nutricionales en las bases abiertas. Toma foto de la tabla (abajo) y toca Guardar: queda registrado con su código.');
+    ?'📴 Sin internet y este producto no está guardado. Tómale foto a la tabla nutricional y toca Guardar.'
+    :'🤷 Este producto todavía no tiene datos. Tómale foto a la tabla nutricional y toca Guardar: la próxima vez saldrá solo.');
   $('cardOCR').scrollIntoView({behavior:'smooth',block:'center'});
 }
+
+$('irEtiqueta').addEventListener('click',()=>{
+  mostrarZona(true);$('cardOCR').open=true;render();
+  $('cardOCR').scrollIntoView({behavior:'smooth',block:'start'});
+  $('fotoTabla').click();
+});
+$('irManual').addEventListener('click',()=>{
+  mostrarZona(true);$('cardDatos').open=true;render();
+  $('cardDatos').scrollIntoView({behavior:'smooth',block:'start'});
+  setTimeout(()=>$('nombre').focus(),300);
+});
 
 // --- Escáner ---
 let escaner=null,detener=null;
@@ -692,22 +829,22 @@ async function cargarEscaner(){if(!escaner)escaner=await import('./engine/escane
 $('btnEscanear').addEventListener('click',async()=>{
   try{
     const esc=await cargarEscaner();
-    $('camara').style.display='block';$('btnEscanear').style.display='none';
+    $('camara').hidden=false;$('btnEscanear').hidden=true;
     estado('scanStat','cargando','Apunta al código de barras, dentro del recuadro.');
     detener=await esc.escanear($('video'),cod=>{
       detener=null;
-      $('camara').style.display='none';$('btnEscanear').style.display='block';
+      $('camara').hidden=true;$('btnEscanear').hidden=false;
       navigator.vibrate?.(80);
       buscar(cod);
     });
   }catch(err){
-    $('camara').style.display='none';$('btnEscanear').style.display='block';
+    $('camara').hidden=true;$('btnEscanear').hidden=false;
     estado('scanStat','','⚠️ No se pudo abrir la cámara ('+err.message+'). Usa 🖼️ para tomar una foto del código o escribe el número.');
   }
 });
 $('btnCancelar').addEventListener('click',()=>{
   detener?.();detener=null;
-  $('camara').style.display='none';$('btnEscanear').style.display='block';estado('scanStat','','');
+  $('camara').hidden=true;$('btnEscanear').hidden=false;estado('scanStat','','');
 });
 $('btnBuscar').addEventListener('click',()=>buscar($('codigo').value));
 $('codigo').addEventListener('keydown',e=>{if(e.key==='Enter')buscar($('codigo').value);});
@@ -755,6 +892,7 @@ function marcar(id,valor){
 }
 $('fotoTabla').addEventListener('change',async e=>{
   const file=e.target.files[0];e.target.value='';if(!file)return;
+  mostrarZona(true);$('cardOCR').open=true;
   try{
     const r=parsearTablaNutricional(await leerFoto(file));
     for(const c of CAMPOS){$(c).value='';$(c).classList.remove('auto-field');}
@@ -790,11 +928,15 @@ $('fotoIng').addEventListener('change',async e=>{
 // --- Guardar / comparar ---
 function renderLista(){
   const l=leerLista().sort((a,b)=>(a.clase||'Z').localeCompare(b.clase||'Z')||a.puntos-b.puntos);
-  $('cardLista').style.display=l.length?'flex':'none';
+  $('cardLista').style.display=l.length?'block':'none';
+  $('comoFunciona').hidden=l.length>0;
+  const veredicto={A:'Apto',B:'Con moderación',C:'Ocasional',D:'Evitar'};
   $('lista').innerHTML=l.map(it=>`<div class="item">
-    <span class="badge t-${it.color}">${it.clase}</span>
-    <span style="flex:1;">${esc(it.nombre)}<div style="font-size:10px;color:#64748B;">🟢${it.conteo.verdes} 🟡${it.conteo.ambar} 🔴${it.conteo.rojos} · ${it.tipo==='bebida'?'bebida':'sólido'}</div></span>
-    <button class="x" data-id="${it.id}" aria-label="Quitar">✕</button></div>`).join('');
+    <button class="item-abrir" data-abrir="${it.id}" ${it.datos?'':'disabled'}>
+      <span class="badge t-${it.color}">${it.clase}</span>
+      <span class="item-tx"><span class="item-n">${esc(it.nombre)}</span><span class="nota">${veredicto[it.clase]||''} · ${it.tipo==='bebida'?'bebida':'sólido'}</span></span>
+    </button>
+    <button class="x" data-id="${it.id}" aria-label="Quitar ${esc(it.nombre)}">✕</button></div>`).join('');
 }
 
 $('segTipo').addEventListener('click',e=>{
@@ -829,9 +971,17 @@ $('guardar').addEventListener('click',()=>{
 $('limpiar').addEventListener('click',()=>{
   limpiarFormulario();$('codigo').value='';
   estado('scanStat','','');estado('ocrStat','','');
+  $('cardOCR').open=false;$('cardDatos').open=false;
+  mostrarZona(false);
   render();window.scrollTo({top:0,behavior:'smooth'});
 });
 $('lista').addEventListener('click',e=>{
+  const a=e.target.closest('button[data-abrir]');
+  if(a){
+    const it=leerLista().find(x=>String(x.id)===a.dataset.abrir);
+    if(it?.datos){cargarProducto({codigo:it.codigo,nombre:it.nombre,tipo:it.tipo,datos:it.datos,fuente:'tus productos'});estado('scanStat','','');}
+    return;
+  }
   const b=e.target.closest('button.x');if(!b)return;
   escribirLista(leerLista().filter(it=>String(it.id)!==b.dataset.id));renderLista();pintarRecetas();
 });
@@ -846,8 +996,10 @@ function planActivo(){
 }
 function mostrarPlan(){
   const p=leerPlan();
-  $('planResumen').textContent=p?(p.nombre||'Plan guardado')+' — '+(resumenPlan(p)||'sin metas numéricas'):'Sin plan: uso los criterios generales para bajar de peso.';
-  $('btnPlan').textContent=p?'Editar':'Cargar plan';
+  $('planTitulo').textContent=p?'Tu plan está activo':'Sin plan todavía';
+  $('planResumen').textContent=p?(resumenPlan(p)||'Sin metas numéricas'):'Mientras tanto uso criterios generales para bajar de peso.';
+  $('btnPlan').textContent=p?'Editar':'Subir mi plan';
+  $('btnPlan').className=p?'btn-gray':'btn-pri';
   $('usarPlanFila').style.display=p?'flex':'none';
 }
 function planAFormulario(p){
@@ -931,6 +1083,7 @@ $('btnBorrarPlan').addEventListener('click',()=>{
   mostrarPlan();render();
 });
 $('usarPlan').addEventListener('change',render);
+$('bajarPeso').addEventListener('change',render);
 mostrarPlan();
 
 // =================== Pestañas ===================
@@ -938,7 +1091,10 @@ const TABS=['hoy','escanear','progreso','recetas','plan'];
 function irA(tab){
   if(!TABS.includes(tab))tab='hoy';
   for(const t of TABS)$('tab-'+t).hidden=t!==tab;
-  for(const b of document.querySelectorAll('nav.tabs button'))b.classList.toggle('on',b.dataset.tab===tab);
+  for(const b of document.querySelectorAll('nav.tabs button')){
+    b.classList.toggle('on',b.dataset.tab===tab);
+    if(b.dataset.tab===tab)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');
+  }
   if(tab==='progreso')pintarProgreso();
   if(tab==='recetas')pintarRecetas();
   if(tab==='hoy')pintarHoy();
@@ -950,8 +1106,7 @@ document.querySelector('nav.tabs').addEventListener('click',e=>{const b=e.target
 // Indicador de red (todo funciona sin ella, salvo buscar códigos nuevos).
 function pintarRed(){
   const on=navigator.onLine;
-  $('redEstado').textContent=on?'● en línea':'● sin internet';
-  $('redEstado').classList.toggle('on',on);
+  $('redEstado').hidden=on;
 }
 addEventListener('online',pintarRed);addEventListener('offline',pintarRed);pintarRed();
 
@@ -962,7 +1117,7 @@ function perfil(){return seg.leerPerfil();}
 function pintarHero(med){
   const t=seg.tendencia(med,'peso');
   const h=$('heroPeso');
-  if(!t.length){h.innerHTML=`<div class="lbl">Tu progreso</div><div class="vacio">Aún no hay mediciones.<br>Conecta tu báscula, registra tu peso o importa tus datos.</div>`;return;}
+  if(!t.length){h.innerHTML=`<div class="vacio-hero"><span class="e">⚖️</span><span class="prod-n">Aquí verás tu progreso</span><span class="nota">Pésate con tu báscula, escribe tu peso o trae los datos de Zepp Life o de tu reloj.</span></div>`;return;}
   const ult=t[t.length-1],pf=perfil();
   const hace=(dias)=>{const t0=new Date(ult.fecha)-dias*864e5;return [...t].reverse().find(p=>new Date(p.fecha)<=t0);};
   const s7=hace(7),s30=hace(30),ini=t[0];
@@ -1049,6 +1204,7 @@ function chartBarras(el,serie,{unidad,meta}){
 function pintarProgreso(){
   const med=seg.leerMediciones(),pf=perfil(),plan=leerPlan();
   pintarHero(med);
+  $('cardRecs').hidden=$('cardPeso').hidden=!med.length;
   chartLinea($('chPeso'),seg.tendencia(med,'peso'),{unidad:'kg'});
   const grasa=seg.tendencia(med,'grasa');
   $('cardGrasa').hidden=!grasa.length;
@@ -1059,7 +1215,12 @@ function pintarProgreso(){
   if(pasos.length)chartBarras($('chPasos'),pasos,{unidad:'pasos',meta:8000});
   const recs=seg.recomendaciones(med,pf,plan);
   const ico={bien:'✅',atencion:'⚠️',info:'💡'};
-  $('recs').innerHTML=recs.map(r=>`<div class="rec"><span>${ico[r.nivel]}</span><span>${esc(r.texto)}</span></div>`).join('');
+  // Primero lo que pide atención, luego lo bueno; se muestran 3 y el resto con "Ver más".
+  const orden={atencion:0,bien:1,info:2};
+  const lista=[...recs].sort((a,b)=>orden[a.nivel]-orden[b.nivel]);
+  const todas=$('recs').dataset.todas==='1';
+  $('recs').innerHTML=lista.slice(0,todas?99:3).map(r=>`<div class="rec"><span>${ico[r.nivel]}</span><span>${esc(r.texto)}</span></div>`).join('');
+  $('recsMas').hidden=todas||lista.length<=3;
   $('historial').innerHTML=med.length?`<table><tr><th>Fecha</th><th>Peso</th><th>Grasa</th><th>Pasos</th><th></th></tr>${
     med.slice(-60).reverse().map(f=>`<tr><td>${fechaCorta(f.fecha)}</td><td>${fmt1(f.peso)}</td><td>${fmt1(f.grasa)}</td><td>${f.pasos!==undefined?Math.round(f.pasos).toLocaleString('es'):'—'}</td><td><button class="x" data-f="${f.fecha}" aria-label="Borrar">✕</button></td></tr>`).join('')}</table>`
     :'<div class="vacio">Sin mediciones.</div>';
@@ -1068,6 +1229,7 @@ function pintarProgreso(){
   consejoDelDia=(utiles.length?utiles:recs)[new Date().getDate()%Math.max(1,(utiles.length?utiles:recs).length)]?.texto||'';
   guardarRecordatorios(false);
 }
+$('recsMas').addEventListener('click',()=>{$('recs').dataset.todas='1';pintarProgreso();});
 $('historial').addEventListener('click',e=>{
   const b=e.target.closest('button.x');if(!b)return;
   if(!confirm('¿Borrar la medición del '+fechaCorta(b.dataset.f)+'?'))return;
@@ -1299,20 +1461,21 @@ function pintarRecetas(){
   const kcal=numero($('kcalReceta').value)||def.k;
   const despensa=leerLista().filter(i=>i.datos);
   const plan=planActivo();
-  $('recetasNota').innerHTML=`Porciones calculadas para <b>${kcal} kcal</b> según ${$('kcalReceta').dataset.tocado?'lo que escribiste':def.de}. `+
-    (despensa.length?`Uso los datos de tus ${despensa.length} producto${despensa.length===1?'':'s'} guardados (★).`:'Guarda los productos que compras (pestaña Escanear) para que las recetas usen sus datos reales.');
+  $('recetasNota').textContent=`Según ${$('kcalReceta').dataset.tocado?'lo que escribiste':def.de}.`+
+    (despensa.length?` ★ usa la etiqueta de tus productos.`:' Guarda lo que compras para usar sus datos reales.');
   const lista=sugerirRecetas({comida:comidaSel||null,kcalObjetivo:kcal,despensa,plan});
-  $('listaRecetas').innerHTML=lista.map(r=>`<details class="card receta">
-    <summary style="display:block;"><h3>${esc(r.n)}</h3>
-      <div class="tags" style="margin-top:6px;"><span class="tag">${r.comida}</span><span class="tag">⏱ ${r.min} min</span>
-      ${r.deTuCompra?`<span class="tag ok">★ ${r.deTuCompra} de tu compra</span>`:''}
-      ${r.choques.length?`<span class="tag no">✕ tu plan evita: ${esc(r.choques[0].choque)}</span>`:''}</div>
-      <div class="macros4" style="margin-top:8px;"><div><b>${r.total.k}</b>kcal</div><div><b>${r.total.p} g</b>proteína</div><div><b>${r.total.c} g</b>carbos</div><div><b>${r.total.g} g</b>grasa</div></div>
-    </summary>
+  $('listaRecetas').innerHTML=lista.map(r=>`<details class="receta">
+    <summary><span class="tx"><span class="receta-n">${esc(r.n)}</span>
+      <span class="nota">${r.total.k} kcal · ${r.total.p} g de proteína · ${r.min} min</span>
+      ${r.deTuCompra||r.choques.length?`<span class="tags">${r.deTuCompra?`<span class="tag ok">★ ${r.deTuCompra} de tu compra</span>`:''}${r.choques.length?`<span class="tag no">Tu plan evita ${esc(r.choques[0].choque)}</span>`:''}</span>`:''}
+    </span><span class="flecha" aria-hidden="true">›</span></summary>
+    <div class="receta-cuerpo">
+    <div class="macros4"><div><b>${r.total.k}</b>kcal</div><div><b>${r.total.p} g</b>proteína</div><div><b>${r.total.c} g</b>carbos</div><div><b>${r.total.g} g</b>grasa</div></div>
     <div class="lbl" style="margin-top:6px;">Ingredientes (1 porción)</div>
     <div>${r.ingredientes.map(i=>`<div class="ing"><span>${i.deTuCompra?'★ ':''}${esc(i.nombre)}${i.choque?' <span class="tag no">evitar</span>':''}</span><span class="g">${i.gramos} g${i.unidades?` <span style="color:#7F9C95;font-weight:400">(${String(i.unidades).replace('.',',')} ${i.unidad}${i.unidades>1?'s':''})</span>`:''}</span></div>`).join('')}</div>
     <div class="lbl">Preparación</div><ol class="pasos">${r.pasos.map(p=>`<li>${esc(p)}</li>`).join('')}</ol>
     <div class="nota">Fibra: ${r.total.f} g. ★ = datos de la etiqueta de tu producto; el resto, valores de referencia (USDA).</div>
+    </div>
   </details>`).join('');
 }
 $('chipsComida').addEventListener('click',e=>{
@@ -1343,8 +1506,8 @@ function pintarAgua(){
   const ml=bien.aguaHoy(),meta=metaAguaHoy(),vasos=Math.round(ml/VASO),metaV=Math.ceil(meta/VASO);
   dibujarVaso(ml/meta);
   $('aguaNum').innerHTML=`${vasos} <small>de ${metaV} vasos</small>`;
-  $('aguaMl').textContent=ml>=meta?`¡Meta cumplida! ${(ml/1000).toFixed(2).replace('.',',')} L hoy.`
-    :`${(ml/1000).toFixed(2).replace('.',',')} de ${(meta/1000).toFixed(1).replace('.',',')} L · vasos de ${VASO} ml`;
+  const litros=v=>(Math.round(v/50)/20).toLocaleString('es-CR',{maximumFractionDigits:2});
+  $('aguaMl').textContent=ml>=meta?`¡Meta cumplida! ${litros(ml)} L hoy`:`${litros(ml)} de ${litros(meta)} L`;
 }
 async function cambiarAgua(ml){
   bien.sumarAgua(ml);
@@ -1385,20 +1548,81 @@ function pintarTuDia(){
   const ayer=med.find(f=>f.fecha===seg.hoy(new Date(Date.now()-864e5)))||{};
   const ml=bien.aguaHoy(),meta=metaAguaHoy(),pz=bien.pausasHoy();
   const sueno=h.sueno??ayer.sueno,ultPeso=[...med].reverse().find(f=>f.peso);
-  const fila=(ic,tx,vl,frac,color)=>`<div class="dia-fila"><span class="ic">${ic}</span><div class="tx">${tx}${frac!==null?`<div class="pb"><div style="width:${Math.min(100,frac*100)}%;background:${color}"></div></div>`:''}</div><span class="vl">${vl}</span></div>`;
+  // Cada fila lleva a donde se completa; si falta el dato, invita a agregarlo.
+  const fila=(ic,tx,vl,frac,color,ir)=>`<button class="dia-fila" data-ir="${ir}"><span class="ic">${ic}</span><span class="tx">${tx}${frac!==null?`<span class="pb"><span style="width:${Math.min(100,frac*100)}%;background:${color}"></span></span>`:''}</span><span class="vl${vl?'':' falta'}">${vl||'Agregar'}</span></button>`;
   $('tuDia').innerHTML=
-    fila('💧','Agua',`${Math.round(ml/VASO)}/${Math.ceil(meta/VASO)}`,ml/meta,'#5CC8E6')+
-    fila('🧘','Pausas activas',`${pz}/${META_PAUSAS}`,pz/META_PAUSAS,'#8BD17C')+
-    fila('🚶','Pasos',h.pasos!==undefined?Math.round(h.pasos).toLocaleString('es'):'—',h.pasos!==undefined?h.pasos/8000:null,'#8BD17C')+
-    fila('😴','Sueño',sueno!==undefined?`${fmt1(sueno)} h`:'—',sueno!==undefined?sueno/8:null,'#A9C2BB')+
-    fila('⚖️','Peso',ultPeso?`${fmt1(ultPeso.peso)} kg`:'—',null);
+    fila('💧','Agua',`${Math.round(ml/VASO)} de ${Math.ceil(meta/VASO)}`,ml/meta,'#5CC8E6','agua')+
+    fila('🧘','Pausas activas',`${pz} de ${META_PAUSAS}`,pz/META_PAUSAS,'#8BD17C','pausa')+
+    fila('🚶','Pasos',h.pasos!==undefined?Math.round(h.pasos).toLocaleString('es-CR'):'',h.pasos!==undefined?h.pasos/8000:null,'#8BD17C','conectar')+
+    fila('😴','Sueño',sueno!==undefined?`${fmt1(sueno)} h`:'',sueno!==undefined?sueno/8:null,'#A9C2BB','conectar')+
+    fila('⚖️','Peso',ultPeso?`${fmt1(ultPeso.peso)} kg`:'',null,null,'registrar');
 }
+function abrirAjuste(id){
+  irA('progreso');
+  const d=$(id);if(d){d.open=true;setTimeout(()=>d.scrollIntoView({behavior:'smooth',block:'start'}),60);}
+}
+function abrirRegistro(){
+  irA('progreso');$('cardRegistro').hidden=false;$('m-fecha').value=seg.hoy();
+  setTimeout(()=>{$('cardRegistro').scrollIntoView({behavior:'smooth',block:'start'});$('m-peso').focus();},60);
+}
+$('tuDia').addEventListener('click',e=>{
+  const b=e.target.closest('[data-ir]');if(!b)return;
+  const ir=b.dataset.ir;
+  if(ir==='agua')cambiarAgua(VASO);
+  else if(ir==='pausa')iniciarPausa('oficina');
+  else if(ir==='registrar')abrirRegistro();
+  else if(ir==='conectar')abrirAjuste('cardConectar');
+});
+
+// Bienvenida: 3 pasos que desaparecen al cumplirse.
+function pintarBienvenida(){
+  let oculta=false;try{oculta=localStorage.getItem('crcr-bienvenida-oculta')==='1';}catch{}
+  const pf=perfil(),rec=leerRec();
+  const pasos=[
+    {ok:!!(pf.estatura&&pesoActual()),t:'Cuéntame tu peso y estatura',d:'Para tu meta de agua, calorías y proteína.',ir:'perfil'},
+    {ok:Object.values(rec).some(r=>r?.activo),t:'Activa tus recordatorios',d:'Agua y pausas activas, aunque no tengas internet.',ir:'recordatorios'},
+    {ok:leerLista().length>0,t:'Escanea tu primer producto',d:'Te digo si te conviene en segundos.',ir:'escanear'}
+  ];
+  const hechos=pasos.filter(p=>p.ok).length;
+  $('bienvenida').hidden=oculta||hechos===pasos.length;
+  $('pasosInicio').innerHTML=pasos.map(p=>`<button class="paso${p.ok?' ok':''}" data-paso="${p.ir}" ${p.ok?'disabled':''}>
+    <span class="paso-c">${p.ok?'✓':''}</span><span class="tx"><span class="paso-t">${p.t}</span><span class="nota">${p.d}</span></span></button>`).join('');
+}
+$('pasosInicio').addEventListener('click',e=>{
+  const b=e.target.closest('[data-paso]');if(!b)return;
+  const ir=b.dataset.paso;
+  if(ir==='perfil'){abrirAjuste('cardPerfil');setTimeout(()=>$('p-estatura').focus(),400);}
+  else if(ir==='recordatorios')abrirAjuste('cardRecordatorios');
+  else irA('escanear');
+});
+$('cerrarBienvenida').addEventListener('click',()=>{try{localStorage.setItem('crcr-bienvenida-oculta','1');}catch{}$('bienvenida').hidden=true;});
+
+// La receta para la siguiente comida del día.
+function comidaQueSigue(){
+  const h=new Date().getHours();
+  return h<10?'desayuno':h<12?'merienda':h<15?'almuerzo':h<18?'merienda':'cena';
+}
+function pintarProxima(){
+  const comida=comidaQueSigue();
+  const r=sugerirRecetas({comida,kcalObjetivo:kcalPorComida().k,despensa:leerLista().filter(i=>i.datos),plan:planActivo()})[0];
+  const b=$('proximaComida');
+  b.hidden=!r;if(!r)return;
+  b.dataset.comida=comida;
+  b.innerHTML=`<span class="pausa-ico" style="background:#3A2E1F">🍳</span><span class="tx"><span class="nota">Idea para tu ${comida}</span><span class="prod-n">${esc(r.n)}</span><span class="nota">${r.total.k} kcal · ${r.total.p} g de proteína · ${r.min} min</span></span><span class="flecha" aria-hidden="true">›</span>`;
+}
+$('proximaComida').addEventListener('click',()=>{
+  comidaSel=$('proximaComida').dataset.comida;
+  for(const x of $('chipsComida').children)x.classList.toggle('on',x.dataset.c===comidaSel);
+  irA('recetas');
+  setTimeout(()=>{const d=$('listaRecetas').querySelector('details');if(d)d.open=true;},50);
+});
+
 function pintarHoy(){
   const h=new Date().getHours();
   const pf=perfil();
   $('hoySaludo').textContent=h<12?'Buenos días':h<19?'Buenas tardes':'Buenas noches';
   $('hoyFecha').textContent=new Date().toLocaleDateString('es',{weekday:'long',day:'numeric',month:'long'}).replace(/^./,c=>c.toUpperCase());
-  pintarAgua();pintarPausaInfo();pintarTuDia();
+  pintarAgua();pintarPausaInfo();pintarTuDia();pintarBienvenida();pintarProxima();
   if(!consejoDelDia){
     const recs=seg.recomendaciones(seg.leerMediciones(),pf,leerPlan()).filter(r=>r.nivel!=='info'||/proteína|pasos/.test(r.texto));
     consejoDelDia=recs.length?recs[new Date().getDate()%recs.length].texto:'';

@@ -2,7 +2,7 @@
 // para que la app de bienestar no descargue los modelos de voz (~70 MB) que no
 // usa. Se registra con scope './nutricion.html', así controla solo esta app.
 // Subir CACHE_NAME cuando se publique una actualización.
-const CACHE_NAME='mi-bienestar-v1';
+const CACHE_NAME='mi-bienestar-v2';
 const ARCHIVOS=[
   './nutricion.html',
   './styles.css',

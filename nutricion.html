@@ -34,7 +34,7 @@ html,body{overflow:auto;height:auto;}
 .luz.verde{background:#22C55E;}.luz.ambar{background:#F59E0B;}.luz.rojo{background:#EF4444;}
 .fila .n{flex:1;}
 .fila .v{font-weight:700;font-family:monospace;}
-.fila .p{color:#64748B;font-size:10px;width:52px;text-align:right;}
+.fila .p{color:#7F9C95;font-size:12px;width:52px;text-align:right;}
 .msg{font-size:11px;padding:6px 8px;border-radius:6px;}
 .msg.alerta{background:#2D2006;color:#FBBF24;}
 .msg.ok{background:#052E16;color:#4ADE80;}
@@ -284,6 +284,47 @@ nav.tabs button{gap:3px;font-size:11px;}
 nav.tabs svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;}
 nav.tabs button.on{color:var(--hoja);background:#1A3330;}
 .pill{background:#3A2E1F;color:#F5C26B;}
+
+/* ===== Revisión con ui-ux-pro-max: tacto ≥44 px, texto ≥12 px, íconos SVG ===== */
+.chk input{width:auto;height:auto;}
+.chk input[type=checkbox]{width:22px;height:22px;}
+.chk{min-height:44px;flex-wrap:wrap;row-gap:6px;}
+.chk .mini,.chk .hora,.mini,.hora{min-height:40px;font-size:15px;}
+input:not([type=checkbox]):not([type=file]),select{min-height:44px;}
+.btn-pri,.btn-blue,.btn-gray,label.btn-blue,label.btn-gray{min-height:44px;display:inline-flex;align-items:center;justify-content:center;gap:8px;}
+.btn-pri,.fila-botones>*{width:100%;}
+.fila-botones .btn-gray{width:auto;}
+.enlace{min-height:44px;display:inline-flex;align-items:center;gap:8px;}
+.enlace.centro{justify-content:center;}
+.sin-codigo .enlace{justify-content:center;}
+.dia-fila{min-height:52px;}
+.dias button{width:44px;height:44px;font-size:13px;}
+.dias{flex-wrap:wrap;padding-left:0;}
+.chips button{min-height:44px;padding:8px 16px;font-size:14px;}
+.kcal-in{min-height:40px;}
+.x{min-width:44px;min-height:44px;}
+details>summary.nota,.chart summary{padding:12px 0;min-height:44px;display:flex;align-items:center;cursor:pointer;}
+.flbl,.tag,.macros4 div,small,.nota{font-size:12px;}
+.chk{font-size:14px;}
+.ayuda code{font-size:11px;}
+.chart svg text{font-size:11px;}
+.ic-g{width:28px;height:28px;color:var(--hoja);}
+.ic-hoja{color:var(--hoja);}
+.ic-agua{color:var(--agua);}
+.ic-ambar{color:#F5C26B;}
+.pausa-ico .ic{width:24px;height:24px;}
+.ac-ic{display:flex;align-items:center;justify-content:center;color:var(--suave);}
+.dia-fila .ic{width:24px;}
+.dia-fila .ic:not(.ic-agua):not(.ic-hoja){color:var(--suave);}
+.accion{gap:6px;min-height:84px;justify-content:center;}
+.rutina small,.leyenda{font-size:12px;}
+table+div,td+div{font-size:12px!important;}
+.acordeon div[style*="font-size:10px"]{font-size:12px!important;}
+.chk .mini{width:60px;flex:none;text-align:center;padding:6px;}
+.chk .hora{width:auto;flex:none;}
+.chk{align-items:center;column-gap:8px;}
+.dias{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;width:100%;}
+.dias button{width:auto;height:44px;border-radius:12px;}
 </style>
 </head>
 <body>
@@ -320,7 +361,7 @@ nav.tabs button.on{color:var(--hoja);background:#1A3330;}
 
   <div class="card pausa">
     <div class="pausa-fila">
-      <div class="pausa-ico">🧘</div>
+      <div class="pausa-ico"><svg class="ic ic-hoja" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="4.5" r="2"/><path d="M12 7v6"/><path d="M8 21l4-8 4 8"/><path d="M4 9l8 2 8-2"/></svg></div>
       <div style="flex:1;min-width:0;"><div class="prod-n">Pausa activa</div><div class="hoy-sub" id="pausaInfo"></div></div>
     </div>
     <div class="rutinas" id="rutinas"></div>
@@ -338,7 +379,7 @@ nav.tabs button.on{color:var(--hoja);background:#1A3330;}
     <div class="consejo" id="consejo"></div>
   </div>
 
-  <button class="enlace centro" id="irRecordatorios">🔔 Recordatorios de agua y pausas</button>
+  <button class="enlace centro" id="irRecordatorios"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 16v-5a6 6 0 0 1 12 0v5l2 2H4z"/><path d="M10 20.5a2 2 0 0 0 4 0"/></svg>Recordatorios de agua y pausas</button>
 </section>
 
 <section class="tab" id="tab-escanear" hidden>
@@ -361,8 +402,8 @@ nav.tabs button.on{color:var(--hoja);background:#1A3330;}
 
   <div id="sinCodigo">
     <div class="sin-codigo">
-      <button class="enlace" id="irEtiqueta">📷 Leer la etiqueta</button>
-      <button class="enlace" id="irManual">✏️ Escribir los datos</button>
+      <button class="enlace" id="irEtiqueta"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="6" width="18" height="14" rx="3"/><circle cx="12" cy="13" r="3.5"/><path d="M8.5 6l1.5-2.5h4L15.5 6"/></svg>Leer la etiqueta</button>
+      <button class="enlace" id="irManual"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg>Escribir los datos</button>
     </div>
     <div class="como" id="comoFunciona">
       <div><b>1</b>Escanea el código o tómale foto a la tabla nutricional.</div>
@@ -442,9 +483,9 @@ nav.tabs button.on{color:var(--hoja);background:#1A3330;}
   <div class="card hero" id="heroPeso"></div>
 
   <div class="acciones">
-    <button class="accion" id="btnBascula"><span>⚖️</span>Báscula</button>
-    <button class="accion" id="btnRegistrar"><span>✏️</span>Registrar</button>
-    <label class="accion"><span>⬆️</span>Importar<input type="file" id="importar" multiple accept=".csv,.zip,.xml,.txt,text/csv,application/zip,text/xml" style="display:none;"></label>
+    <button class="accion" id="btnBascula"><svg class="ic ic-g" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M8.5 10a5 5 0 0 1 7 0"/><path d="M12 10l1.5-2"/></svg>Báscula</button>
+    <button class="accion" id="btnRegistrar"><svg class="ic ic-g" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg>Registrar</button>
+    <label class="accion"><svg class="ic ic-g" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V4"/><path d="M7 9l5-5 5 5"/><path d="M4 15v4a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-4"/></svg>Importar<input type="file" id="importar" multiple accept=".csv,.zip,.xml,.txt,text/csv,application/zip,text/xml" style="display:none;"></label>
   </div>
   <div id="segStat" class="motor-status" role="status" style="display:none;"></div>
   <div class="card" id="datosPendientes" hidden>
@@ -484,7 +525,7 @@ nav.tabs button.on{color:var(--hoja);background:#1A3330;}
   <div class="seccion-t">Ajustes y datos</div>
   <div class="card acordeones">
   <details class="acordeon" id="cardRecordatorios">
-    <summary><span class="ac-ic">🔔</span>Recordatorios</summary>
+    <summary><span class="ac-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 16v-5a6 6 0 0 1 12 0v5l2 2H4z"/><path d="M10 20.5a2 2 0 0 0 4 0"/></svg></span>Recordatorios</summary>
     <label class="chk"><input type="checkbox" id="r-pesar"> ⚖️ Pesarme a las <input id="r-pesarHora" type="time" value="07:00" class="hora"></label>
     <div class="dias" id="r-dias"></div>
     <label class="chk"><input type="checkbox" id="r-agua"> 💧 Agua cada <input id="r-aguaCada" inputmode="numeric" value="2" class="mini"> h, de <input id="r-aguaDesde" inputmode="numeric" value="8" class="mini"> a <input id="r-aguaHasta" inputmode="numeric" value="20" class="mini"> h</label>
@@ -500,7 +541,7 @@ nav.tabs button.on{color:var(--hoja);background:#1A3330;}
   </details>
 
   <details class="acordeon" id="cardPerfil">
-    <summary><span class="ac-ic">👤</span>Mi perfil</summary>
+    <summary><span class="ac-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span>Mi perfil</summary>
     <div class="g2">
       <div class="fld"><div class="flbl">Sexo</div><select id="p-sexo"><option value="">—</option><option value="m">Mujer</option><option value="h">Hombre</option></select></div>
       <div class="fld"><div class="flbl">Edad</div><input id="p-edad" inputmode="numeric"></div>
@@ -510,7 +551,7 @@ nav.tabs button.on{color:var(--hoja);background:#1A3330;}
   </details>
 
   <details class="acordeon" id="cardConectar">
-    <summary><span class="ac-ic">🔗</span>Conectar báscula, Zepp Life y reloj</summary>
+    <summary><span class="ac-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg></span>Conectar báscula, Zepp Life y reloj</summary>
     <div class="ayuda">
       <p><b>Báscula por Bluetooth</b> (Android con Chrome): toca ⚖️ Báscula, elige tu báscula y súbete descalzo. Funciona con Xiaomi Mi Scale / Body Composition Scale 2 (las de Zepp Life) y básculas con Bluetooth estándar. <b>Cierra Zepp Life antes</b>: si está abierta, se queda con la báscula.</p>
       <p><b>Zepp Life:</b> en la web de privacidad de Zepp/Huami pide "Exportar datos"; te llega un ZIP con BODY, ACTIVITY y SLEEP en CSV. Súbelo con ⬆️ Importar (si el ZIP trae contraseña, descomprímelo y sube los CSV).</p>
@@ -522,7 +563,7 @@ nav.tabs button.on{color:var(--hoja);background:#1A3330;}
   </details>
 
   <details class="acordeon" id="cardHistorial">
-    <summary><span class="ac-ic">📋</span>Historial</summary>
+    <summary><span class="ac-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M4.5 6h.01M4.5 12h.01M4.5 18h.01"/></svg></span>Historial</summary>
     <div id="historial"></div>
   </details>
   </div>
@@ -582,7 +623,7 @@ nav.tabs button.on{color:var(--hoja);background:#1A3330;}
         <button class="btn-gray" id="btnBorrarPlan" style="flex-shrink:0;">Borrar</button>
         <button class="btn-gray" id="btnCerrarPlan" style="flex-shrink:0;">Cerrar</button>
       </div>
-      <div style="font-size:10px;color:#475569;">Esta herramienta te ayuda a aplicar tu plan en el súper; ante cualquier duda manda lo que diga tu nutricionista.</div>
+      <div class="nota">Esta herramienta te ayuda a aplicar tu plan en el súper; ante cualquier duda manda lo que diga tu nutricionista.</div>
     </div>
   </div>
 
@@ -618,7 +659,7 @@ nav.tabs button.on{color:var(--hoja);background:#1A3330;}
       <tr><td>Azúcares</td><td class="verde">≤ 2,5</td><td class="ambar">2,6–11,25</td><td class="rojo">&gt; 11,25</td></tr>
       <tr><td>Sal</td><td class="verde">≤ 0,3</td><td class="ambar">0,31–0,75</td><td class="rojo">&gt; 0,75</td></tr>
     </table>
-    <div style="font-size:10px;color:#64748B;">% IR = % de la ingesta de referencia diaria (2000 kcal · 70 g grasa · 20 g saturadas · 90 g azúcares · 6 g sal). Sal = sodio × 2,5.</div></details>
+    <div class="nota">% IR = % de la ingesta de referencia diaria (2000 kcal · 70 g grasa · 20 g saturadas · 90 g azúcares · 6 g sal). Sal = sodio × 2,5.</div></details>
   </div>
 </section>
 </div></div>
@@ -999,7 +1040,7 @@ $('lista').addEventListener('click',e=>{
 // --- Mi plan de nutrición ---
 const PL_NUM=['kcal','comidas','proteina','carbos','grasa','fibra','azucarMax','salMax'];
 $('pl-condiciones').innerHTML=Object.entries(CONDICIONES).map(([k,c])=>
-  `<label class="chk" style="font-size:11px;"><input type="checkbox" id="pl-c-${k}"> ${c.nombre}</label>`).join('');
+  `<label class="chk"><input type="checkbox" id="pl-c-${k}"> ${c.nombre}</label>`).join('');
 function planActivo(){
   const p=leerPlan();
   return p&&$('usarPlan').checked?p:null;
@@ -1537,6 +1578,9 @@ $('kcalReceta').addEventListener('input',()=>{$('kcalReceta').dataset.tocado=$('
 
 
 // =================== Hoy: agua, pausas activas y tu día ===================
+const ICONOS={"gota": "<path d=\"M12 3c3 4.2 6 7.6 6 11.2a6 6 0 0 1-12 0C6 10.6 9 7.2 12 3z\"/>", "estirar": "<circle cx=\"12\" cy=\"4.5\" r=\"2\"/><path d=\"M12 7v6\"/><path d=\"M8 21l4-8 4 8\"/><path d=\"M4 9l8 2 8-2\"/>", "pasos": "<path d=\"M7 3.5c1.7 0 2.8 1.9 2.8 4.6S8.7 13 7 13s-2.8-2.2-2.8-4.9S5.3 3.5 7 3.5z\"/><path d=\"M5 16.5h4\"/><path d=\"M17 8.5c1.7 0 2.8 1.9 2.8 4.6S18.7 18 17 18s-2.8-2.2-2.8-4.9 1.1-4.6 2.8-4.6z\"/><path d=\"M15 21h4\"/>", "luna": "<path d=\"M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z\"/>", "bascula": "<rect x=\"4\" y=\"4\" width=\"16\" height=\"16\" rx=\"4\"/><path d=\"M8.5 10a5 5 0 0 1 7 0\"/><path d=\"M12 10l1.5-2\"/>", "olla": "<path d=\"M4 11h16a8 8 0 0 1-16 0z\"/><path d=\"M8 7c0-2 2-2 2-4M12 7c0-2 2-2 2-4\"/>"};
+const icono=(n,c="ic")=>`<svg class="${c}" viewBox="0 0 24 24" aria-hidden="true">${ICONOS[n]}</svg>`;
+
 const VASO=250;
 function pesoActual(){return [...seg.leerMediciones()].reverse().find(f=>f.peso)?.peso;}
 function metaAguaHoy(){return bien.metaAgua(pesoActual());}
@@ -1600,11 +1644,11 @@ function pintarTuDia(){
   // Cada fila lleva a donde se completa; si falta el dato, invita a agregarlo.
   const fila=(ic,tx,vl,frac,color,ir)=>`<button class="dia-fila" data-ir="${ir}"><span class="ic">${ic}</span><span class="tx">${tx}${frac!==null?`<span class="pb"><span style="width:${Math.min(100,frac*100)}%;background:${color}"></span></span>`:''}</span><span class="vl${vl?'':' falta'}">${vl||'Agregar'}</span></button>`;
   $('tuDia').innerHTML=
-    fila('💧','Agua',`${Math.round(ml/VASO)} de ${Math.ceil(meta/VASO)}`,ml/meta,'#5CC8E6','agua')+
-    fila('🧘','Pausas activas',`${pz} de ${META_PAUSAS}`,pz/META_PAUSAS,'#8BD17C','pausa')+
-    fila('🚶','Pasos',h.pasos!==undefined?Math.round(h.pasos).toLocaleString('es-CR'):'',h.pasos!==undefined?h.pasos/8000:null,'#8BD17C','conectar')+
-    fila('😴','Sueño',sueno!==undefined?`${fmt1(sueno)} h`:'',sueno!==undefined?sueno/8:null,'#A9C2BB','conectar')+
-    fila('⚖️','Peso',ultPeso?`${fmt1(ultPeso.peso)} kg`:'',null,null,'registrar');
+    fila(icono('gota','ic ic-agua'),'Agua',`${Math.round(ml/VASO)} de ${Math.ceil(meta/VASO)}`,ml/meta,'#5CC8E6','agua')+
+    fila(icono('estirar','ic ic-hoja'),'Pausas activas',`${pz} de ${META_PAUSAS}`,pz/META_PAUSAS,'#8BD17C','pausa')+
+    fila(icono('pasos','ic ic-hoja'),'Pasos',h.pasos!==undefined?Math.round(h.pasos).toLocaleString('es-CR'):'',h.pasos!==undefined?h.pasos/8000:null,'#8BD17C','conectar')+
+    fila(icono('luna'),'Sueño',sueno!==undefined?`${fmt1(sueno)} h`:'',sueno!==undefined?sueno/8:null,'#A9C2BB','conectar')+
+    fila(icono('bascula'),'Peso',ultPeso?`${fmt1(ultPeso.peso)} kg`:'',null,null,'registrar');
 }
 function abrirAjuste(id){
   irA('progreso');
@@ -1657,7 +1701,7 @@ function pintarProxima(){
   const b=$('proximaComida');
   b.hidden=!r;if(!r)return;
   b.dataset.comida=comida;
-  b.innerHTML=`<span class="pausa-ico" style="background:#3A2E1F">🍳</span><span class="tx"><span class="nota">Idea para tu ${comida}</span><span class="prod-n">${esc(r.n)}</span><span class="nota">${r.total.k} kcal · ${r.total.p} g de proteína · ${r.min} min</span></span><span class="flecha" aria-hidden="true">›</span>`;
+  b.innerHTML=`<span class="pausa-ico" style="background:#3A2E1F">${icono('olla','ic ic-ambar')}</span><span class="tx"><span class="nota">Idea para tu ${comida}</span><span class="prod-n">${esc(r.n)}</span><span class="nota">${r.total.k} kcal · ${r.total.p} g de proteína · ${r.min} min</span></span><span class="flecha" aria-hidden="true">›</span>`;
 }
 $('proximaComida').addEventListener('click',()=>{
   comidaSel=$('proximaComida').dataset.comida;

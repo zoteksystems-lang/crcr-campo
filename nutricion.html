@@ -71,6 +71,7 @@ input,select,textarea{font-size:15px;padding:10px 12px;border-radius:10px;backgr
 .pill{font-size:11px;padding:4px 9px;border-radius:20px;background:#21393A;color:#A9C2BB;white-space:nowrap;}
 .pill.on{color:#4ADE80;}
 .tab[hidden]{display:none!important;}
+.armado{color:#F87171!important;border-color:#7F1D1D!important;}
 html{background:#0E1C1B;}
 .fila .v{font-family:inherit;font-variant-numeric:tabular-nums;}
 .sin-codigo .enlace{flex:1;text-align:center;background:#15292A;border:1px solid #21393A;border-radius:12px;padding:12px 8px;font-size:14px;}
@@ -949,7 +950,7 @@ document.querySelectorAll('#cardDatos input,#cardDatos textarea,#cardDatos selec
 }));
 $('guardar').addEventListener('click',()=>{
   const r=render();
-  if(!r.clase){alert('Primero escanea un producto o ingresa al menos un nutriente.');return;}
+  if(!r.clase){estado('scanStat','','Primero escanea un producto o escribe al menos un nutriente.');return;}
   const nombre=$('nombre').value.trim()||'Sin nombre';
   const l=leerLista().filter(it=>!actual.codigo||it.codigo!==actual.codigo);
   const p100=producto(),datos100={};
@@ -1078,13 +1079,22 @@ $('btnGuardarPlan').addEventListener('click',()=>{
   mostrarPlan();$('planEditor').style.display='none';render();pintarRecetas();
 });
 $('btnBorrarPlan').addEventListener('click',()=>{
-  if(!confirm('¿Borrar tu plan de este teléfono?'))return;
+  if(!confirmar($('btnBorrarPlan'),'¿Seguro? Toca otra vez')) return;
   borrarPlan();planAFormulario({condiciones:{}});$('planTexto').value='';estado('planStat','','');
   mostrarPlan();render();
 });
 $('usarPlan').addEventListener('change',render);
 $('bajarPeso').addEventListener('change',render);
 mostrarPlan();
+
+// Confirmación en dos toques (sin diálogos del navegador): el primer toque cambia
+// el texto del botón; el segundo, dentro de 4 s, confirma.
+function confirmar(btn,texto){
+  if(btn.dataset.armado==='1'){delete btn.dataset.armado;clearTimeout(btn._t);btn.textContent=btn.dataset.txt;return true;}
+  btn.dataset.armado='1';btn.dataset.txt=btn.textContent;btn.textContent=texto;btn.classList.add('armado');
+  btn._t=setTimeout(()=>{delete btn.dataset.armado;btn.textContent=btn.dataset.txt;btn.classList.remove('armado');},4000);
+  return false;
+}
 
 // =================== Pestañas ===================
 const TABS=['hoy','escanear','progreso','recetas','plan'];
@@ -1232,7 +1242,7 @@ function pintarProgreso(){
 $('recsMas').addEventListener('click',()=>{$('recs').dataset.todas='1';pintarProgreso();});
 $('historial').addEventListener('click',e=>{
   const b=e.target.closest('button.x');if(!b)return;
-  if(!confirm('¿Borrar la medición del '+fechaCorta(b.dataset.f)+'?'))return;
+  if(!confirmar(b,'Borrar')) return;
   seg.borrarMedicion(b.dataset.f);pintarProgreso();
 });
 

@@ -42,13 +42,6 @@ export async function leerCedula(dataUrlOrBlob, {onProgress}={}){
   return {...parsearTexto(data.text||''), textoCrudo:data.text};
 }
 
-// Texto crudo de cualquier foto (p. ej. tabla nutricional en nutricion.html).
-export async function leerTexto(dataUrlOrBlob){
-  const worker=await obtenerWorker();
-  const {data}=await worker.recognize(dataUrlOrBlob);
-  return data.text||'';
-}
-
 export async function cerrarOCR(){
   if(workerPromise){
     const w=await workerPromise;

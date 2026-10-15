@@ -4,7 +4,7 @@ Asistente de campo para Cruz Roja Costarricense. Sin nube: interpretación de
 despacho, signos vitales, entrevista SAMPLE/OPQRST, diagnóstico diferencial,
 boleta APA y buscador corren con reglas propias en `engine/*.js` sobre las
 tablas de `data.js`. La voz se transcribe con Whisper local (transformers.js)
-y la cédula (y la tabla nutricional en `nutricion.html`) se lee con Tesseract.js local — ningún dato de paciente sale del
+y la cédula se lee con Tesseract.js local — ningún dato de paciente sale del
 dispositivo.
 
 ## Estructura
@@ -15,38 +15,6 @@ dispositivo.
 - `vendor/` — transformers.js + Tesseract.js, vendorizados (no CDN).
 - `models/` — pesos de Whisper-tiny (cuantizado, multilingüe) y el idioma
   español de Tesseract, servidos desde el propio dominio.
-- `nutricion.html` — **Mi Bienestar**, app de bienestar instalable aparte
-  (`manifest-nutricion.webmanifest`) con 5 pestañas: Hoy, Escanear,
-  Progreso, Recetas y Plan. Funciona sin internet (solo buscar un código
-  nuevo usa red). **Hoy** (`engine/bienestar.js`): vaso de agua con meta
-  según el peso (~35 ml/kg), pausas activas guiadas con temporizador
-  (oficina, activa y express) y resumen del día; recordatorios de agua
-  (con botón "+1 vaso" en la notificación) y de pausas activas en horario
-  laboral. Tipografía Bricolage Grotesque vendorizada (OFL) en
-  `vendor/fonts/`.
-  **Progreso** (`engine/seguimiento.js`, `engine/bascula.js`): peso,
-  composición corporal y datos del reloj; báscula Bluetooth (Web Bluetooth:
-  Xiaomi Mi Scale / Body Composition Scale 2 de Zepp Life y básculas con el
-  estándar Bluetooth, solo Chrome/Android), importación de Zepp Life (ZIP o
-  CSV), Apple Salud (exportar.zip, leído por trozos con fflate), Samsung
-  Health, Garmin, openScale y CSV genéricos, y un Atajo de iPhone que abre
-  `nutricion.html#datos?peso=…&pasos=…`. Gráficos, recomendaciones y
-  recordatorios (notificaciones del Service Worker con Periodic Background
-  Sync donde exista, y archivo .ics para el calendario del teléfono).
-  **Recetas** (`engine/recetas.js`): gramos por porción calculados para las
-  calorías de un tiempo de comida del plan o del perfil, usando los datos de
-  los productos guardados.
-  Escáner de alimentos para bajar de peso (estilo
-  MyFitnessPal): se escanea el código de barras (`engine/escaner.js`, con
-  BarcodeDetector nativo o ZXing vendorizado), se buscan los datos
-  (`engine/codigobarras.js`: memoria del teléfono → Open Food Facts → USDA
-  FoodData Central) y se muestran macros por 100 g y por porción, el
-  semáforo (umbrales FSA) y el veredicto: Tipo A apto · B con moderación ·
-  C no apto para el día a día · D no apto (`engine/nutricion.js`). Si el
-  producto no está en ninguna base, se le toma foto a la tabla nutricional
-  (OCR local) y queda guardado con su código para la próxima vez, aun sin
-  internet. Es la única parte de la app que usa red (solo para buscar
-  códigos nuevos).
 - `sw.js` / `manifest.webmanifest` — Service Worker que precachea todo
   (~70MB la primera vez) para que después funcione sin conexión.
 

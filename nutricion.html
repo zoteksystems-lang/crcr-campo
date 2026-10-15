@@ -447,6 +447,15 @@ nav.tabs button.on{color:var(--hoja);background:#1A3330;}
     <label class="accion"><span>⬆️</span>Importar<input type="file" id="importar" multiple accept=".csv,.zip,.xml,.txt,text/csv,application/zip,text/xml" style="display:none;"></label>
   </div>
   <div id="segStat" class="motor-status" role="status" style="display:none;"></div>
+  <div class="card" id="datosPendientes" hidden>
+    <div class="lbl">Llegaron datos por un enlace</div>
+    <div id="datosPendTxt" style="font-size:14px;line-height:1.5;"></div>
+    <div class="nota">Guárdalos solo si vienen de tu Atajo de Salud.</div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn-pri" id="datosGuardar" style="flex:1;">Guardar</button>
+      <button class="btn-gray" id="datosDescartar">Descartar</button>
+    </div>
+  </div>
 
   <div class="card" id="cardRegistro" hidden>
     <div class="lbl">Registrar medición</div>
@@ -1356,16 +1365,46 @@ $('importar').addEventListener('change',async e=>{
   importadas(total,files.length>1?`${files.length} archivos`:files[0].name);
 });
 
-// Datos que llegan por el Atajo de iPhone (#datos?peso=…)
+// Datos que llegan por el Atajo de iPhone (#datos?peso=…). Cualquier enlace
+// puede traer ese formato, así que nunca se guardan solos: se muestran y la
+// persona confirma. Los valores imposibles se descartan.
+const RANGO_URL={peso:[20,400],grasa:[2,75],musculo:[5,150],agua:[20,80],visceral:[1,60],imc:[10,80],
+  cintura:[30,250],pasos:[0,100000],kcalActivas:[0,10000],fcReposo:[25,220],sueno:[0,24]};
+let filaPendiente=null;
 function datosDeURL(){
-  const fila=seg.filaDesdeURL(location.hash);
-  if(!fila)return false;
-  seg.agregarMediciones([fila]);
+  const cruda=seg.filaDesdeURL(location.hash);
+  if(!cruda)return false;
   history.replaceState(null,'',location.pathname+'#progreso');
+  const fila={fecha:cruda.fecha},descartados=[];
+  for(const [k,v] of Object.entries(cruda)){
+    if(k==='fecha')continue;
+    const r=RANGO_URL[k];
+    if(r&&v>=r[0]&&v<=r[1])fila[k]=v;else descartados.push(seg.METRICAS[k]?.nombre||k);
+  }
   irA('progreso');
-  msgSeg('listo','✅ Datos de Salud recibidos: '+Object.keys(fila).filter(k=>k!=='fecha').map(k=>seg.METRICAS[k].nombre.toLowerCase()).join(', ')+'.');
+  if(Object.keys(fila).length<2){
+    msgSeg('','⚠️ El enlace traía datos que no son válidos. No se guardó nada.');
+    return true;
+  }
+  filaPendiente=fila;
+  $('datosPendTxt').textContent=Object.entries(fila).filter(([k])=>k!=='fecha')
+    .map(([k,v])=>`${seg.METRICAS[k].nombre}: ${Math.round(v*10)/10} ${seg.METRICAS[k].unidad}`.trim()).join(' · ')
+    +` (${fila.fecha})`+(descartados.length?`. Descarté por fuera de rango: ${descartados.join(', ')}.`:'');
+  $('datosPendientes').hidden=false;
+  msgSeg('','');
   return true;
 }
+$('datosGuardar').addEventListener('click',()=>{
+  if(!filaPendiente)return;
+  const fila=filaPendiente;filaPendiente=null;
+  seg.agregarMediciones([fila]);
+  $('datosPendientes').hidden=true;
+  pintarProgreso();
+  msgSeg('listo','✅ Datos de Salud guardados: '+Object.keys(fila).filter(k=>k!=='fecha').map(k=>seg.METRICAS[k].nombre.toLowerCase()).join(', ')+'.');
+});
+$('datosDescartar').addEventListener('click',()=>{
+  filaPendiente=null;$('datosPendientes').hidden=true;msgSeg('','Datos descartados.');
+});
 $('urlAtajo').textContent=location.origin+location.pathname+'#datos?peso=[Peso]&grasa=[Grasa]&pasos=[Pasos]&kcal=[Energía activa]&sueno=[Horas de sueño]';
 
 // Perfil

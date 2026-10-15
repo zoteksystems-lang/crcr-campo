@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0E1C1B">
-<link rel="manifest" href="./manifest-nutricion.webmanifest">
+<link rel="manifest" href="./manifest-nutricion.webmanifest" crossorigin="use-credentials">
 <link rel="icon" href="./icon-nutricion.svg">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Mi Bienestar">
@@ -1767,7 +1767,7 @@ for(const c of document.querySelectorAll('input:not([type=checkbox]):not([type=f
   if(!c.getAttribute('aria-label')&&c.placeholder)c.setAttribute('aria-label',c.placeholder.replace(/…$/,''));
 
 // =================== Arranque ===================
-if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').then(()=>revisarRecordatorios()).catch(()=>{});
+if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw-bienestar.js',{scope:'./nutricion.html'}).then(()=>revisarRecordatorios()).catch(()=>{});
 addEventListener('hashchange',()=>{
   if(datosDeURL())return;
   const h=location.hash.slice(1);

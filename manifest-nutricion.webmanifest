@@ -4,7 +4,7 @@
   "short_name": "Mi Bienestar",
   "description": "Agua, pausas activas, escáner de alimentos, progreso con tu báscula y reloj, y recetas a tu medida. Funciona sin internet.",
   "start_url": "./nutricion.html",
-  "scope": "./",
+  "scope": "./nutricion.html",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#0E1C1B",

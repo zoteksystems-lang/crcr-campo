@@ -47,6 +47,7 @@ dispositivo.
   (OCR local) y queda guardado con su código para la próxima vez, aun sin
   internet. Es la única parte de la app que usa red (solo para buscar
   códigos nuevos).
+- `sw-bienestar.js` — Service Worker propio de Mi Bienestar (scope `nutricion.html`): precachea solo lo que usa esa app y maneja sus recordatorios.
 - `sw.js` / `manifest.webmanifest` — Service Worker que precachea todo
   (~70MB la primera vez) para que después funcione sin conexión.
 

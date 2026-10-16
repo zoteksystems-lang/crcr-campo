@@ -586,7 +586,7 @@ function revCfg(){try{return {on:localStorage.getItem('crcr-rev')==='1',pin:loca
 function pintarRevision(){
   const c=revCfg();const on=ge('revOn');if(!on)return;
   on.checked=c.on;ge('revPinBox').hidden=!c.on;ge('revPin').value=c.pin;
-  ge('revNota').textContent=c.on?'Cada grabación (audio + transcripción) se sube a un almacenamiento privado para revisarla y después se borra. Necesita señal; si no hay, queda pendiente.':'Las grabaciones quedan solo en este teléfono.';
+  ge('revNota').textContent=c.on&&c.pin.length<12?'⚠️ Falta el código de revisión (o es el viejo de 6 números): escribí el código nuevo completo para que se suban.':c.on?'Cada grabación (audio + transcripción) se sube a un almacenamiento privado para revisarla y después se borra. Necesita señal; si no hay, queda pendiente.':'Las grabaciones quedan solo en este teléfono.';
 }
 function cambiarRevision(){
   const on=ge('revOn').checked;
@@ -594,7 +594,7 @@ function cambiarRevision(){
   try{localStorage.setItem('crcr-rev',on?'1':'0');}catch{}
   pintarRevision();if(on)subirPendientes();
 }
-function guardarPinRev(){try{localStorage.setItem('crcr-rev-pin',ge('revPin').value.trim().slice(0,40));}catch{}subirPendientes();}
+function guardarPinRev(){try{localStorage.setItem('crcr-rev-pin',ge('revPin').value.trim().slice(0,40));}catch{}pintarRevision();subirPendientes();}
 async function subirArchivo(f,pin){
   const r=await fetch('./api/subir',{method:'POST',headers:{'content-type':f.type||'application/octet-stream','x-pin':pin,'x-nombre':f.name},body:f});
   if(!r.ok){let m='';try{m=(await r.json()).error;}catch{}throw new Error(m||('HTTP '+r.status));}

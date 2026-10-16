@@ -463,7 +463,10 @@ async function procesarDespacho(txt){
   try{
     mapaOff=mapaOff||await import('./engine/mapaoffline.js');
     ubicPaciente=await mapaOff.ubicarPaciente(dir,txt);
-    if(ubicPaciente&&boletaAuto.has('os'))boleta.os=`${dir} — ${ubicPaciente.texto} (${ubicPaciente.lat}, ${ubicPaciente.lon})`;
+    // Si de la grabación no salió una frase de dirección pero igual se ubicó (p. ej. solo "Alajuela centro"), se llena.
+    const du=ge('dubic');
+    if(ubicPaciente&&du&&!du.value.trim()){du.value=ubicPaciente.texto;du.classList.add('auto-field');pintarNav();if(!boleta.os)boletaAuto.add('os');}
+    if(ubicPaciente&&boletaAuto.has('os'))boleta.os=`${dir||ubicPaciente.texto} — ${ubicPaciente.texto} (${ubicPaciente.lat}, ${ubicPaciente.lon})`;
     guardarEstado();pintarGuia();
   }catch(e){console.warn('ubicar',e);}
 }
@@ -683,7 +686,7 @@ function pintarGuia(texto){
   ultimaGuia=g;
   const dondeEsta=(ge('dubic')||{value:''}).value.trim();
   const up=ubicPaciente;
-  let h=dondeEsta?`<div class="donde"><div>📍 <b>Paciente:</b> ${escHtml(dondeEsta)}</div>${up?`<div class="nota">Ubicado: ${escHtml(up.texto)}${up.precision==='localidad'?' (aproximado)':''}${up.ruta?` · <b>${up.ruta.min} min</b> (${up.ruta.km} km) desde la unidad, sin tránsito`:''}</div>`:''}<button class="btn-red" onclick="abrirMapaSinSenal()">🗺️ Ver al paciente en el mapa y la ruta</button></div>`:'';
+  let h=dondeEsta?`<div class="donde"><div>📍 <b>Paciente:</b> ${escHtml(dondeEsta)}</div>${up?`<div class="nota">Ubicado: ${escHtml(up.texto)}${up.precision==='localidad'?' (aproximado)':''}${up.lejos>60?` <b class="c-a">⚠️ queda a ${up.lejos} km de la unidad: confirmá con la central o marcalo en el mapa</b>`:''}${up.ruta?` · <b>${up.ruta.min} min</b> (${up.ruta.km} km) desde la unidad, sin tránsito`:''}</div>`:''}<button class="btn-red" onclick="abrirMapaSinSenal()">🗺️ Ver al paciente en el mapa y la ruta</button></div>`:'';
   h+=htmlImpresiones(g.impresiones,g.triadas,'guia');
   if(herrAgente){h+=htmlMarcas(g.impresiones);h+=htmlGravedad(g);}
   for(const sec of g.secciones){

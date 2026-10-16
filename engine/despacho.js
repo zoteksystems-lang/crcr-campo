@@ -5,7 +5,9 @@ import {normalize, keywordScore} from './util.js';
 // Detecta códigos CRC citados textualmente (ej: "E36", "código 65", "65").
 export function detectarCodigos(texto, CODS){
   const encontrados=[];
-  const nt=' '+normalize(texto)+' ';
+  // Whisper oye "de hecho de 25" / "despacho 25" por "despacho E25": el número
+  // justo después de despacho/código se toma como código E si existe.
+  const nt=(' '+normalize(texto)+' ').replace(/ (despacho|de hecho|codigo|clave)( de| e)? (\d{2}) /g,(m,a,b,n)=>CODS['E'+n]?` ${a} e${n} `:m);
   for(const [cod,desc] of Object.entries(CODS)){
     const pat=cod.startsWith('E')?cod.toLowerCase():` ${cod} `;
     if(cod.startsWith('E')){

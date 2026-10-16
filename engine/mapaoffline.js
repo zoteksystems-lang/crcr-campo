@@ -186,11 +186,14 @@ let contextoDespacho='';
 // guardada (o hay señal), calcula tiempo y distancia desde la unidad.
 export async function ubicarPaciente(direccion,textoDespacho){
   await GEO.cargarLugares(obtener);
-  const a=direccion?GEO.geocodificar(direccion):null,b=GEO.geocodificar(textoDespacho||direccion||'');
+  // El GPS de la unidad desempata nombres repetidos (hay "San Rafael" en todo el país).
+  const pos=posicion||await new Promise(ok=>navigator.geolocation?navigator.geolocation.getCurrentPosition(p=>ok({lat:p.coords.latitude,lon:p.coords.longitude}),()=>ok(null),{timeout:8000,maximumAge:60000}):ok(null));
+  const a=direccion?GEO.geocodificar(direccion,{cerca:pos}):null,b=GEO.geocodificar(textoDespacho||direccion||'',{cerca:pos});
   const g=!a?b:(b&&b.precision==='referencia'&&a.precision!=='referencia'?b:a);
   if(!g)return null;
+  // Más de 60 km de la unidad: probablemente otro lugar con el mismo nombre.
+  g.lejos=pos?Math.round(km(pos,g)):null;
   let ruta=null;
-  const pos=posicion||await new Promise(ok=>navigator.geolocation?navigator.geolocation.getCurrentPosition(p=>ok({lat:p.coords.latitude,lon:p.coords.longitude}),()=>ok(null),{timeout:8000,maximumAge:60000}):ok(null));
   if(pos&&(await estadoDescarga()||navigator.onLine)){
     try{await RUTA.cargarRed(obtener);ruta=RUTA.calcularRuta(pos,g);}catch{}
   }

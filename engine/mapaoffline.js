@@ -143,7 +143,7 @@ async function rutaA(d,nombre){
     if(!r){pintarPanel('<b>No encontré un camino por carretera.</b><div class="nota">Revisá el punto de destino.</div>');return;}
     map.getSource('ruta').setData({type:'Feature',geometry:{type:'LineString',coordinates:r.coords}});
     const b=r.coords.reduce((b,[x,y])=>[[Math.min(b[0][0],x),Math.min(b[0][1],y)],[Math.max(b[1][0],x),Math.max(b[1][1],y)]],[[180,90],[-180,-90]]);
-    map.fitBounds(b,{padding:{top:60,bottom:110,left:40,right:40},maxZoom:16});
+    map.fitBounds(b,{padding:{top:100,bottom:110,left:50,right:50},maxZoom:16});   // arriba: alto del marcador PACIENTE
     pintarPanel(`<div class="mp-res"><b>${minutos(r.segundos)}</b> · ${(r.metros/1000).toFixed(1)} km <span class="nota">(sin tránsito; calculado en el teléfono en ${Math.round(performance.now()-t0)} ms)</span></div>
       <div class="mp-dst">📍 ${esc(nombre||d.texto)}</div>
       <ol class="mp-vias">${r.vias.slice(0,8).map(v=>`<li>${esc(v.nombre)} · ${v.km} km</li>`).join('')}</ol>

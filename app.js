@@ -150,6 +150,7 @@ function go(name){
   if(name==='repaso')renderRep();
   if(name==='desp')renderCods();
   if(name==='hist')renderHistorial();
+  if(name==='herr')import('./engine/calculadoras.js').then(m=>m.pintarHerramientas(ge('herrPage'),{boleta,guardar:guardarEstado,aviso:t=>alert(t)}));
   if(name==='chat'){setTimeout(()=>{const c=ge('chatmsgs');if(c)c.scrollTop=99999;},100);}
 }
 

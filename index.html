@@ -287,6 +287,8 @@
 </div></div>
 
 <!-- HISTORIAL -->
+<div id="s-herr" class="screen"><div class="page" id="herrPage"></div></div>
+
 <div id="s-hist" class="screen"><div class="page">
   <div class="card"><div class="lbl">🗂️ Incidentes archivados (local)</div>
   <div style="font-size:13px;color:#475569;font-style:italic;">Guardado en este dispositivo con IndexedDB. Nada se sube a ningún servidor.</div></div>
@@ -321,6 +323,8 @@
   <div class="hoja-in" role="dialog" aria-label="Más secciones">
     <div class="hoja-t">Más herramientas</div>
     <div class="hoja-g">
+      <button onclick="go('herr')"><span>🧰</span>Herramientas<small>Glasgow, O₂, quemaduras…</small></button>
+      <button onclick="cerrarMas();abrirMapaSinSenal()"><span>🗺️</span>Mapa<small>Rutas y centros de salud</small></button>
       <button onclick="go('desp')"><span>📻</span>Despacho<small>Códigos de radio</small></button>
       <button onclick="go('enf')"><span>🩺</span>Enfermedades<small>Reconocimiento rápido</small></button>
       <button onclick="go('repaso')"><span>📚</span>Protocolos<small>Repaso offline</small></button>

@@ -12,11 +12,12 @@ export const GCS={
   O:[[4,'Espontánea'],[3,'A la voz'],[2,'Al dolor (presión)'],[1,'Ninguna']],
   V:[[5,'Orientado'],[4,'Confuso'],[3,'Palabras inapropiadas'],[2,'Sonidos incomprensibles'],[1,'Ninguna']],
   M:[[6,'Obedece órdenes'],[5,'Localiza el dolor'],[4,'Retira (flexión normal)'],[3,'Flexión anormal (decorticación)'],[2,'Extensión (descerebración)'],[1,'Ninguna']],
+  Mped:[[6,'Movimientos espontáneos'],[5,'Retira al tocar'],[4,'Retira al dolor'],[3,'Flexión anormal'],[2,'Extensión'],[1,'Ninguna']],
   Vped:[[5,'Balbucea / sonríe, sigue objetos'],[4,'Llanto consolable'],[3,'Llanto inconsolable al dolor'],[2,'Quejido al dolor'],[1,'Ninguna']]
 };
 export function interpretarGCS(t){
-  if(t>=14)return 'Leve (13-15)';if(t>=9)return 'Moderado (9-12): vigilar vía aérea, reevaluar seguido';
-  return 'Grave (≤8): no protege su vía aérea — posición, cánula orofaríngea si no hay reflejo, aspirar; prealerta al hospital';
+  if(t>=13)return 'Leve (13-15)';if(t>=9)return 'Moderado (9-12): vigilar vía aérea, reevaluar seguido';
+  return 'Grave (≤8): no protege su vía aérea — posición, cánula orofaríngea y aspiración según protocolo; prealerta al hospital';
 }
 // ── Apgar ──
 export const APGAR=[
@@ -26,52 +27,55 @@ export const APGAR=[
   ['Tono muscular','Flácido','Algo de flexión','Movimiento activo'],
   ['Respiración','Ausente','Lenta, irregular','Buena, llora']
 ];
-export const interpretarApgar=t=>t>=7?'Normal (7-10)':t>=4?'Depresión moderada (4-6): estimular, secar, abrigar, O2/ventilar según protocolo':'Depresión grave (0-3): reanimación neonatal ya';
+export const interpretarApgar=t=>t>=7?'Normal (7-10)':t>=4?'Depresión moderada (4-6): estimular, secar, abrigar, O2/ventilar según protocolo':'Depresión grave (0-3): reanimación neonatal según protocolo. No esperar al Apgar: si no respira o FC < 100, ventilar';
 // ── TEP pediátrico (Dieckmann) ──
 export function interpretarTEP(a,r,c){
   const n=[a,r,c].filter(Boolean).length;
   if(n===0)return ['Estable','Los 3 lados normales.','ok'];
-  if(n===3)return ['Fallo cardiorrespiratorio','Los 3 lados alterados: RCP / soporte inmediato.','rojo'];
+  if(n===3)return ['Fallo cardiorrespiratorio','Los 3 lados alterados: soporte vital inmediato (vía aérea, ventilación); comprobar pulso e iniciar RCP solo si no tiene.','rojo'];
   if(a&&r)return ['Fallo respiratorio','Apariencia + respiración alteradas: O2, ventilar si hace falta, traslado urgente.','rojo'];
   if(a&&c)return ['Shock descompensado','Apariencia + circulación alteradas: traslado inmediato.','rojo'];
   if(r&&c)return ['Compromiso respiratorio y circulatorio','Tratar como grave: O2 y traslado urgente.','rojo'];
-  if(a)return ['Disfunción del sistema nervioso / metabólica','Solo apariencia: glicemia, buscar trauma, intoxicación, infección.','amarillo'];
+  if(a)return ['Disfunción del sistema nervioso / metabólica','Solo apariencia: glicemia si está en su protocolo, buscar trauma, intoxicación, infección.','amarillo'];
   if(r)return ['Dificultad respiratoria','Solo trabajo respiratorio: posición cómoda, O2 según protocolo.','amarillo'];
   return ['Shock compensado','Solo circulación: vigilar, buscar sangrado o deshidratación.','amarillo'];
 }
 // ── Signos vitales normales por edad (PALS 2020, aproximados) ──
 export const NORMALES=[
-  ['Recién nacido (0-1 mes)',[100,205],[40,60],[60,90]],
+  ['Recién nacido (0-1 mes)',[100,205],[40,60],[60,84]],
   ['Lactante (1-12 meses)',[100,180],[30,53],[72,104]],
   ['1-2 años',[98,140],[22,37],[86,106]],
   ['3-5 años',[80,120],[20,28],[89,112]],
-  ['6-11 años',[75,118],[18,25],[97,115]],
+  ['6-9 años',[75,118],[18,25],[97,115]],
+  ['10-12 años',[75,118],[18,25],[102,120]],
   ['12-15 años',[60,100],[12,20],[110,131]],
-  ['Adulto',[60,100],[12,20],[100,139]]
+  ['Adulto',[60,100],[12,20],[90,139]]
 ];
-export function grupoEdad(edad){if(edad==null||isNaN(edad))return 6;if(edad<1/12)return 0;if(edad<1)return 1;if(edad<3)return 2;if(edad<6)return 3;if(edad<12)return 4;if(edad<16)return 5;return 6;}
+export function grupoEdad(edad){if(edad==null||isNaN(edad))return 7;if(edad<1/12)return 0;if(edad<1)return 1;if(edad<3)return 2;if(edad<6)return 3;if(edad<10)return 4;if(edad<13)return 5;if(edad<16)return 6;return 7;}
 // ── Índice de shock ──
 export function indiceShock(fc,pas,edad){
   if(!fc||!pas)return null;const si=fc/pas;
   let lim=1.0,txt;
-  if(edad!=null&&edad<18){lim=edad<4?1.22:edad<7?1.2:edad<13?1.0:0.9;}
+  const nino=edad!=null&&edad<18;
+  if(nino&&edad<4)return {si:Math.round(si*100)/100,txt:'Índice de shock pediátrico (SIPA) no validado en menores de 4 años',alerta:false};
+  if(nino)lim=edad<7?1.22:edad<13?1.0:0.9;
   if(edad==null||edad>=18)txt=si<0.7?'Normal':si<1?'Normal-alto: vigilar':si<=1.3?'Elevado: posible hipovolemia / shock':'Muy elevado: shock grave';
-  else txt=si>=lim?`Anormal para la edad (≥${lim}): sospecha de shock`:'Dentro de lo esperado para la edad';
-  return {si:Math.round(si*100)/100,txt,alerta:si>=1||(edad!=null&&edad<18&&si>=lim)};
+  else txt=si>lim?`Anormal para la edad (>${lim}): sospecha de shock`:'Dentro de lo esperado para la edad';
+  return {si:Math.round(si*100)/100,txt,alerta:nino?si>lim:si>=1};
 }
 // ── Oxígeno ──
 export function autonomiaO2(litrosAgua,presion,unidad,flujo){
   const bar=unidad==='psi'?presion/14.5:presion;
   const util=Math.max(0,bar-20);                  // reserva de seguridad 20 bar (≈300 psi)
-  const min=flujo>0?litrosAgua*util/flujo:0;
+  const min=Math.round(flujo>0?litrosAgua*util/flujo:0);
   const nivel=min<10?'rojo':min<=30?'amarillo':'ok';
-  return {min,txt:`${Math.floor(min/60)} h ${String(Math.round(min%60)).padStart(2,'0')} min`,nivel};
+  return {min,txt:`${Math.floor(min/60)} h ${String(min%60).padStart(2,'0')} min`,nivel};
 }
 export const FIO2=[
   ['Cánula nasal','1-6 L/min','24-44 % (≈ +4 % por litro)'],
   ['Mascarilla simple','5-10 L/min','35-60 %'],
   ['Mascarilla con reservorio','10-15 L/min','60-90 % (inflar la bolsa antes)'],
-  ['Venturi','según la válvula','24-50 % exacto (EPOC)'],
+  ['Venturi','según la válvula','24-50 % (EPOC, según protocolo)'],
   ['Bolsa-válvula-mascarilla + reservorio','15 L/min','≈ 100 %']
 ];
 // ── Quemaduras: regla de los 9 (adulto) y modificada para niños ──
@@ -82,8 +86,8 @@ export const QUEMA={
 export function gravedadQuemadura(pct,nino,zonas){
   const r=[];
   if(pct>=(nino?10:20))r.push(`Quemadura extensa (≥${nino?10:20} %): riesgo de shock; traslado a centro especializado`);
-  if(zonas.some(z=>/Cabeza|Genitales/.test(z)))r.push('Zona especial (cara, genitales): grave aunque sea pequeña');
-  r.push('Enfriar con agua a temperatura ambiente 20 min (no hielo); cubrir con apósito limpio y abrigar al paciente');
+  r.push('Zonas especiales (cara, manos, pies, genitales, articulaciones grandes) o quemadura que rodea un miembro/tórax: grave aunque sea pequeña');
+  r.push('Enfriar con agua a temperatura ambiente 20 min (no hielo); en quemaduras extensas o en niños, enfriar solo la zona y vigilar hipotermia; cubrir con apósito limpio y abrigar');
   r.push('Hollín en nariz/boca, voz ronca o quemadura en cara: vía aérea en riesgo');
   return r;
 }
@@ -92,7 +96,7 @@ export const HIPOTERMIA=[
   ['I — Leve','Consciente, tiembla','35-32 °C','Abrigar, bebidas calientes si traga bien, mover con cuidado'],
   ['II — Moderada','Confuso/somnoliento, no tiembla','32-28 °C','Manejar horizontal y con suavidad (riesgo de arritmia), aislar del frío, traslado'],
   ['III — Grave','Inconsciente, signos vitales presentes','28-24 °C','Igual que II + vía aérea; traslado a centro con recalentamiento'],
-  ['IV — Paro','Sin signos vitales','< 24 °C','RCP; "no está muerto hasta que está caliente y muerto"']
+  ['IV — Paro','Sin signos vitales','< 24 °C','RCP según protocolo (comprobar pulso hasta 1 min); "no está muerto hasta que está caliente y muerto"']
 ];
 export const HIPERTERMIA=[
   ['Calambres por calor','Dolor muscular, conciencia normal','Sombra, hidratar con sales, estirar'],
@@ -118,11 +122,11 @@ const edadBoleta=()=>{const e=parseFloat(ctxApp.boleta.edad);return isNaN(e)?nul
 function pasar(campos,etq){Object.assign(sv(),campos);ctxApp.guardar();ctxApp.aviso(`✅ ${etq} quedó en la boleta (signos vitales).`);}
 
 function gcs(c){
-  const ped=(edadBoleta()??99)<2;
+  const ped=(edadBoleta()??99)<2;const GM=ped?GCS.Mped:GCS.M;
   const sel={O:4,V:5,M:6};
   const fila=(k,ops)=>`<div class="lbl">${{O:'Ojos',V:'Verbal',M:'Motor'}[k[0]]}</div><div class="herr-ops">${ops.map(([v,t])=>`<button data-k="${k[0]}" data-v="${v}">${v} · ${esc(t)}</button>`).join('')}</div>`;
   c.innerHTML=`<div class="lbl" style="color:#93C5FD;">Escala de Glasgow${ped?' (verbal pediátrica, < 2 años)':''}</div>
-    ${fila('O',GCS.O)}${fila('V',ped?GCS.Vped:GCS.V)}${fila('M',GCS.M)}
+    ${fila('O',GCS.O)}${fila('V',ped?GCS.Vped:GCS.V)}${fila('M',GM)}
     <div class="herr-res" id="gcsRes"></div><button class="btn-blue" id="gcsPasar">📋 Pasar a la boleta</button>
     <div class="nota">Anotalo como O+V+M (ej. O3 V4 M5 = 12). Lo más importante es el motor.</div>`;
   const pintar=()=>{c.querySelectorAll('[data-k]').forEach(b=>b.classList.toggle('on',+b.dataset.v===sel[b.dataset.k]));
@@ -191,14 +195,15 @@ function apgar(c){
   c.querySelectorAll('[data-i]').forEach(b=>b.onclick=()=>{v[+b.dataset.i]=+b.dataset.p;pintar();});pintar();
 }
 function quema(c){
-  let nino=(edadBoleta()??99)<10;const marcadas=new Set();
+  let nino=(edadBoleta()??99)<5;const marcadas=new Set();
   const pintar=()=>{
     const z=nino?QUEMA.nino:QUEMA.adulto;
     const pct=z.filter(([n])=>marcadas.has(n)).reduce((s,[,p])=>s+p,0)+(+c.dataset.palmas||0);
     c.innerHTML=`<div class="lbl" style="color:#93C5FD;">Superficie quemada (solo 2.º y 3.er grado)</div>
-      <div class="g2"><button class="btn-gray ${!nino?'on':''}" data-m="a">Adulto (regla de 9)</button><button class="btn-gray ${nino?'on':''}" data-m="n">Niño</button></div>
+      <div class="g2"><button class="btn-gray ${!nino?'on':''}" data-m="a">Adulto (regla de 9)</button><button class="btn-gray ${nino?'on':''}" data-m="n">Lactante / niño pequeño</button></div>
+      ${nino?'<div class="nota">Tabla de lactante: la cabeza baja ~1 % por año de edad (Lund-Browder); en niños mayores sobreestima la cabeza.</div>':''}
       <div class="herr-ops">${z.map(([n,p])=>`<button data-z="${esc(n)}" class="${marcadas.has(n)?'on':''}">${esc(n)} · ${p} %</button>`).join('')}</div>
-      <label class="flbl">Quemaduras chicas: ¿cuántas palmas del paciente? (1 palma ≈ 1 %)</label><input id="palmas" inputmode="numeric" value="${esc(c.dataset.palmas||'')}">
+      <label class="flbl">Quemaduras chicas: ¿cuántas palmas del paciente? (palma con dedos ≈ 1 %)</label><input id="palmas" inputmode="numeric" value="${esc(c.dataset.palmas||'')}">
       <div class="herr-res"><b>${pct} % de superficie corporal</b></div>
       <ul class="herr-lista">${gravedadQuemadura(pct,nino,[...marcadas]).map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`;
     c.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>{nino=b.dataset.m==='n';marcadas.clear();pintar();});
@@ -209,7 +214,7 @@ function quema(c){
 function o2(c){
   c.innerHTML=`<div class="lbl" style="color:#93C5FD;">¿Cuánto oxígeno me queda?</div>
     <label class="flbl">Tamaño del cilindro (litros de agua)</label>
-    <select id="o2L"><option value="2">2 L (portátil)</option><option value="2.8">D / 2,8 L</option><option value="4.6" selected>E / 4,6 L</option><option value="5">5 L</option><option value="10">10 L</option><option value="46">M / H grande</option></select>
+    <select id="o2L"><option value="2">2 L (portátil)</option><option value="2.3">D / 2,3 L</option><option value="4.1" selected>E / 4,1 L</option><option value="5">5 L</option><option value="10">10 L</option><option value="22">M / 22 L</option><option value="46">H / 46 L</option></select>
     <div class="g2"><input id="o2P" inputmode="numeric" placeholder="Presión del manómetro"><select id="o2U"><option value="psi">psi</option><option value="bar">bar</option></select></div>
     <label class="flbl">Flujo (L/min)</label><input id="o2F" inputmode="numeric" value="15">
     <div class="herr-res" id="o2Res">Poné la presión del manómetro.</div>

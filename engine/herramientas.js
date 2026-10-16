@@ -36,9 +36,10 @@ export function news2(sv={},o2=false){
   if(fc==null)falta.push('FC');else sumar('FC',fc<=40?3:fc<=50?1:fc<=90?0:fc<=110?1:fc<=130?2:3);
   if(gcs!=null&&gcs<15)sumar('Conciencia alterada',3);
   if(t==null)falta.push('T°');else sumar('T°',t<=35?3:t<=36?1:t<=38?0:t<=39?1:2);
-  const riesgo=total>=7?'alto':total>=5||rojo?'medio':'bajo';
+  if(gcs==null)falta.push('Glasgow');
+  const riesgo=total>=7?'alto':total>=5?'medio':rojo?'bajo-medio':'bajo';
   const accion=riesgo==='alto'?'Riesgo ALTO de deterioro: traslado inmediato, reevaluar cada 5 min, prealerta al hospital.'
-    :riesgo==='medio'?'Riesgo MEDIO: reevaluar cada 5-15 min; considerar prealerta.':'Riesgo bajo: reevaluar cada 15 min o si cambia.';
+    :riesgo==='medio'?'Riesgo MEDIO: reevaluar cada 5-15 min; considerar prealerta.':riesgo==='bajo-medio'?'Un parámetro en 3: riesgo bajo-medio, reevaluar pronto ese parámetro.':'Riesgo bajo: reevaluar cada 15 min o si cambia.';
   return {total,riesgo,partes,falta,accion,completo:falta.length===0};
 }
 
@@ -49,20 +50,20 @@ export function traumaRojo(sv={},edad=null){
   const fr=n('fr'),sp=n('spo2'),pas=n('pa1'),fc=n('fc'),gcs=n('gcs'),motor=n('pM');
   const r=[];
   if(motor!=null&&motor<6)r.push(`Glasgow motor ${motor} (<6)`);
-  else if(gcs!=null&&gcs<=13)r.push(`Glasgow ${gcs}`);
+  else if(gcs!=null&&gcs<=13)r.push(`Glasgow ${gcs} (criterio 2011)`);
   if(fr!=null&&(fr<10||fr>29))r.push(`FR ${fr}`);
   if(sp!=null&&sp<90)r.push(`SpO₂ ${sp}%`);
   if(pas!=null){
     if(edad!=null&&edad<10&&pas<70+2*edad)r.push(`PA ${pas} (niño: <${70+2*edad})`);
     else if(edad!=null&&edad>=65&&pas<110)r.push(`PA ${pas} (≥65 años: <110)`);
     else if(pas<90)r.push(`PA ${pas}`);
-    if(edad!=null&&edad>=65&&fc!=null&&fc>pas)r.push('FC mayor que la PA sistólica');
+    if((edad==null||edad>=10)&&fc!=null&&fc>pas)r.push('FC mayor que la PA sistólica');
   }
   return r;
 }
 export const TRAUMA_ROJO_LESIONES=['Lesión penetrante en cabeza, cuello, tórax o abdomen (o extremidad arriba de codo/rodilla)',
-  'Cráneo deprimido o abierto','Tórax inestable o deformado','Sospecha de fractura de pelvis','2 o más fracturas de huesos largos proximales (húmero/fémur)',
-  'Extremidad aplastada, desguantada, mutilada o sin pulso','Amputación arriba de muñeca o tobillo','Sangrado activo que necesita torniquete o hemostático','Sospecha de lesión medular (parálisis)'];
+  'Deformidad o sospecha de fractura de cráneo','Tórax inestable o deformado','Sospecha de fractura de pelvis','2 o más fracturas de huesos largos proximales (húmero/fémur)',
+  'Extremidad aplastada, desguantada, mutilada o sin pulso','Amputación arriba de muñeca o tobillo','Sangrado activo que necesita torniquete o empaquetamiento con presión continua','Sospecha de lesión medular con pérdida motora o sensitiva nueva'];
 
 // Prealerta / entrega IMIST-AMBO: Identificación, Mecanismo, Injurias/queja,
 // Signos, Tratamiento — Alergias, Medicamentos, antecedentes (Background), Otros.
@@ -88,7 +89,7 @@ export function prealerta({boleta={},impresiones=[],marcas=[],ctx={}}){
 
 // Destino sugerido en Costa Rica (lineamiento CCSS Código Infarto 2022; ACV).
 export const DESTINO={
-  iam:'Código Infarto (CCSS): si se llega a hemodinamia en <120 min desde el inicio del dolor, priorizar hospital con hemodinamia (San Juan de Dios, México, Calderón Guardia, San Vicente de Paúl en Heredia, San Rafael de Alajuela); si no, el más cercano para fibrinolítico. Confirmar destino con la central.',
+  iam:'Código Infarto (CCSS): si se llega a hemodinamia en <120 min desde el primer contacto/diagnóstico (ECG), priorizar hospital con hemodinamia (San Juan de Dios, México, Calderón Guardia, San Vicente de Paúl en Heredia, San Rafael de Alajuela); si no, destino según protocolo y la central. Confirmar destino con la central.',
   acv:'Posible ACV: avisar a la central para destino con trombólisis/trombectomía (p. ej. Calderón Guardia). Llevar la hora de última vez visto bien.',
   mordedura:'Ofidismo: trasladar a centro con suero antiofídico (consultar con la central / Centro de Intoxicaciones).',
   intox:'Centro Nacional de Control de Intoxicaciones: 2223-1028 / 800-INTOXICA (24 h).',

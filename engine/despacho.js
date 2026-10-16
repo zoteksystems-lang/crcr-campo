@@ -40,19 +40,24 @@ export function sugerirEPP(enfermedadesProbables, EPP_POR_TIPO){
 
 // Ubicación del despacho para navegar: coordenadas si vienen, o la frase de
 // lugar ("Ruta 27 km 14", "200 m norte de la iglesia de Grecia", "barrio…").
-const MARCAS_LUGAR=/\b(ruta\s*(?:nacional\s*)?\d+[^,.;]*|km\s*\d+[^,.;]*|autopista[^,.;]*|carretera[^,.;]*|(?:\d+\s*(?:m|mts|metros|varas)\s*)?(?:al\s*)?(?:norte|sur|este|oeste)\s+de[^,.;]*|(?:frente|contiguo|costado|diagonal|detr[aá]s|cerca)\s+(?:a|al|de|del)?[^,.;]*|(?:barrio|urbanizaci[oó]n|residencial|condominio|calle|avenida|av\.?|caser[ií]o|distrito|cant[oó]n)\s+[^,.;]*|en\s+[A-ZÁÉÍÓÚÑ][^,.;]*)/gi;
+const MARCAS_LUGAR=/\b(ruta\s*(?:nacional\s*)?\d+[^,.;]*|km\s*\d+[^,.;]*|autopista[^,.;]*|carretera[^,.;]*|(?:\d+\s*(?:m|mts|metros|varas)\s*)?(?:al\s*)?(?:norte|sur|este|oeste)\s+de[^,.;]*|(?:frente|contiguo|contigo|costado|diagonal|detr[aá]s|cerca)\s+(?:a|al|de|del)?[^,.;]*|(?:barrio|urbanizaci[oó]n|residencial|condominio|calle|avenida|av\.?|caser[ií]o|distrito|cant[oó]n)\s+[^,.;]*|en\s+[A-ZÁÉÍÓÚÑ][^,.;]*)/gi;
 export function extraerUbicacion(texto){
   const t=String(texto||'');
   const c=t.match(/(-?\d{1,2}\.\d{3,})\s*,\s*(-?\d{2,3}\.\d{3,})/);
   if(c)return{texto:`${c[1]}, ${c[2]}`,lat:+c[1],lon:+c[2]};
   // Se descartan los códigos de radio para que no estorben ("E36", "código 65").
+  // Se corta la charla de radio que sigue a la dirección ("… escuela. Central a unidad 4-2").
+  const RADIO=/\b(central\w*|unidad|copiado|copiamos|cambio|diez cuatro|10-4|proceda|enterado|recibido|fuera)\b.*$/i;
+  // "Dirección: Heredia, San Rafael, frente a la escuela" → se toma esa frase completa.
+  const dir=t.match(/direcci[oó]n\s*[:,.-]?\s*([^.;\n]{4,120})/i);
+  if(dir){const d=dir[1].replace(RADIO,'').replace(/[\s,]+$/,'').trim();if(d.length>=4)return{texto:d};}
   const limpio=t.replace(/\bE\d{2}\b/g,' ').replace(/\bc[oó]digo\s*\d+\b/gi,' ');
   const partes=[];
   for(const m of limpio.matchAll(MARCAS_LUGAR)){
     // "en …" solo cuenta con nombre propio ("en Grecia"), no "en el pecho".
     if(/^en\s/i.test(m[0])&&!/^en\s+[A-ZÁÉÍÓÚÑ]/.test(m[0]))continue;
     if(/\b(pecho|brazo|pierna|cabeza|abdomen|est[oó]mago|espalda|cuello|cara|mano|pie)\b/i.test(m[0])&&!/^(barrio|calle|avenida|ruta)/i.test(m[0]))continue;
-    const p=m[0].replace(/\s+/g,' ').trim().replace(/^en\s+/i,'');
+    const p=m[0].replace(RADIO,'').replace(/\s+/g,' ').trim().replace(/^en\s+/i,'').replace(/[\s,]+$/,'');
     if(p.length>=4&&!partes.some(x=>x.includes(p)))partes.push(p);
   }
   return partes.length?{texto:partes.slice(0,3).join(', ')}:null;

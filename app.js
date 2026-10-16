@@ -443,7 +443,7 @@ let mapaOff=null;
 async function abrirMapaSinSenal(){
   mapaOff=mapaOff||await import('./engine/mapaoffline.js');
   const imp=ultimaGuia?.impresiones?.find(d=>d.conf!=='descartar')?.id||null;
-  mapaOff.abrirMapaOffline({direccion:(ge('dubic')||{value:''}).value.trim(),impresion:imp});
+  mapaOff.abrirMapaOffline({direccion:(ge('dubic')||{value:''}).value.trim(),textoDespacho:(ge('dtxt')||{value:''}).value.trim(),impresion:imp});
 }
 function cerrarMapaSinSenal(){mapaOff?.cerrarMapaOffline();}
 function mpBuscarDir(){mapaOff?.buscarDireccion();}
@@ -652,7 +652,9 @@ function pintarGuia(texto){
   if(!texto.trim()){ultimaGuia=null;return;}
   const g=arriboAgente.guiaArribo(texto,{ENF,SIGNOS,EPP_POR_TIPO,sv:boleta.sv1});
   ultimaGuia=g;
-  let h=htmlImpresiones(g.impresiones,g.triadas,'guia');
+  const dondeEsta=(ge('dubic')||{value:''}).value.trim();
+  let h=dondeEsta?`<div class="donde"><div>📍 <b>Paciente:</b> ${escHtml(dondeEsta)}</div><button class="btn-red" onclick="abrirMapaSinSenal()">🗺️ Ver al paciente en el mapa y la ruta</button></div>`:'';
+  h+=htmlImpresiones(g.impresiones,g.triadas,'guia');
   if(herrAgente){h+=htmlMarcas(g.impresiones);h+=htmlGravedad(g);}
   for(const sec of g.secciones){
     if(sec.id==='triadas')continue;

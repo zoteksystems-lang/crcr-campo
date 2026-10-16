@@ -87,7 +87,7 @@ async function iniciarMapa(){
   salud=await (await obtener('mapa/salud.json')).json();
   map.addSource('salud',{type:'geojson',data:{type:'FeatureCollection',features:salud.map((s,i)=>({type:'Feature',id:i,
     geometry:{type:'Point',coordinates:[s.lo,s.la]},properties:{i,t:s.t,n:s.n,h24:s.h24?1:0}}))}});
-  map.addLayer({id:'salud-c',type:'circle',source:'salud',filter:['any',['==',['get','t'],'hospital'],['==',['get','t'],'cruzroja'],['all',['!=',['get','t'],'consultorio'],['>=',['zoom'],10]],['>=',['zoom'],13]],
+  map.addLayer({id:'salud-c',type:'circle',source:'salud',filter:['any',['==',['get','t'],'hospital'],['all',['==',['get','h24'],1],['>=',['zoom'],11]],['all',['!=',['get','t'],'consultorio'],['>=',['zoom'],14]],['>=',['zoom'],15]],
     paint:{'circle-radius':['interpolate',['linear'],['zoom'],7,['match',['get','t'],'hospital',5,2.5],14,['match',['get','t'],'hospital',11,7]],
       'circle-color':['match',['get','t'],'hospital','#DC2626','clinica','#F59E0B','area','#F59E0B','ebais','#16A34A','cruzroja','#FFFFFF','ambulancia','#FFFFFF','#64748B'],
       'circle-stroke-color':['case',['==',['get','h24'],1],'#7F1D1D','#0F172A'],'circle-stroke-width':['case',['==',['get','h24'],1],2.5,1]}});
@@ -123,7 +123,7 @@ function seguirGPS(){
 function ponerDestino(d){
   destino=d;
   if(marcaDestino)marcaDestino.remove();
-  const el=document.createElement('div');el.className='mp-dest';el.textContent='📍';
+  const el=document.createElement('div');el.className='mp-dest';el.innerHTML='<span class="mp-dest-pin">🚑</span><span class="mp-dest-tx">PACIENTE</span>';
   marcaDestino=new window.maplibregl.Marker({element:el,anchor:'bottom'}).setLngLat([d.lon,d.lat]).addTo(map);
   rutaA(d);
 }
@@ -143,12 +143,14 @@ async function rutaA(d,nombre){
     if(!r){pintarPanel('<b>No encontré un camino por carretera.</b><div class="nota">Revisá el punto de destino.</div>');return;}
     map.getSource('ruta').setData({type:'Feature',geometry:{type:'LineString',coordinates:r.coords}});
     const b=r.coords.reduce((b,[x,y])=>[[Math.min(b[0][0],x),Math.min(b[0][1],y)],[Math.max(b[1][0],x),Math.max(b[1][1],y)]],[[180,90],[-180,-90]]);
-    map.fitBounds(b,{padding:{top:90,bottom:200,left:40,right:40},maxZoom:16});
+    map.fitBounds(b,{padding:{top:60,bottom:110,left:40,right:40},maxZoom:16});
     pintarPanel(`<div class="mp-res"><b>${minutos(r.segundos)}</b> · ${(r.metros/1000).toFixed(1)} km <span class="nota">(sin tránsito; calculado en el teléfono en ${Math.round(performance.now()-t0)} ms)</span></div>
       <div class="mp-dst">📍 ${esc(nombre||d.texto)}</div>
       <ol class="mp-vias">${r.vias.slice(0,8).map(v=>`<li>${esc(v.nombre)} · ${v.km} km</li>`).join('')}</ol>
       ${r.fueraDeRed>300?`<div class="nota">⚠️ El punto queda a ${r.fueraDeRed} m de la carretera más cercana.</div>`:''}
       <div class="g2"><a class="btn-gray mp-btn" target="_blank" rel="noopener" href="https://waze.com/ul?ll=${d.lat},${d.lon}&navigate=yes">🚗 Waze (voz)</a><a class="btn-gray mp-btn" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination=${d.lat},${d.lon}&travelmode=driving">🗺️ Maps (voz)</a></div>`);
+    // Achicado: se ve el mapa con el paciente; el ▴ muestra las vías.
+    $('mpPanel').classList.add('min');const asa=$('mpPanel').querySelector('.mp-asa');if(asa)asa.textContent='▴';
   }catch(e){estado('');pintarPanel(`<b>⚠️ ${esc(e.message)}</b>`);}
 }
 
@@ -179,11 +181,13 @@ async function masCercanos(filtro,titulo){
 }
 
 // Abre el mapa. opciones: {direccion, impresion} (impresión principal para sugerir destino)
-export async function abrirMapaOffline({direccion='',impresion=null}={}){
+let contextoDespacho='';
+export async function abrirMapaOffline({direccion='',textoDespacho='',impresion=null}={}){
+  contextoDespacho=textoDespacho;
   $('mpOverlay').hidden=false;document.body.classList.add('mp-abierto');
   $('mpBuscar').value=direccion;
   const bajado=await estadoDescarga();
-  $('mpDescarga').hidden=bajado;
+  $('mpDescarga').hidden=true;   // la descarga va como botón chico arriba: no tapa al paciente
   if(!bajado&&!navigator.onLine){estado('');pintarPanel('<b>El mapa no está descargado y no hay señal.</b><div class="nota">Cuando tengas señal (mejor Wi-Fi), tocá "Descargar mapa" para tenerlo siempre.</div>');return;}
   seguirGPS();
   if(!listo)listo=iniciarMapa().catch(e=>{listo=null;throw e;});
@@ -194,15 +198,24 @@ export async function abrirMapaOffline({direccion='',impresion=null}={}){
   if(impresion==='iam')rapidos.unshift(['❤️ Hemodinamia más cercana',s=>s.cap?.includes('hemodinamia')]);
   if(impresion==='politrauma'||impresion==='tce')rapidos.push(['🦴 Trauma',s=>s.cap?.includes('trauma')||['San Juan de Dios','México','Calderón Guardia'].some(n=>s.n.includes(n))]);
   rapidos.push(['🕐 Abierto 24 h más cercano',s=>s.h24&&s.t!=='cruzroja'&&s.t!=='ambulancia'],['➕ Cruz Roja más cercana',s=>s.t==='cruzroja']);
-  $('mpRapidos').innerHTML=rapidos.map(([t],i)=>`<button data-r="${i}">${t}</button>`).join('');
-  $('mpRapidos').querySelectorAll('button').forEach(b=>b.onclick=()=>{const [t,f]=rapidos[+b.dataset.r];masCercanos(f,t);});
-  if(direccion)buscarDireccion();
+  $('mpRapidos').innerHTML=(bajado?'':`<button id="mpDescargar" class="mp-bajar">⬇️ Guardar mapa sin señal (57 MB)</button>`)+`<button id="mpVerPaciente">🚑 Paciente</button><button id="mpCentros">🏥 Centros: ver todos</button>`+rapidos.map(([t],i)=>`<button data-r="${i}">${t}</button>`).join('');
+  if(!bajado)$('mpDescargar').onclick=iniciarDescarga;
+  $('mpVerPaciente').onclick=()=>{if(destino)map.flyTo({center:[destino.lon,destino.lat],zoom:16});else buscarDireccion();};
+  $('mpCentros').onclick=()=>{const todos=$('mpCentros').classList.toggle('on');
+    map.setFilter('salud-c',todos?null:['any',['==',['get','t'],'hospital'],['all',['==',['get','h24'],1],['>=',['zoom'],11]],['all',['!=',['get','t'],'consultorio'],['>=',['zoom'],14]],['>=',['zoom'],15]]);
+    $('mpCentros').textContent=todos?'🏥 Centros: menos':'🏥 Centros: ver todos';};
+  $('mpRapidos').querySelectorAll('button[data-r]').forEach(b=>b.onclick=()=>{const [t,f]=rapidos[+b.dataset.r];masCercanos(f,t);});
+  if(direccion||contextoDespacho)buscarDireccion();
+  else if(posicion)map.flyTo({center:[posicion.lon,posicion.lat],zoom:14});
 }
 export async function buscarDireccion(){
-  const q=$('mpBuscar').value.trim();if(!q)return;
+  const q=$('mpBuscar').value.trim();if(!q&&!contextoDespacho)return;
   try{await GEO.cargarLugares(obtener);}catch(e){pintarPanel('⚠️ '+esc(e.message));return;}
-  const g=GEO.geocodificar(q,{cerca:posicion});
-  if(!g){pintarPanel(`<b>No ubiqué "${esc(q)}".</b><div class="nota">Tocá "📌 Marcar en el mapa" y tocá el punto exacto.</div>`);return;}
+  const conTodo=contextoDespacho&&!contextoDespacho.includes(q)?q+'. '+contextoDespacho:(contextoDespacho||q);
+  const a=q?GEO.geocodificar(q,{cerca:posicion}):null,b=GEO.geocodificar(conTodo,{cerca:posicion});
+  // El texto completo gana si es más preciso (referencia vs. solo localidad) o si la dirección sola no dio nada.
+  const g=!a?b:(b&&b.precision==='referencia'&&a.precision!=='referencia'?b:a);
+  if(!g){pintarPanel(`<b>No ubiqué "${esc(q||'la dirección del despacho')}".</b><div class="nota">Tocá "📌 Marcar en el mapa" y tocá el punto exacto.</div>`);return;}
   ponerDestino({lat:g.lat,lon:g.lon,texto:g.texto});
   estado(`Entendí: ${g.texto}${g.precision==='localidad'?' (aproximado: solo la localidad)':''}`);
 }
@@ -212,7 +225,7 @@ export async function iniciarDescarga(){
   const b=$('mpDescargar');b.disabled=true;
   try{
     await descargarTodo(p=>{b.textContent=`⬇️ Descargando… ${Math.round(p*100)}%`;});
-    b.textContent='✅ Mapa descargado: funciona sin señal';
-    setTimeout(()=>{$('mpDescarga').hidden=true;},1500);
+    b.textContent='✅ Mapa guardado: funciona sin señal';
+    setTimeout(()=>b.remove(),2500);
   }catch(e){b.disabled=false;b.textContent='⬇️ Reintentar descarga';estado('⚠️ '+e.message);}
 }

@@ -196,3 +196,7 @@ body.mp-abierto{overflow:hidden;}
 .mp-descarga .btn-red{padding:10px;font-size:14.5px;}
 .donde{background:#2A0E12;border:1px solid #DC2626;border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:8px;font-size:15px;}
 .mp-chips button.mp-bajar{background:#14532D;border-color:#22C55E;color:#DCFCE7;}
+
+.btn-grabar-hero{width:100%;background:#DC2626;color:#fff;border-radius:18px;padding:20px 16px;font-size:22px;font-weight:900;display:flex;flex-direction:column;align-items:center;gap:6px;box-shadow:0 6px 20px rgba(220,38,38,.35);}
+.btn-grabar-hero small{font-size:13px;font-weight:600;opacity:.92;line-height:1.35;}
+.btn-grabar-hero.grabando{background:#374151;animation:latido 1.4s infinite;}

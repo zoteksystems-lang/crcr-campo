@@ -13,7 +13,8 @@ const REFERENCIA=[[/\b(iglesia|templo|parroquia|capilla|catedral|ermita)\b/,'pla
   [/\b(universidad|tec|ucr|una)\b/,'university'],[/\b(parque|parquecito)\b/,'park'],[/\b(plaza|cancha|plaza de deportes)\b/,'pitch'],
   [/\b(estadio)\b/,'stadium'],[/\b(delegacion|policia|fuerza publica)\b/,'police'],[/\b(bomberos)\b/,'fire_station'],
   [/\b(banco|bn|bcr)\b/,'bank'],[/\b(bomba|gasolinera|estacion de servicio)\b/,'fuel'],[/\b(super|supermercado|pali|maxipali|mas x menos|walmart|automercado)\b/,'supermarket'],
-  [/\b(municipalidad)\b/,'townhall'],[/\b(salon comunal)\b/,'community_centre'],[/\b(mercado)\b/,'marketplace'],[/\b(hotel)\b/,'hotel'],[/\b(mall|centro comercial)\b/,'mall']];
+  [/\b(municipalidad)\b/,'townhall'],[/\b(salon comunal)\b/,'community_centre'],[/\b(mercado)\b/,'marketplace'],[/\b(hotel)\b/,'hotel'],[/\b(mall|centro comercial)\b/,'mall'],
+  [/\b(hospital)\b/,'s_hospital'],[/\b(ebais)\b/,'s_ebais'],[/\b(clinica|area de salud)\b/,'s_clinica'],[/\b(cruz roja)\b/,'s_cruzroja']];
 
 // Cómo SUENA el nombre (Whisper escribe "Eredia" por Heredia, "Sandra Fael" por San Rafael).
 const fon=s=>norm(s).split(' ').map(w=>w.replace(/^h/,'').replace(/ll/g,'y').replace(/v/g,'b').replace(/z/g,'s').replace(/c([ei])/g,'s$1').replace(/qu/g,'k').replace(/c/g,'k').replace(/(.)\1/g,'$1')).join('');
@@ -54,6 +55,8 @@ export async function cargarLugares(obtener){
   if(lugares)return lugares;
   const r=await obtener('mapa/lugares.json');
   lugares=(await r.json()).map(([n,c,la,lo])=>({n,c,la,lo,k:norm(n)}));
+  try{const s=await (await obtener('mapa/salud.json')).json();
+    for(const x of s)lugares.push({n:x.n,c:'s_'+x.t,la:x.la,lo:x.lo,k:norm(x.n)});}catch{}
   return lugares;
 }
 function km(a,b){const x=(b.lo-a.lo)*Math.PI/180*Math.cos((a.la+b.la)/2*Math.PI/180),y=(b.la-a.la)*Math.PI/180;return 6371*Math.hypot(x,y);}
@@ -84,10 +87,12 @@ export function geocodificar(texto,{cerca}={}){
   if(c)return {lat:+c[1],lon:+c[2],texto:'coordenadas',precision:'exacta'};
   // 1. Localidades nombradas en el texto (la más larga primero: "San Rafael de Heredia" > "Heredia")
   // Se ignoran barrios que se llaman como una referencia común ("La Plaza", "El Parque", "Centro").
-  const GENERICO=/^(la |el |los |las )?(plaza|parque|iglesia|escuela|colegio|centro|mercado|estadio|cancha|bomba|super|cruce|entrada|esquina|puente|rio|playa|calle|ruta|barrio)( central| de deportes)?$/;
-  const exactas=lugares.filter(l=>LOCALIDAD.has(l.c)&&l.k.length>=4&&!GENERICO.test(l.k)&&t.includes(' '+l.k+' '));
+  const GENERICO=/^(la |el |los |las )?(plaza|parque|iglesia|escuela|colegio|centro|mercado|estadio|cancha|bomba|super|cruce|entrada|esquina|puente|rio|playa|calle|ruta|barrio|hospital|clinica|ebais|cruz roja|perez)( central| de deportes)?$/;
+  // "Cruz Roja" no es el cantón La Cruz.
+  const tl=t.replace(/ cruz roja /g,' cruzroja ');
+  const exactas=lugares.filter(l=>LOCALIDAD.has(l.c)&&l.k.length>=4&&!GENERICO.test(l.k)&&tl.includes(' '+l.k+' '));
   // Si el nombre vino mal transcrito, se busca por cómo suena.
-  const info=localidadesPorSonido(t);
+  const info=localidadesPorSonido(tl);
   for(const l of exactas)info.set(l,{d:0,pos:t.slice(0,t.indexOf(' '+l.k+' ')+1).trim().split(' ').filter(Boolean).length});
   const dist=new Map([...info].map(([l,v])=>[l,v.d]));
   const locs=[...dist.keys()].filter(l=>!GENERICO.test(l.k));

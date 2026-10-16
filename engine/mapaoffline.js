@@ -182,6 +182,20 @@ async function masCercanos(filtro,titulo){
 
 // Abre el mapa. opciones: {direccion, impresion} (impresión principal para sugerir destino)
 let contextoDespacho='';
+// Ubica al paciente con el texto del despacho y, si hay GPS y la red vial está
+// guardada (o hay señal), calcula tiempo y distancia desde la unidad.
+export async function ubicarPaciente(direccion,textoDespacho){
+  await GEO.cargarLugares(obtener);
+  const a=direccion?GEO.geocodificar(direccion):null,b=GEO.geocodificar(textoDespacho||direccion||'');
+  const g=!a?b:(b&&b.precision==='referencia'&&a.precision!=='referencia'?b:a);
+  if(!g)return null;
+  let ruta=null;
+  const pos=posicion||await new Promise(ok=>navigator.geolocation?navigator.geolocation.getCurrentPosition(p=>ok({lat:p.coords.latitude,lon:p.coords.longitude}),()=>ok(null),{timeout:8000,maximumAge:60000}):ok(null));
+  if(pos&&(await estadoDescarga()||navigator.onLine)){
+    try{await RUTA.cargarRed(obtener);ruta=RUTA.calcularRuta(pos,g);}catch{}
+  }
+  return {...g,ruta:ruta&&{min:Math.round(ruta.segundos/60),km:Math.round(ruta.metros/100)/10}};
+}
 export async function abrirMapaOffline({direccion='',textoDespacho='',impresion=null}={}){
   contextoDespacho=textoDespacho;
   $('mpOverlay').hidden=false;document.body.classList.add('mp-abierto');

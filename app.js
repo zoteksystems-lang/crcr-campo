@@ -252,7 +252,8 @@ async function transcribirYProcesar(blob, destino){
       trans=texto;
       if(statusEl)statusEl.textContent=texto||'(sin voz detectada)';
       if(texto){ const dt=ge('dtxt'); if(dt && (!dt.value.trim()||dt.dataset.vivo)){dt.value=texto;delete dt.dataset.vivo;autoUbicacion(texto);} }
-      vivoTexto='';pintarGuia();
+      vivoTexto='';
+      if(texto)procesarDespacho(ge('dtxt').value);else pintarGuia();
     }else{
       trans2=texto;vivoTexto='';
       if(statusEl)statusEl.textContent=texto||'(sin voz detectada)';
@@ -280,6 +281,7 @@ async function toggleRec(){
         storeAgente.guardarGrabacion(rec);
         stream.getTracks().forEach(t=>t.stop());recsOn=false;
         const b=ge('rbtn');if(b){b.textContent='🎙️ Grabar';b.style.background='#DC2626';}
+        const hb=ge('btnHeroRec');if(hb)hb.classList.remove('grabando');
         const rs=ge('rstat');if(rs)rs.style.display='none';
         const rp=ge('recpill');if(rp)rp.style.display='none';
         renderRecs();
@@ -291,6 +293,7 @@ async function toggleRec(){
       iniciarVivo(()=>chunks,mime,'desp');
       recsOn=true;
       const b=ge('rbtn');if(b){b.textContent='⏹ Detener';b.style.background='#374151';}
+      const hb=ge('btnHeroRec');if(hb)hb.classList.add('grabando');
       const rs=ge('rstat');if(rs)rs.style.display='block';
       const rp=ge('recpill');if(rp)rp.style.display='flex';
     }catch(err){alert('Micrófono no disponible: '+err.message);}
@@ -438,6 +441,32 @@ async function abrirMapa(modo){
   }
 }
 function cerrarMapa(){ge('mapaBox').hidden=true;ge('btnMapaAqui').hidden=false;ge('mapaFrame').removeAttribute('src');mapaModo=null;}
+// ── De la grabación sale todo ──
+function grabarDesdeInicio(){go('desp');if(!recsOn)toggleRec();else toggleRec();}
+const TIPO_DESPACHO=d=>!d?null:['politrauma','tce','trauma_col','trauma_tx','trauma_abd'].includes(d.id)&&/(colisi|choque|atropell|moto|vehic|carro)/i.test(ge('dtxt')?.value||'')?'Accidente Tránsito'
+  :d.g==='Trauma'?'Trauma':d.g==='Gineco-obstétrico'?'GinecoObstétrico':'Medico';
+let ubicPaciente=null;
+// Interpreta el despacho, llena la boleta (marcado 🤖, editable) y ubica al paciente.
+async function procesarDespacho(txt){
+  if(!txt?.trim()||!despachoAgente)return;
+  ultimoDespacho=despachoAgente.interpretarDespacho(txt,{CODS,ENF,EPP_POR_TIPO});
+  documentacionAgente.autocompletarBoleta(boleta,{despacho:ultimoDespacho}).forEach(p=>boletaAuto.add(p));
+  pintarGuia();
+  const ppal=ultimaGuia?.impresiones?.find(d=>d.conf!=='descartar');
+  const ctx=ultimaGuia?.contexto||{};
+  const tipo=ctx.nino?'Pediátrico':TIPO_DESPACHO(ppal);
+  if(tipo&&(!boleta.td||boletaAuto.has('td')||boleta.td==='Medico')){boleta.td=tipo;boletaAuto.add('td');}
+  const dir=(ge('dubic')||{value:''}).value.trim();
+  if(dir&&!boleta.os){boleta.os=dir;boletaAuto.add('os');}
+  guardarEstado();
+  // Ubicación del paciente (sin señal si el mapa está guardado)
+  try{
+    mapaOff=mapaOff||await import('./engine/mapaoffline.js');
+    ubicPaciente=await mapaOff.ubicarPaciente(dir,txt);
+    if(ubicPaciente&&boletaAuto.has('os'))boleta.os=`${dir} — ${ubicPaciente.texto} (${ubicPaciente.lat}, ${ubicPaciente.lon})`;
+    guardarEstado();pintarGuia();
+  }catch(e){console.warn('ubicar',e);}
+}
 // ── Mapa sin señal ──
 let mapaOff=null;
 async function abrirMapaSinSenal(){
@@ -473,7 +502,7 @@ function interpDesp(){
   const du=ge('dubic');if(du&&ultimoDespacho.ubicacion){du.value=ultimoDespacho.ubicacion.texto;du.classList.add('auto-field');}
   pintarNav();
   addMsg('user','📻 Despacho: '+txt);addMsg('assistant','📻 DESPACHO INTERPRETADO (motor local)\n\n'+ultimoDespacho.resumen);
-  pintarGuia();ge('guiaCard')?.scrollIntoView({behavior:'smooth',block:'start'});
+  procesarDespacho(txt);ge('guiaCard')?.scrollIntoView({behavior:'smooth',block:'start'});
   // autocompleta boleta automáticamente (marcado 🤖, editable)
   const auto=documentacionAgente.autocompletarBoleta(boleta,{despacho:ultimoDespacho});
   auto.forEach(p=>boletaAuto.add(p));
@@ -653,7 +682,8 @@ function pintarGuia(texto){
   const g=arriboAgente.guiaArribo(texto,{ENF,SIGNOS,EPP_POR_TIPO,sv:boleta.sv1});
   ultimaGuia=g;
   const dondeEsta=(ge('dubic')||{value:''}).value.trim();
-  let h=dondeEsta?`<div class="donde"><div>📍 <b>Paciente:</b> ${escHtml(dondeEsta)}</div><button class="btn-red" onclick="abrirMapaSinSenal()">🗺️ Ver al paciente en el mapa y la ruta</button></div>`:'';
+  const up=ubicPaciente;
+  let h=dondeEsta?`<div class="donde"><div>📍 <b>Paciente:</b> ${escHtml(dondeEsta)}</div>${up?`<div class="nota">Ubicado: ${escHtml(up.texto)}${up.precision==='localidad'?' (aproximado)':''}${up.ruta?` · <b>${up.ruta.min} min</b> (${up.ruta.km} km) desde la unidad, sin tránsito`:''}</div>`:''}<button class="btn-red" onclick="abrirMapaSinSenal()">🗺️ Ver al paciente en el mapa y la ruta</button></div>`:'';
   h+=htmlImpresiones(g.impresiones,g.triadas,'guia');
   if(herrAgente){h+=htmlMarcas(g.impresiones);h+=htmlGravedad(g);}
   for(const sec of g.secciones){
@@ -1104,7 +1134,7 @@ document.addEventListener('DOMContentLoaded',()=>{
 // Exponer al scope global — necesario para los onclick="..." inline del HTML
 // (tanto el HTML estático como el que este mismo archivo genera dinámicamente).
 // ═══════════════════════════════════════════════════
-Object.assign(window, {abrirMapaSinSenal,cerrarMapaSinSenal,mpBuscarDir,mpTocar,mpDescargar,cambiarRevision,guardarPinRev,subirPendientes,enviarRevision,borrarRec,abrirMapa,cerrarMapa,cambiarVoz,marcarHora,metronomo,verPrealerta,copiarPrealerta,compartirPrealerta,usarImpresiones,sugerirEnBoleta,verSignos,modoTriage,
+Object.assign(window, {grabarDesdeInicio,abrirMapaSinSenal,cerrarMapaSinSenal,mpBuscarDir,mpTocar,mpDescargar,cambiarRevision,guardarPinRev,subirPendientes,enviarRevision,borrarRec,abrirMapa,cerrarMapa,cambiarVoz,marcarHora,metronomo,verPrealerta,copiarPrealerta,compartirPrealerta,usarImpresiones,sugerirEnBoleta,verSignos,modoTriage,
   guardarAudio,compartirAudio,pintarNav,abrirMas,cerrarMas,go, toggleTimer, resetTimer, addN, cerrarIncidente, exportarHistorial,
   quickChat, renderCods, toggleRec, toggleRec2, analyzeRec, interpDesp,
   answTriage, resetTriage, adj, resetC, analyzeSO, setbt, campoEditado,

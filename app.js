@@ -5,7 +5,7 @@
 // al arrancar y se vuelcan a estas variables.
 'use strict';
 
-let CODS,TNIV,TSTEPS,TACC,SCAMPOS,OCAMPOS,ENF,PROT,EQP,BOT,QPROMPTS,EPP_POR_TIPO;
+let CODS,TNIV,TSTEPS,TACC,SCAMPOS,OCAMPOS,ENF,PROT,EQP,BOT,QPROMPTS,EPP_POR_TIPO,SIGNOS={},ZONAS={};
 let despachoAgente, vitalsAgente, entrevistaAgente, diagnosticoAgente, documentacionAgente, chatAgente, whisperAgente, ocrAgente, storeAgente;
 
 // ═══════════════════════════════════════════════════
@@ -57,6 +57,7 @@ async function cargarMotores(){
     import('./engine/chat.js'),
     import('./engine/store.js'),
   ]);
+  try{({SIGNOS,ZONAS}=await import('./engine/signos.js'));}catch(e){console.error(e);}
   ({CODS,TNIV,TSTEPS,TACC,SCAMPOS,OCAMPOS,ENF,PROT,EQP,BOT,QPROMPTS,EPP_POR_TIPO}=data);
   despachoAgente=despacho; vitalsAgente=vitals; entrevistaAgente=entrevista;
   diagnosticoAgente=diagnostico; documentacionAgente=documentacion; chatAgente=chat;
@@ -625,6 +626,35 @@ function renderEnf(){
   list.innerHTML=fil.map(e=>`<button onclick="showEnfD('${e.id}')" style="display:flex;align-items:center;gap:10px;background:#1E293B;border:1px solid #334155;border-radius:8px;padding:10px 12px;width:100%;margin-bottom:5px;text-align:left;font-family:inherit;cursor:pointer;"><span style="font-size:20px;flex-shrink:0;">${e.i}</span><div style="flex:1;min-width:0;"><div style="font-size:14px;font-weight:700;color:#F1F5F9;">${e.t}</div>${e.e?`<div style="font-size:12px;color:#DC2626;font-weight:800;margin-top:1px;">Código ${e.e}</div>`:''}</div><span style="color:#475569;font-size:16px;flex-shrink:0;">›</span></button>`).join('');
 }
 function showEnfD(id){enfSel=id;const lv=ge('elf'),dv=ge('edetail');if(lv)lv.style.display='none';if(dv){dv.style.display='block';renderEnfD();}}
+// Mapa del cuerpo con los signos a ubicar en este código (dibujo propio, sin internet).
+const SILUETA='<g fill="#1E293B" stroke="#334155" stroke-width="2">'+
+  '<circle cx="100" cy="38" r="26"/>'+
+  '<rect x="88" y="62" width="24" height="18" rx="6"/>'+
+  '<path d="M58 84h84c10 0 18 8 18 18l-2 110c0 8-6 14-14 14h-6v-0H62h-6c-8 0-14-6-14-14l-2-110c0-10 8-18 18-18z"/>'+
+  '<path d="M56 90c-12 2-18 12-20 24l-12 110c-1 8 10 10 12 2l18-104z"/>'+
+  '<path d="M144 90c12 2 18 12 20 24l12 110c1 8-10 10-12 2l-18-104z"/>'+
+  '<path d="M64 226h72l-4 186c0 8-14 8-16 0l-16-150-16 150c-2 8-16 8-16 0z"/>'+
+  '</g>';
+function mapaSignos(id){
+  const lista=SIGNOS[id];
+  if(!lista||!lista.length)return '';
+  let marcas='',filas='';
+  const usados={};
+  lista.forEach(([zona,txt],i)=>{
+    const n=i+1;
+    (ZONAS[zona]||[]).forEach(([x,y])=>{
+      const k=x+','+y,des=(usados[k]=(usados[k]||0)+1)-1;   // varias marcas en la misma zona se corren
+      const cx=x+des*15,cy=y+des*4;
+      marcas+=`<circle cx="${cx}" cy="${cy}" r="10" fill="#DC2626" stroke="#0F172A" stroke-width="2"/><text x="${cx}" y="${cy+4.5}" text-anchor="middle" font-size="12" font-weight="800" fill="#fff">${n}</text>`;
+    });
+    const sinMarca=!ZONAS[zona];
+    filas+=`<div class="signo"><span class="signo-n${sinMarca?' gen':''}">${sinMarca?(zona==='piel'?'🖐':'ℹ'):n}</span><span>${txt}</span></div>`;
+  });
+  return `<div class="card"><div class="lbl">🔍 Signos a ubicar</div>
+    <div class="mapa-signos"><svg viewBox="0 0 200 420" role="img" aria-label="Dónde buscar los signos en el cuerpo">${SILUETA}${marcas}</svg>
+    <div class="nota-mapa">El paciente de frente: su izquierda queda a tu derecha.</div></div>
+    ${filas}</div>`;
+}
 function backEnf(){enfSel=null;const lv=ge('elf'),dv=ge('edetail');if(lv)lv.style.display='block';if(dv)dv.style.display='none';}
 function renderEnfD(){
   const dv=ge('edetail');if(!dv)return;
@@ -636,6 +666,7 @@ function renderEnfD(){
     <div class="lbl">Reconocimiento rápido</div>
     ${e.r.map(ri=>`<div style="background:#1E293B;border-radius:7px;padding:9px 11px;margin-bottom:5px;"><div style="font-size:13px;font-weight:800;color:${ri.s.startsWith('⚠️')?'#FCA5A5':'#60A5FA'};margin-bottom:3px;">${ri.s}</div><div style="font-size:14px;color:#94A3B8;line-height:1.6;">${ri.d}</div></div>`).join('')}
   </div>
+  ${mapaSignos(e.id)}
   <div class="card"><div class="lbl">⚡ Acción inmediata</div>
     ${e.a.map(ai=>`<div style="font-size:14px;color:#F1F5F9;padding:6px 0;border-bottom:1px solid #1E293B;line-height:1.5;">${ai}</div>`).join('')}
   </div>

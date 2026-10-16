@@ -1,7 +1,7 @@
 // Service Worker — precachea TODO (app + motor Whisper + OCR Tesseract) en la
 // primera visita con red, para que después la app funcione 100% sin conexión.
 // Subir la versión de CACHE_NAME cuando se publique una actualización real.
-const CACHE_NAME='crcr-campo-v8';
+const CACHE_NAME='crcr-campo-v9';
 const ARCHIVOS=[
   './',
   './index.html',
@@ -17,6 +17,7 @@ const ARCHIVOS=[
   './engine/entrevista.js',
   './engine/ocr.js',
   './engine/store.js',
+  './engine/signos.js',
   './engine/util.js',
   './engine/vitals.js',
   './engine/whisper.js',

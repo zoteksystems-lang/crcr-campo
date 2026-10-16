@@ -84,6 +84,10 @@
     <textarea id="dtxt" rows="3" placeholder="Ej: E36 colisión Ruta 27 km 14, código 65..."></textarea>
     <button onclick="interpDesp()" class="btn-red">🧭 Interpretar (motor local)</button>
   </div>
+  <div class="card guia" id="guiaCard">
+    <div class="lbl" style="color:#93C5FD;display:flex;justify-content:space-between;align-items:center;">🧭 Al llegar: qué revisar <span id="guiaVivo" class="vivo" hidden>escuchando</span></div>
+    <div id="guiaCont"><div class="guia-vacia">Escribí o grabá el despacho. Mientras tanto, acá van apareciendo las <b>3 impresiones diagnósticas</b>, las tríadas que coincidan y la lista de qué revisar al llegar, en orden.</div></div>
+  </div>
   <div class="card">
     <div class="lbl">📍 Ubicación del despacho</div>
     <input id="dubic" placeholder="Se llena sola con el despacho; podés corregirla…" oninput="pintarNav()">
@@ -103,25 +107,50 @@
 
 <!-- TRIAGE -->
 <div id="s-triage" class="screen"><div class="page">
-  <div class="card" style="border:2px solid #DC2626;" id="trcard">
-    <div id="trlbl" style="font-size:13px;color:#475569;">Algoritmo START — Paso 1/7</div>
-    <div id="trq" style="font-size:18px;font-weight:700;text-align:center;padding:8px 0;line-height:1.4;">¿El paciente camina por sus propios medios?</div>
-    <div style="display:flex;gap:10px;" id="trbuts">
-      <button onclick="answTriage(true)" style="flex:1;padding:13px;border-radius:9px;background:#16A34A;color:#fff;font-size:15px;font-weight:700;">✅ SÍ</button>
-      <button onclick="answTriage(false)" style="flex:1;padding:13px;border-radius:9px;background:#DC2626;color:#fff;font-size:15px;font-weight:700;">✗ NO</button>
+  <div class="tr-modo" role="tablist" aria-label="Tipo de paciente">
+    <button id="trm-ad" class="on" onclick="modoTriage('ad')" role="tab">🧑 Adulto <small>START</small></button>
+    <button id="trm-ni" onclick="modoTriage('ni')" role="tab">👶 Niño 1-8 años <small>JumpSTART</small></button>
+  </div>
+  <div class="card tr-card" id="trcard">
+    <div id="trlbl" class="tr-paso">START — Paso 1</div>
+    <div id="trq" class="tr-q">¿Camina por sus propios medios?</div>
+    <div id="trh" class="tr-h"></div>
+    <div class="tr-bts" id="trbuts">
+      <button onclick="answTriage(true)" class="tr-si">✅ SÍ</button>
+      <button onclick="answTriage(false)" class="tr-no">✗ NO</button>
     </div>
   </div>
   <div id="trres" style="display:none;" class="card"></div>
-  <button onclick="resetTriage()" class="btn-gray" style="width:100%;">↺ Nuevo paciente / Reiniciar</button>
-  <div class="card" style="border:1px solid #D97706;">
-    <div class="lbl" style="color:#D97706;">🏷️ SALT — Triage Masivo</div>
-    <div style="font-size:13px;color:#CBD5E1;line-height:1.8;">
-      <b style="color:#D97706;">S</b>ort — mover/agitar/caminar<br>
-      <b style="color:#D97706;">A</b>ssess — evaluar los que no se movieron<br>
-      <b style="color:#D97706;">L</b>ifesaving — hemorragia, vía aérea<br>
-      <b style="color:#D97706;">T</b>reat/transport — clasificar y trasladar
-    </div>
-  </div>
+  <button onclick="resetTriage()" class="btn-gray" style="width:100%;">↺ Siguiente paciente</button>
+  <details class="card tr-ref" open>
+    <summary>🧑 START adulto — resumen (RPM 30-2-Obedece)</summary>
+    <ol>
+      <li>¿Camina? → <b class="c-v">VERDE</b></li>
+      <li>¿Respira? NO → abrí vía aérea: respira → <b class="c-r">ROJO</b> · no respira → <b class="c-n">NEGRO</b></li>
+      <li><b>R</b>espiración: más de 30/min → <b class="c-r">ROJO</b></li>
+      <li><b>P</b>erfusión: sin pulso radial o llenado capilar &gt;2 s → <b class="c-r">ROJO</b> (controlá hemorragia)</li>
+      <li><b>M</b>ente: no obedece órdenes simples → <b class="c-r">ROJO</b></li>
+      <li>Pasó todo lo anterior → <b class="c-a">AMARILLO</b></li>
+    </ol>
+    <p class="nota">En triage solo se hace: abrir vía aérea, controlar hemorragia grave y posición. Máximo 30-60 segundos por paciente.</p>
+  </details>
+  <details class="card tr-ref">
+    <summary>👶 JumpSTART niño (1-8 años) — resumen</summary>
+    <ol>
+      <li>¿Camina? → <b class="c-v">VERDE</b></li>
+      <li>¿Respira? NO → abrí vía aérea: respira → <b class="c-r">ROJO</b></li>
+      <li>Sigue sin respirar: ¿pulso? NO → <b class="c-n">NEGRO</b> · SÍ → 5 ventilaciones: respira → <b class="c-r">ROJO</b> · no → <b class="c-n">NEGRO</b></li>
+      <li>Respiración menor de 15 o mayor de 45 → <b class="c-r">ROJO</b></li>
+      <li>Sin pulso periférico → <b class="c-r">ROJO</b></li>
+      <li>AVDN: no responde o responde mal al dolor → <b class="c-r">ROJO</b></li>
+      <li>Pasó todo → <b class="c-a">AMARILLO</b></li>
+    </ol>
+    <p class="nota">Bebés que no caminan por edad: si todo es normal y no tienen lesiones importantes → VERDE.</p>
+  </details>
+  <details class="card tr-ref">
+    <summary>🏷️ SALT — triage masivo</summary>
+    <p style="line-height:1.8;"><b>S</b>ort: que caminen / que muevan un brazo / quietos (primero estos)<br><b>A</b>ssess: evaluar a cada uno<br><b>L</b>ifesaving: hemorragia, vía aérea, descomprimir tórax, antídoto<br><b>T</b>reat/transport: clasificar y trasladar</p>
+  </details>
   <div class="card">
     <div class="lbl">Conteo de víctimas</div>
     <div class="g2">
@@ -161,22 +190,7 @@
     <div id="ctotal" style="text-align:center;font-size:13px;color:#6B7280;margin-top:4px;">Total: 0 víctimas</div>
     <button onclick="resetC()" class="btn-gray" style="font-size:13px;padding:7px;">↺ Reiniciar conteo</button>
   </div>
-  <div class="card">
-    <div class="lbl">Niveles START</div>
-    <div id="trlevels"></div>
-  </div>
-  <div class="card" style="border:1px solid #4ADE80;">
-    <div class="lbl" style="color:#4ADE80;">👶 JUMPSTART — Pediátrico (&lt;8 años)</div>
-    <div style="font-size:13px;color:#94A3B8;line-height:1.8;">
-      • ¿Camina? → <b style="color:#16A34A;">VERDE</b><br>
-      • No camina, no respira → <b style="color:#F59E0B;">5 ventilaciones rescate</b><br>
-      • Respira tras ventilaciones → <b style="color:#DC2626;">ROJO</b><br>
-      • No respira tras ventilaciones → <b style="color:#6B7280;">NEGRO</b><br>
-      • FR &lt;15 o &gt;45 → <b style="color:#DC2626;">ROJO</b><br>
-      • Pulso ausente → <b style="color:#DC2626;">ROJO</b><br>
-      • Todo normal → <b style="color:#D97706;">AMARILLO</b>
-    </div>
-  </div>
+  <div class="card"><div class="lbl">Niveles</div><div id="trlevels"></div></div>
 </div></div>
 
 <!-- ENTREVISTA -->

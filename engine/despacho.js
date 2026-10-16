@@ -49,6 +49,9 @@ export function extraerUbicacion(texto){
   const limpio=t.replace(/\bE\d{2}\b/g,' ').replace(/\bc[oó]digo\s*\d+\b/gi,' ');
   const partes=[];
   for(const m of limpio.matchAll(MARCAS_LUGAR)){
+    // "en …" solo cuenta con nombre propio ("en Grecia"), no "en el pecho".
+    if(/^en\s/i.test(m[0])&&!/^en\s+[A-ZÁÉÍÓÚÑ]/.test(m[0]))continue;
+    if(/\b(pecho|brazo|pierna|cabeza|abdomen|est[oó]mago|espalda|cuello|cara|mano|pie)\b/i.test(m[0])&&!/^(barrio|calle|avenida|ruta)/i.test(m[0]))continue;
     const p=m[0].replace(/\s+/g,' ').trim().replace(/^en\s+/i,'');
     if(p.length>=4&&!partes.some(x=>x.includes(p)))partes.push(p);
   }

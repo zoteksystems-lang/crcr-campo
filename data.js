@@ -30,14 +30,27 @@ AMARILLO:{c:"#D97706",bg:"#451A03",l:"Urgente",d:"Estable pero puede deteriorars
 VERDE:{c:"#16A34A",bg:"#052E16",l:"Menor",d:"Lesión leve — puede esperar"},
 NEGRO:{c:"#4B5563",bg:"#111827",l:"Sin expectativa",d:"Fallecido / lesión incompatible"}
 };
+// START (adultos y niños que aparentan 8 años o más). Cada paso: pregunta, cómo
+// medirlo (h) y a dónde va con SÍ / NO (número = siguiente paso, color = resultado).
+// Fuente: START (Hoag Hospital / Newport Beach), RPM: Respiración 30 – Pulso 2 – Mente.
 export const TSTEPS=[
-{q:"¿El paciente camina por sus propios medios?",si:1,no:2},
-{q:"→ Dirigir al área VERDE. ¿Siguiente paciente?",si:"VERDE",no:"VERDE"},
-{q:"¿Respira espontáneamente?",si:3,no:"ABR"},
-{q:"→ ABRIR VÍA AÉREA. ¿Respira ahora?",si:"ROJO",no:"NEGRO"},
-{q:"¿FR entre 10 y 29 respiraciones por minuto?",si:4,no:"ROJO"},
-{q:"¿Llenado capilar ≤ 2 segundos?",si:5,no:"ROJO"},
-{q:"¿Obedece órdenes simples?",si:"AMARILLO",no:"ROJO"}
+{q:"¿Camina por sus propios medios?",h:"Pedí en voz alta: «los que puedan caminar, vengan hacia acá».",si:"VERDE",no:1},
+{q:"¿Respira?",h:"Mirá el pecho, escuchá y sentí, máximo 10 segundos.",si:3,no:2},
+{q:"Abrí la vía aérea (inclinación de cabeza o tracción mandibular si hay trauma). ¿Respira ahora?",h:"Solo reposicionar; no ventilar ni hacer RCP en triage.",si:"ROJO",no:"NEGRO"},
+{q:"¿Respira 30 o menos por minuto?",h:"Contá 15 segundos y multiplicá × 4. Más de 30 → ROJO.",si:4,no:"ROJO"},
+{q:"¿Tiene pulso radial y llenado capilar de 2 segundos o menos?",h:"Si no hay pulso radial o el llenado tarda más de 2 s → ROJO. Controlá hemorragias graves de una vez.",si:5,no:"ROJO"},
+{q:"¿Obedece órdenes simples?",h:"«Apretame la mano», «abrí los ojos». Si no obedece → ROJO.",si:"AMARILLO",no:"ROJO"}
+];
+// JumpSTART (niños de 1 a 8 años; si aparenta adulto, usar START).
+export const TSTEPS_NINO=[
+{q:"¿Camina por sus propios medios?",h:"Los bebés que aún no caminan no se clasifican aquí: seguí con la evaluación.",si:"VERDE",no:1},
+{q:"¿Respira?",h:"Mirá el pecho, escuchá y sentí, máximo 10 segundos.",si:4,no:2},
+{q:"Abrí la vía aérea. ¿Respira ahora?",h:"Inclinación de cabeza o tracción mandibular.",si:"ROJO",no:3},
+{q:"¿Tiene pulso periférico (radial o braquial)?",h:"Si NO tiene pulso → NEGRO. Si tiene pulso: dale 5 ventilaciones de rescate y respondé abajo.",si:6,no:"NEGRO"},
+{q:"¿Respira entre 15 y 45 por minuto?",h:"Contá 15 segundos × 4. Menos de 15 o más de 45 → ROJO.",si:5,no:"ROJO"},
+{q:"¿Tiene pulso periférico palpable?",h:"Radial (o braquial en lactantes). Sin pulso → ROJO.",si:7,no:"ROJO"},
+{q:"Después de las 5 ventilaciones: ¿respira solo?",h:"Si respira → ROJO. Si sigue sin respirar → NEGRO.",si:"ROJO",no:"NEGRO"},
+{q:"AVDN: ¿está Alerta, responde a la Voz o localiza el Dolor?",h:"Si NO responde o responde mal al dolor (sin localizar, postura anormal) → ROJO. Lactante que aún no camina, con todo normal y sin lesiones importantes → puede ir a VERDE.",si:"AMARILLO",no:"ROJO"}
 ];
 // Acciones inmediatas por nivel de triage — antes generadas por IA, ahora fijas y offline.
 export const TACC={

@@ -5,15 +5,15 @@
 // al arrancar y se vuelcan a estas variables.
 'use strict';
 
-let CODS,TNIV,TSTEPS,TACC,SCAMPOS,OCAMPOS,ENF,PROT,EQP,BOT,QPROMPTS,EPP_POR_TIPO,SIGNOS={},ZONAS={};
-let despachoAgente, vitalsAgente, entrevistaAgente, diagnosticoAgente, documentacionAgente, chatAgente, whisperAgente, ocrAgente, storeAgente;
+let CODS,TNIV,TSTEPS,TSTEPS_NINO,trModo='ad',TACC,SCAMPOS,OCAMPOS,ENF,PROT,EQP,BOT,QPROMPTS,EPP_POR_TIPO,SIGNOS={},ZONAS={};
+let arriboAgente, impresionAgente, despachoAgente, vitalsAgente, entrevistaAgente, diagnosticoAgente, documentacionAgente, chatAgente, whisperAgente, ocrAgente, storeAgente;
 
 // ═══════════════════════════════════════════════════
 // ESTADO
 // ═══════════════════════════════════════════════════
 let notas=[],recs=[],recsOn=false,recsOn2=false,mr=null,mr2=null,chunks=[],chunks2=[],
 trans='',trans2='',
-trStep=0,trABR=false,trCts={r:0,a:0,v:0,n:0},
+trStep=0,trCts={r:0,a:0,v:0,n:0},
 bolTab='veh',
 boleta=boletaVacia(),
 boletaAuto=new Set(), // rutas ("cod","sam.S",...) que llenó el motor — se marcan 🤖 en la UI
@@ -58,7 +58,8 @@ async function cargarMotores(){
     import('./engine/store.js'),
   ]);
   try{({SIGNOS,ZONAS}=await import('./engine/signos.js'));}catch(e){console.error(e);}
-  ({CODS,TNIV,TSTEPS,TACC,SCAMPOS,OCAMPOS,ENF,PROT,EQP,BOT,QPROMPTS,EPP_POR_TIPO}=data);
+  try{arriboAgente=await import('./engine/arribo.js');impresionAgente=await import('./engine/impresion.js');}catch(e){console.error(e);}
+  ({CODS,TNIV,TSTEPS,TSTEPS_NINO,TACC,SCAMPOS,OCAMPOS,ENF,PROT,EQP,BOT,QPROMPTS,EPP_POR_TIPO}=data);
   despachoAgente=despacho; vitalsAgente=vitals; entrevistaAgente=entrevista;
   diagnosticoAgente=diagnostico; documentacionAgente=documentacion; chatAgente=chat;
   storeAgente=store;
@@ -182,7 +183,7 @@ function renderNotas(){
 async function cerrarIncidente(){
   if(!confirm('¿Cerrar este incidente? Se archiva la boleta actual y se abre una en blanco.'))return;
   await storeAgente.archivarIncidente(JSON.parse(JSON.stringify(boleta)));
-  boleta=boletaVacia();boletaAuto=new Set();notas=[];trCts={r:0,a:0,v:0,n:0};trStep=0;trABR=false;
+  boleta=boletaVacia();boletaAuto=new Set();notas=[];trCts={r:0,a:0,v:0,n:0};trStep=0;
   trans='';trans2='';
   renderNotas();resetC();resetTriage();renderBol();guardarEstado();
   alert('Incidente archivado. Boleta lista para el siguiente llamado.');
@@ -247,9 +248,10 @@ async function transcribirYProcesar(blob, destino){
     if(destino==='desp'){
       trans=texto;
       if(statusEl)statusEl.textContent=texto||'(sin voz detectada)';
-      if(texto){ const dt=ge('dtxt'); if(dt && !dt.value.trim())dt.value=texto; }
+      if(texto){ const dt=ge('dtxt'); if(dt && (!dt.value.trim()||dt.dataset.vivo)){dt.value=texto;delete dt.dataset.vivo;autoUbicacion(texto);} }
+      vivoTexto='';pintarGuia();
     }else{
-      trans2=texto;
+      trans2=texto;vivoTexto='';
       if(statusEl)statusEl.textContent=texto||'(sin voz detectada)';
       if(texto)aplicarExtraccionEntrevista(texto);
     }
@@ -267,6 +269,7 @@ async function toggleRec(){
       chunks=[];mr=new MediaRecorder(stream,{mimeType:mime});
       mr.ondataavailable=e=>{if(e.data.size>0)chunks.push(e.data);};
       mr.onstop=async()=>{
+        detenerVivo();
         const blob=new Blob(chunks,{type:mime});
         const lbl=(ge('rlbl')||{value:'Despacho'}).value;
         const rec={id:'r'+Date.now(),lbl,ts:nowStr(),blob,tx:'',sz:Math.round(blob.size/1024)+'KB'};
@@ -282,6 +285,7 @@ async function toggleRec(){
         renderRecs();
       };
       mr.start(500);
+      iniciarVivo(()=>chunks,mime,'desp');
       recsOn=true;
       const b=ge('rbtn');if(b){b.textContent='⏹ Detener';b.style.background='#374151';}
       const rs=ge('rstat');if(rs)rs.style.display='block';
@@ -297,6 +301,7 @@ async function toggleRec2(){
       chunks2=[];mr2=new MediaRecorder(stream,{mimeType:mime});
       mr2.ondataavailable=e=>{if(e.data.size>0)chunks2.push(e.data);};
       mr2.onstop=async()=>{
+        detenerVivo();
         const blob=new Blob(chunks2,{type:mime});
         const rec={id:'r'+Date.now(),lbl:'Entrevista',ts:nowStr(),blob,tx:'',sz:Math.round(blob.size/1024)+'KB'};
         recs.push({...rec, url:URL.createObjectURL(blob)});
@@ -308,6 +313,7 @@ async function toggleRec2(){
         await transcribirYProcesar(blob,'entrev');
       };
       mr2.start(500);
+      iniciarVivo(()=>chunks2,mime,'entrev');
       recsOn2=true;
       const b=ge('rbtn2');if(b){b.textContent='⏹ Detener';b.style.background='#374151';}
       const rs=ge('rstat2');if(rs)rs.style.display='block';
@@ -356,7 +362,8 @@ function analyzeRec(id){
   const desp=despachoAgente.interpretarDespacho(r.tx,{CODS,ENF,EPP_POR_TIPO});
   const dx=diagnosticoAgente.sugerirDiagnosticos(r.tx,ENF);
   const texto=desp.resumen+(dx.length?`\n🩺 Posibles cuadros relacionados: ${dx.map(d=>d.t).join(', ')}`:'');
-  addMsg('assistant','🎙️ ANÁLISIS DE GRABACIÓN\n\n'+texto);go('chat');
+  addMsg('assistant','🎙️ ANÁLISIS DE GRABACIÓN\n\n'+texto);
+  go('desp');pintarGuia(r.tx+'. '+textoDelCaso());ge('guiaCard')?.scrollIntoView({block:'start'});
 }
 
 // ═══════════════════════════════════════════════════
@@ -375,19 +382,20 @@ function pintarNav(){
   }
 }
 // Mientras se escribe el despacho, la ubicación se va llenando sola (si no la corrigieron a mano).
-document.addEventListener('input',e=>{
-  if(e.target.id!=='dtxt'||!despachoAgente)return;
-  const du=ge('dubic');if(!du||du.dataset.manual)return;
-  const u=despachoAgente.extraerUbicacion(e.target.value);
+function autoUbicacion(texto){
+  const du=ge('dubic');if(!du||du.dataset.manual||!despachoAgente)return;
+  const u=despachoAgente.extraerUbicacion(texto);
   du.value=u?u.texto:'';du.classList.toggle('auto-field',!!u);pintarNav();
-});
+}
+document.addEventListener('input',e=>{if(e.target.id==='dtxt')autoUbicacion(e.target.value);});
 document.addEventListener('input',e=>{if(e.target.id==='dubic')e.target.dataset.manual=e.target.value?'1':'';});
 function interpDesp(){
   const txt=(ge('dtxt')||{value:''}).value;if(!txt.trim()){alert('Ingresá el texto primero.');return;}
   ultimoDespacho=despachoAgente.interpretarDespacho(txt,{CODS,ENF,EPP_POR_TIPO});
   const du=ge('dubic');if(du&&ultimoDespacho.ubicacion){du.value=ultimoDespacho.ubicacion.texto;du.classList.add('auto-field');}
   pintarNav();
-  addMsg('user','📻 Despacho: '+txt);addMsg('assistant','📻 DESPACHO INTERPRETADO (motor local)\n\n'+ultimoDespacho.resumen);go('chat');
+  addMsg('user','📻 Despacho: '+txt);addMsg('assistant','📻 DESPACHO INTERPRETADO (motor local)\n\n'+ultimoDespacho.resumen);
+  pintarGuia();ge('guiaCard')?.scrollIntoView({behavior:'smooth',block:'start'});
   // autocompleta boleta automáticamente (marcado 🤖, editable)
   const auto=documentacionAgente.autocompletarBoleta(boleta,{despacho:ultimoDespacho});
   auto.forEach(p=>boletaAuto.add(p));
@@ -395,25 +403,128 @@ function interpDesp(){
 }
 
 // ═══════════════════════════════════════════════════
+// GUÍA DE ARRIBO + 3 IMPRESIONES DIAGNÓSTICAS (motor local)
+// ═══════════════════════════════════════════════════
+// Análisis en vivo: mientras se graba, cada ~12 s se transcribe solo lo nuevo
+// (Whisper local) y la guía de arribo se va actualizando.
+let vivoTexto='',vivoHasta=0,vivoTimer=null,vivoOcupado=false;
+function iniciarVivo(getChunks,mime,destino){
+  vivoTexto='';vivoHasta=0;vivoOcupado=false;
+  const marca=ge('guiaVivo');if(marca)marca.hidden=false;
+  clearInterval(vivoTimer);
+  vivoTimer=setInterval(async()=>{
+    if(vivoOcupado||!whisperListo||!whisperAgente?.transcribirDesde)return;
+    vivoOcupado=true;
+    try{
+      const r=await whisperAgente.transcribirDesde(new Blob(getChunks(),{type:mime}),vivoHasta);
+      vivoHasta=r.hasta;
+      if(r.texto){
+        vivoTexto=(vivoTexto+' '+r.texto).trim();
+        const st=ge(destino==='desp'?'rtxt':'rtxt2');if(st){st.style.display='block';st.textContent='🎧 '+vivoTexto;}
+        const dt=ge('dtxt');
+        if(destino==='desp'&&dt&&(!dt.value.trim()||dt.dataset.vivo)){dt.value=vivoTexto;dt.dataset.vivo='1';autoUbicacion(vivoTexto);}
+        pintarGuia();
+      }
+    }catch(e){console.warn('vivo',e);}
+    vivoOcupado=false;
+  },12000);
+}
+function detenerVivo(){
+  clearInterval(vivoTimer);vivoTimer=null;
+  const marca=ge('guiaVivo');if(marca)marca.hidden=true;
+}
+let ultimaGuia=null,guiaTimer=null;
+const guiaHechos=new Set();
+const escHtml=t=>String(t??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+// Todo lo que se sabe del caso: despacho, grabaciones, notas y entrevista.
+function textoDelCaso(){
+  return [(ge('dtxt')||{}).value,trans,trans2,vivoTexto,notas.map(n=>n.txt).join(' '),
+    Object.values(boleta.sam||{}).join(' '),Object.values(boleta.opr||{}).join(' ')].filter(Boolean).join('. ');
+}
+function htmlImpresiones(imp,triadas,dondeBoton){
+  if(!imp.length)return '<div class="guia-vacia">Todavía no hay datos suficientes para una impresión diagnóstica.</div>';
+  const conf={alta:'Más probable',media:'Posible',baja:'Menos probable',descartar:'Descartar'};
+  let h='';
+  if(triadas.length)h+=triadas.map(t=>`<div class="triada">⚠️ <b>${escHtml(t.n)}</b> (${t.si.length}/3) → sospechá <b>${escHtml(t.que)}</b>.<br>Presente: ${escHtml(t.si.join(', '))}.${t.no.length?`<br><b>Buscá:</b> ${escHtml(t.no.join(', '))}.`:''}${t.extra?'<br>'+escHtml(t.extra):''}</div>`).join('');
+  h+='<div class="imp">'+imp.map((d,i)=>`<div class="imp-it ${d.conf}">
+    <div class="imp-c">Impresión ${i+1} · ${conf[d.conf]||''}</div>
+    <div class="imp-n">${escHtml(d.n)}</div>
+    <div class="imp-por">Por: ${escHtml(d.por.join(', '))}</div>
+    <ul>${d.confirmar.slice(0,i===0?4:2).map(c=>`<li>${escHtml(c)}</li>`).join('')}</ul></div>`).join('')+'</div>';
+  h+=`<button class="btn-blue" style="width:100%;" onclick="usarImpresiones('${dondeBoton}')">📋 Pasar estas 3 a la boleta</button>
+    <div class="guia-vacia" style="font-size:12.5px;">Es una ayuda: confirmá con tu valoración antes de anotarlas.</div>`;
+  return h;
+}
+function pintarGuia(texto){
+  const el=ge('guiaCont');if(!el||!arriboAgente)return;
+  texto=texto??textoDelCaso();
+  if(!texto.trim()){ultimaGuia=null;return;}
+  const g=arriboAgente.guiaArribo(texto,{ENF,SIGNOS,EPP_POR_TIPO,sv:boleta.sv1});
+  ultimaGuia=g;
+  let h=htmlImpresiones(g.impresiones,g.triadas,'guia');
+  for(const sec of g.secciones){
+    if(sec.id==='triadas')continue;
+    h+=`<div class="g-sec"><h4>${escHtml(sec.t)}</h4>${sec.items.map(it=>{
+      const k=sec.id+'|'+it;
+      return `<label><input type="checkbox" data-k="${escHtml(k)}" ${guiaHechos.has(k)?'checked':''}><span>${it}</span></label>`;}).join('')}
+      ${sec.enf&&SIGNOS[sec.enf]?`<button class="btn-gray" style="width:100%;margin-top:4px;" onclick="verSignos('${sec.enf}')">🧍 Ver en el mapa del cuerpo</button>`:''}</div>`;
+  }
+  el.innerHTML=h;
+}
+document.addEventListener('change',e=>{
+  const k=e.target?.dataset?.k;if(!k||!e.target.closest('#guiaCont'))return;
+  if(e.target.checked)guiaHechos.add(k);else guiaHechos.delete(k);
+});
+function verSignos(id){go('enf');showEnfD(id);}
+function usarImpresiones(origen){
+  const imp=origen==='boleta'?impresionesBoleta:(ultimaGuia?.impresiones||[]);
+  if(!imp.length)return;
+  const ya=['dx1','dx2','dx3'].filter(f=>boleta[f]);
+  if(ya.length&&!confirm('La boleta ya tiene impresión diagnóstica. ¿Reemplazarla por estas 3?'))return;
+  imp.slice(0,3).forEach((d,i)=>{const f='dx'+(i+1);boleta[f]=d.n;boletaAuto.delete(f);});
+  guardarEstado();
+  if(origen==='boleta')renderBol();else alert('✅ Las 3 impresiones quedaron en la boleta (pestaña Signos vitales → Impresión diagnóstica). Podés editarlas ahí.');
+}
+let impresionesBoleta=[];
+function sugerirEnBoleta(){
+  const texto=textoDelCaso();
+  const ctx=arriboAgente.contextoPaciente(texto);
+  impresionesBoleta=impresionAgente.tresImpresiones(texto,{sv:boleta.sv1,ctx});
+  const tri=impresionAgente.triadasPresentes(texto,{sv:boleta.sv1});
+  const el=ge('bolImp');if(el)el.innerHTML=htmlImpresiones(impresionesBoleta,tri,'boleta');
+}
+// Mientras se escribe el despacho, la guía se actualiza sola.
+document.addEventListener('input',e=>{
+  if(e.target.id!=='dtxt')return;
+  clearTimeout(guiaTimer);guiaTimer=setTimeout(()=>pintarGuia(),350);
+});
+
+// ═══════════════════════════════════════════════════
 // TRIAGE
 // ═══════════════════════════════════════════════════
+function pasosTr(){return trModo==='ni'?TSTEPS_NINO:TSTEPS;}
+function modoTriage(m){
+  trModo=m;
+  ge('trm-ad')?.classList.toggle('on',m==='ad');ge('trm-ni')?.classList.toggle('on',m==='ni');
+  resetTriage();
+}
 function renderTr(){
-  const idx=trStep,q=trABR?TSTEPS[3]:TSTEPS[idx];
-  const l=ge('trlbl'),qe=ge('trq'),r=ge('trres');
-  if(l)l.textContent='Algoritmo START — Paso '+(typeof idx==='number'?idx+1:'*')+'/'+TSTEPS.length;
+  const q=pasosTr()[trStep];
+  const l=ge('trlbl'),qe=ge('trq'),h=ge('trh'),r=ge('trres');
+  if(l)l.textContent=(trModo==='ni'?'JumpSTART (niño)':'START (adulto)')+' — Paso '+(trStep+1);
   if(qe)qe.textContent=q?q.q:'';
+  if(h){h.textContent=q?.h||'';h.style.display=q?.h?'block':'none';}
   if(r)r.style.display='none';
 }
 function renderTrLevels(){
   const el=ge('trlevels');if(!el)return;
-  el.innerHTML=Object.entries(TNIV).map(([code,n])=>`<div style="display:flex;gap:10px;align-items:center;background:#1E293B;border-radius:7px;padding:8px 10px;border-left:4px solid ${n.c};margin-bottom:4px;"><div style="font-weight:800;color:${n.c};min-width:75px;font-size:14px;">${code}</div><div><div style="font-size:14px;font-weight:700;">${n.l}</div><div style="font-size:13px;color:#6B7280;">${n.d}</div></div></div>`).join('');
+  el.innerHTML=Object.entries(TNIV).map(([code,n])=>`<div style="display:flex;gap:10px;align-items:center;background:#1E293B;border-radius:7px;padding:8px 10px;border-left:4px solid ${n.c};margin-bottom:4px;"><div style="font-weight:800;color:${n.c};min-width:75px;font-size:14px;">${code}</div><div><div style="font-size:14px;font-weight:700;">${n.l}</div><div style="font-size:13px;color:#94A3B8;">${n.d}</div></div></div>`).join('');
 }
 function answTriage(si){
-  const q=trABR?TSTEPS[3]:TSTEPS[trStep];
+  const q=pasosTr()[trStep];if(!q)return;
   const next=si?q.si:q.no;
-  if(next==='ABR'){trABR=true;trStep='ABR';renderTr();return;}
-  if(typeof next==='string'&&next!=='ABR'){showTrRes(next);return;}
-  trABR=false;trStep=next;renderTr();
+  if(typeof next==='string'){showTrRes(next);return;}
+  trStep=next;renderTr();
 }
 function showTrRes(code){
   const n=TNIV[code];boleta.trc=code;guardarEstado();
@@ -423,11 +534,12 @@ function showTrRes(code){
     r.innerHTML=`<div style="text-align:center;gap:8px;display:flex;flex-direction:column;"><div style="font-size:34px;font-weight:900;color:${n.c};">${code}</div><div style="font-size:15px;font-weight:700;">${n.l}</div><div style="font-size:14px;color:#94A3B8;">${n.d}</div></div>
     <div style="margin-top:8px;font-size:13px;color:#F1F5F9;line-height:1.7;">${acciones.join('<br>')}</div>`;}
   if(q)q.style.display='none';
+  const th=ge('trh');if(th)th.style.display='none';
   ge('trbuts').style.display='none';
   if(b){b.style.display='block';b.innerHTML=`<span style="background:${n.c};color:#fff;padding:4px 12px;border-radius:20px;font-size:13px;font-weight:800;">Triage: ${code}</span>`;}
 }
 function resetTriage(){
-  trStep=0;trABR=false;
+  trStep=0;
   const r=ge('trres'),q=ge('trq'),bt=ge('trbuts');
   if(r)r.style.display='none';if(q)q.style.display='block';if(bt)bt.style.display='flex';
   const b=ge('tbadge');if(b)b.style.display='none';
@@ -454,10 +566,8 @@ function aplicarExtraccionEntrevista(texto){
   Object.entries(sam).forEach(([k,v])=>{ if(v && !boleta.sam[k]){boleta.sam[k]=v;boletaAuto.add('sam.'+k);} });
   Object.entries(opr).forEach(([k,v])=>{ if(v && !boleta.opr[k]){boleta.opr[k]=v;boletaAuto.add('opr.'+k);} });
   initSO();
-  const dx=diagnosticoAgente.sugerirDiagnosticos(texto+' '+Object.values(boleta.sam).join(' '),ENF);
-  if(dx.length){
-    dx.slice(0,2).forEach((d,i)=>{ const campo=i===0?'dx1':'dx2'; if(!boleta[campo]){boleta[campo]=`${d.t} (${d.e||'—'})`;boletaAuto.add(campo);} });
-  }
+  // La impresión diagnóstica no se autollena: se sugiere y el socorrista la confirma.
+  pintarGuia();
   guardarEstado();
 }
 function analyzeSO(){
@@ -574,6 +684,8 @@ function renderBol(){
       ${svI('sv2','pa2','PA Diast.')}${svI('sv2','spo2','SpO₂')}${svI('sv2','gcs','Glasgow')}
     </div></div>
     <div class="card"><div class="lbl">Impresión diagnóstica</div>
+      <button class="btn-blue" onclick="sugerirEnBoleta()">🧠 Sugerir 3 impresiones con todo lo registrado</button>
+      <div id="bolImp" style="display:flex;flex-direction:column;gap:8px;"></div>
       ${['dx1','dx2','dx3'].map((f,i)=>`<div class="fld"><div class="flbl">Dx ${i+1}${badge(f)}</div><input value="${b[f]}" onchange="boleta.${f}=this.value;campoEditado('${f}')" class="${autoCls(f)}" placeholder="CIE-10 / descripción" style="width:100%;"></div>`).join('')}
     </div>`;
   }
@@ -609,7 +721,6 @@ function autoBot(){
     incidente:{u:(ge('inc-u')||{}).value,hd:(ge('inc-hd')||{}).value,hl:(ge('inc-hl')||{}).value},
     notas,
     despacho:ultimoDespacho,
-    diagnosticos:diagnosticoAgente.sugerirDiagnosticos(notas.map(n=>n.txt).join(' ')+' '+trans+' '+trans2,ENF)
   };
   const auto=documentacionAgente.autocompletarBoleta(boleta,ctx);
   auto.forEach(p=>boletaAuto.add(p));
@@ -796,7 +907,7 @@ document.addEventListener('DOMContentLoaded',()=>{
 // Exponer al scope global — necesario para los onclick="..." inline del HTML
 // (tanto el HTML estático como el que este mismo archivo genera dinámicamente).
 // ═══════════════════════════════════════════════════
-Object.assign(window, {
+Object.assign(window, {usarImpresiones,sugerirEnBoleta,verSignos,modoTriage,
   guardarAudio,compartirAudio,pintarNav,abrirMas,cerrarMas,go, toggleTimer, resetTimer, addN, cerrarIncidente, exportarHistorial,
   quickChat, renderCods, toggleRec, toggleRec2, analyzeRec, interpDesp,
   answTriage, resetTriage, adj, resetC, analyzeSO, setbt, campoEditado,

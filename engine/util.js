@@ -3,7 +3,9 @@ export function normalize(str){
   return (str||'').toString().toLowerCase()
     .normalize('NFD').replace(/[̀-ͯ]/g,'') // quita tildes (marcas diacríticas tras NFD)
     .replace(/[^a-z0-9\s]/gi,' ')
-    .replace(/\s+/g,' ').trim();
+    .replace(/\s+/g,' ').trim()
+    // Whisper escribe "e 21" o "E-21": se junta para reconocer el código.
+    .replace(/\be (\d{2})\b/g,'e$1');
 }
 export function tokenize(str){
   return normalize(str).split(' ').filter(w=>w.length>2);

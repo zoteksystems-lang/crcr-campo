@@ -86,3 +86,41 @@ nav.abajo{display:flex;background:var(--tarjeta);border-top:1px solid var(--bord
 .btn-nav{display:flex;align-items:center;justify-content:center;gap:6px;min-height:52px;border-radius:12px;font-size:16px;font-weight:800;text-decoration:none;color:#fff;background:#1D4ED8;}
 .btn-nav:first-child{background:#0EA5E9;color:#04202B;}
 .btn-nav.off{opacity:.35;pointer-events:none;}
+
+/* Triage: selector adulto/niño, paso a paso y resúmenes */
+.tr-modo{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.tr-modo button{background:var(--campo);border:2px solid var(--campo-borde);color:#CBD5E1;border-radius:12px;padding:11px 8px;font-size:15px;font-weight:800;display:flex;flex-direction:column;align-items:center;gap:2px;}
+.tr-modo button small{font-size:12px;font-weight:600;color:var(--suave);}
+.tr-modo button.on{border-color:var(--rojo);background:#2A0E12;color:#fff;}
+.tr-card{border:2px solid var(--rojo);}
+.tr-paso{font-size:13px;color:var(--suave);font-weight:700;}
+.tr-q{font-size:19px;font-weight:800;text-align:center;line-height:1.35;padding:4px 0;}
+.tr-h{font-size:14px;color:#CBD5E1;background:#14213A;border-radius:10px;padding:9px 11px;line-height:1.45;}
+.tr-bts{display:flex;gap:10px;}
+.tr-bts button{flex:1;padding:16px;border-radius:12px;color:#fff;font-size:17px;font-weight:800;}
+.tr-si{background:#16A34A;}.tr-no{background:var(--rojo);}
+.tr-ref summary,.guia summary{font-weight:800;font-size:15px;cursor:pointer;list-style:none;}
+.tr-ref summary::-webkit-details-marker,.guia summary::-webkit-details-marker{display:none;}
+.tr-ref summary::after,.guia summary::after{content:' ▾';color:var(--suave);}
+.tr-ref ol{padding-left:20px;line-height:1.75;font-size:14px;color:#E2E8F0;margin-top:8px;}
+.tr-ref .nota,.guia .nota{font-size:13px;color:var(--suave);}
+.c-v{color:#4ADE80;}.c-a{color:#FBBF24;}.c-r{color:#F87171;}.c-n{color:#9CA3AF;}
+
+/* Guía de arribo e impresiones diagnósticas */
+.guia{border:2px solid #2563EB;}
+.guia-vacia{font-size:14px;color:var(--suave);}
+.imp{display:flex;flex-direction:column;gap:8px;}
+.imp-it{background:#14213A;border-radius:12px;padding:10px 12px;border-left:5px solid #64748B;}
+.imp-it.alta{border-left-color:#EF4444;}.imp-it.media{border-left-color:#F59E0B;}.imp-it.baja,.imp-it.descartar{border-left-color:#64748B;}
+.imp-n{font-weight:800;font-size:15px;}
+.imp-c{font-size:12px;font-weight:700;color:var(--suave);text-transform:uppercase;letter-spacing:.4px;}
+.imp-por{font-size:13px;color:var(--suave);margin-top:2px;}
+.imp-it ul{margin:6px 0 0 18px;font-size:14px;line-height:1.5;color:#E2E8F0;}
+.triada{background:#3B1D06;border:1px solid #F59E0B;border-radius:12px;padding:10px 12px;font-size:14px;line-height:1.5;}
+.g-sec{border-top:1px solid var(--borde);padding-top:10px;}
+.g-sec h4{font-size:14px;font-weight:800;color:#93C5FD;margin-bottom:6px;}
+.g-sec label{display:flex;gap:9px;align-items:flex-start;font-size:14px;line-height:1.45;padding:4px 0;}
+.g-sec input[type=checkbox]{width:20px;height:20px;flex-shrink:0;margin-top:1px;-webkit-appearance:checkbox;appearance:checkbox;accent-color:#22C55E;padding:0;}
+.g-sec input:checked+span{text-decoration:line-through;color:var(--tenue);}
+.vivo{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:800;color:#FCA5A5;}
+.vivo::before{content:'';width:8px;height:8px;border-radius:50%;background:#EF4444;animation:blink 1s infinite;}

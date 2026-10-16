@@ -52,9 +52,23 @@ async function blobA16kMono(blob){
   return rendered.getChannelData(0);
 }
 
+// chunk_length_s: Whisper solo "ve" 30 s por vez; sin esto un despacho largo
+// quedaba cortado en los primeros 30 segundos.
+const OPC={language:'spanish',task:'transcribe',chunk_length_s:30,stride_length_s:5};
 export async function transcribir(blob, {onProgress}={}){
   const transcriber=await precargarModelo(onProgress);
   const audio=await blobA16kMono(blob);
-  const resultado=await transcriber(audio,{language:'spanish',task:'transcribe'});
+  const resultado=await transcriber(audio,OPC);
   return (resultado.text||'').trim();
+}
+// Transcripción en vivo: solo el pedazo nuevo desde el segundo `desde`
+// (con 1 s de solape para no cortar palabras). Devuelve hasta dónde llegó.
+export async function transcribirDesde(blob, desde=0){
+  const transcriber=await precargarModelo();
+  const audio=await blobA16kMono(blob);
+  const ini=Math.max(0,Math.floor((desde-1)*16000));
+  const hasta=audio.length/16000;
+  if(hasta-desde<3)return {texto:'',hasta:desde};
+  const resultado=await transcriber(audio.subarray(ini),OPC);
+  return {texto:(resultado.text||'').trim(),hasta};
 }

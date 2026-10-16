@@ -1,7 +1,7 @@
 // Service Worker — precachea TODO (app + motor Whisper + OCR Tesseract) en la
 // primera visita con red, para que después la app funcione 100% sin conexión.
 // Subir la versión de CACHE_NAME cuando se publique una actualización real.
-const CACHE_NAME='crcr-campo-v16';
+const CACHE_NAME='crcr-campo-v20';
 const ARCHIVOS=[
   './',
   './index.html',
@@ -24,6 +24,26 @@ const ARCHIVOS=[
   './engine/senales.js',
   './engine/pesos.js',
   './engine/herramientas.js',
+  './engine/ruta.js',
+  './mapa/fonts/Noto Sans Italic/0-255.pbf',
+  './mapa/fonts/Noto Sans Italic/256-511.pbf',
+  './mapa/fonts/Noto Sans Italic/8192-8447.pbf',
+  './mapa/fonts/Noto Sans Medium/0-255.pbf',
+  './mapa/fonts/Noto Sans Medium/256-511.pbf',
+  './mapa/fonts/Noto Sans Medium/8192-8447.pbf',
+  './mapa/fonts/Noto Sans Regular/0-255.pbf',
+  './mapa/fonts/Noto Sans Regular/256-511.pbf',
+  './mapa/fonts/Noto Sans Regular/8192-8447.pbf',
+  './mapa/sprites/light.json',
+  './mapa/sprites/light.png',
+  './mapa/sprites/light@2x.json',
+  './mapa/sprites/light@2x.png',
+  './engine/geocodificar.js',
+  './engine/mapaoffline.js',
+  './vendor/maplibre-gl.js',
+  './vendor/maplibre-gl.css',
+  './vendor/pmtiles.js',
+  './vendor/basemaps.js',
   './engine/util.js',
   './engine/vitals.js',
   './engine/whisper.js',
@@ -58,7 +78,8 @@ self.addEventListener('install',(event)=>{
 self.addEventListener('activate',(event)=>{
   event.waitUntil(
     caches.keys().then(nombres=>Promise.all(
-      nombres.filter(n=>n!==CACHE_NAME).map(n=>caches.delete(n))
+      // El mapa descargado (crcr-mapa-*) NO se borra al actualizar la app.
+      nombres.filter(n=>n!==CACHE_NAME&&!n.startsWith('crcr-mapa')).map(n=>caches.delete(n))
     )).then(()=>self.clients.claim())
   );
 });
@@ -66,6 +87,9 @@ self.addEventListener('activate',(event)=>{
 // Cache-first: si ya está descargado, ni se intenta tocar la red.
 self.addEventListener('fetch',(event)=>{
   if(event.request.method!=='GET')return;
+  // El mapa offline tiene su propia caché (engine/mapaoffline.js) y usa pedidos parciales (Range).
+  const ruta=new URL(event.request.url).pathname;
+  if(ruta.endsWith('.pmtiles')||/\/mapa\/(rutas|salud|lugares)/.test(ruta))return;
   event.respondWith(
     caches.match(event.request).then(cached=>{
       if(cached)return cached;

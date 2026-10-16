@@ -142,3 +142,29 @@ nav.abajo{display:flex;background:var(--tarjeta);border-top:1px solid var(--bord
 
 .rev-sw{display:flex;gap:9px;align-items:center;font-size:14px;font-weight:700;color:#CBD5E1;}
 .rev-sw input{width:22px;height:22px;-webkit-appearance:checkbox;appearance:checkbox;accent-color:#3B82F6;padding:0;flex-shrink:0;}
+
+/* Mapa sin señal */
+.mp{position:fixed;inset:0;z-index:200;background:#0B1220;display:flex;flex-direction:column;}
+body.mp-abierto{overflow:hidden;}
+.mp-top{padding:8px 10px;display:flex;flex-direction:column;gap:6px;background:var(--tarjeta);border-bottom:1px solid var(--borde);}
+.mp-fila{display:flex;gap:6px;align-items:center;}
+.mp-fila input{flex:1;padding:10px 12px;}
+.mp-fila>button{background:var(--campo);border:1px solid var(--campo-borde);color:#fff;border-radius:10px;min-width:46px;height:46px;font-size:18px;}
+.mp-chips{display:flex;gap:6px;overflow-x:auto;flex-wrap:nowrap;}
+.mp-chips button{flex-shrink:0;background:#14213A;border:1px solid #2563EB;color:#DBEAFE;border-radius:999px;padding:8px 12px;font-size:13.5px;font-weight:700;white-space:nowrap;}
+#mpTocar.on{background:#2563EB;color:#fff;}
+.mp-estado{font-size:13px;color:#93C5FD;min-height:0;}
+.mp-mapa{flex:1;min-height:0;}
+.mp-descarga{position:absolute;left:10px;right:10px;bottom:10px;background:var(--tarjeta);border:1px solid var(--borde);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:6px;z-index:2;}
+.mp-panel{position:absolute;left:8px;right:8px;bottom:8px;max-height:45vh;overflow-y:auto;background:var(--tarjeta);border:1px solid var(--borde);border-radius:14px;padding:12px;font-size:14.5px;line-height:1.45;display:flex;flex-direction:column;gap:6px;z-index:1;box-shadow:0 -4px 20px rgba(0,0,0,.4);}
+.mp-panel .nota{font-size:12.5px;color:var(--suave);}
+.mp-res b{font-size:22px;color:#93C5FD;}
+.mp-dst{font-size:15px;}
+.mp-vias,.mp-lista{margin:0 0 0 18px;padding:0;}
+.mp-lista li{margin-bottom:4px;}
+.mp-lista button{background:none;color:inherit;text-align:left;padding:4px 0;width:100%;}
+.mp-btn{text-align:center;text-decoration:none;padding:10px;}
+.mp-yo{width:18px;height:18px;border-radius:50%;background:#2563EB;border:3px solid #fff;box-shadow:0 0 0 6px rgba(37,99,235,.3);}
+.mp-dest{font-size:30px;line-height:1;}
+.mp-asa{align-self:center;background:var(--campo);border:1px solid var(--campo-borde);color:#CBD5E1;border-radius:999px;width:60px;height:26px;font-size:16px;line-height:1;margin:-4px 0 2px;}
+.mp-panel.min{max-height:64px;overflow:hidden;}

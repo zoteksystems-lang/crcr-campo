@@ -100,7 +100,8 @@
   <div class="card">
     <div class="lbl">📍 Ubicación del despacho</div>
     <input id="dubic" placeholder="Se llena sola con el despacho; podés corregirla…" oninput="pintarNav()">
-    <button id="btnMapaAqui" class="btn-red" onclick="abrirMapa('ruta')">🗺️ Ver ruta aquí, sin salir de la app</button>
+    <button class="btn-red" onclick="abrirMapaSinSenal()">🗺️ Mapa y ruta — funciona sin señal</button>
+    <button id="btnMapaAqui" class="btn-gray" onclick="abrirMapa('ruta')">🚦 Ruta con tránsito en vivo (Google, con señal)</button>
     <div id="mapaBox" class="mapa-box" hidden>
       <div class="mapa-tabs">
         <button id="mt-ruta" class="on" onclick="abrirMapa('ruta')">🛣️ Ruta y tiempo</button>
@@ -340,5 +341,23 @@ if('serviceWorker' in navigator){
   });
 }
 </script>
+<!-- MAPA SIN SEÑAL (pantalla completa) -->
+<div id="mpOverlay" class="mp" hidden>
+  <div class="mp-top">
+    <div class="mp-fila">
+      <input id="mpBuscar" placeholder="Dirección del despacho…" onkeydown="if(event.key==='Enter')mpBuscarDir()">
+      <button onclick="mpBuscarDir()" aria-label="Buscar">🔎</button>
+      <button onclick="cerrarMapaSinSenal()" aria-label="Cerrar mapa">✕</button>
+    </div>
+    <div class="mp-fila mp-chips"><button id="mpTocar" onclick="mpTocar()">📌 Marcar en el mapa</button><span id="mpRapidos" class="mp-chips"></span></div>
+    <div id="mpEstado" class="mp-estado"></div>
+  </div>
+  <div id="mpMapa" class="mp-mapa"></div>
+  <div id="mpDescarga" class="mp-descarga" hidden>
+    <button id="mpDescargar" class="btn-red" onclick="mpDescargar()">⬇️ Descargar mapa de Costa Rica (57 MB, una vez)</button>
+    <div class="nota">Mejor con Wi-Fi. Después funciona sin señal: mapa, rutas y centros de salud.</div>
+  </div>
+  <div id="mpPanel" class="mp-panel" hidden></div>
+</div>
 </body>
 </html>

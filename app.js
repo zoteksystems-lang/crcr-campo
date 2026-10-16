@@ -437,6 +437,17 @@ async function abrirMapa(modo){
   }
 }
 function cerrarMapa(){ge('mapaBox').hidden=true;ge('btnMapaAqui').hidden=false;ge('mapaFrame').removeAttribute('src');mapaModo=null;}
+// ── Mapa sin señal ──
+let mapaOff=null;
+async function abrirMapaSinSenal(){
+  mapaOff=mapaOff||await import('./engine/mapaoffline.js');
+  const imp=ultimaGuia?.impresiones?.find(d=>d.conf!=='descartar')?.id||null;
+  mapaOff.abrirMapaOffline({direccion:(ge('dubic')||{value:''}).value.trim(),impresion:imp});
+}
+function cerrarMapaSinSenal(){mapaOff?.cerrarMapaOffline();}
+function mpBuscarDir(){mapaOff?.buscarDireccion();}
+function mpTocar(){mapaOff?.activarTocar();}
+function mpDescargar(){mapaOff?.iniciarDescarga();}
 function pintarNav(){
   const v=(ge('dubic')||{value:''}).value.trim();
   const c=v.match(/^(-?\d{1,2}\.\d+)\s*,\s*(-?\d{2,3}\.\d+)$/);
@@ -1090,7 +1101,7 @@ document.addEventListener('DOMContentLoaded',()=>{
 // Exponer al scope global — necesario para los onclick="..." inline del HTML
 // (tanto el HTML estático como el que este mismo archivo genera dinámicamente).
 // ═══════════════════════════════════════════════════
-Object.assign(window, {cambiarRevision,guardarPinRev,subirPendientes,enviarRevision,borrarRec,abrirMapa,cerrarMapa,cambiarVoz,marcarHora,metronomo,verPrealerta,copiarPrealerta,compartirPrealerta,usarImpresiones,sugerirEnBoleta,verSignos,modoTriage,
+Object.assign(window, {abrirMapaSinSenal,cerrarMapaSinSenal,mpBuscarDir,mpTocar,mpDescargar,cambiarRevision,guardarPinRev,subirPendientes,enviarRevision,borrarRec,abrirMapa,cerrarMapa,cambiarVoz,marcarHora,metronomo,verPrealerta,copiarPrealerta,compartirPrealerta,usarImpresiones,sugerirEnBoleta,verSignos,modoTriage,
   guardarAudio,compartirAudio,pintarNav,abrirMas,cerrarMas,go, toggleTimer, resetTimer, addN, cerrarIncidente, exportarHistorial,
   quickChat, renderCods, toggleRec, toggleRec2, analyzeRec, interpDesp,
   answTriage, resetTriage, adj, resetC, analyzeSO, setbt, campoEditado,

@@ -80,3 +80,9 @@ nav.abajo{display:flex;background:var(--tarjeta);border-top:1px solid var(--bord
 .signo:last-child{border-bottom:none;}
 .signo-n{width:26px;height:26px;border-radius:50%;background:var(--rojo);color:#fff;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
 .signo-n.gen{background:var(--campo);color:#CBD5E1;}
+
+/* Ubicación del despacho */
+.nav-ubic{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.btn-nav{display:flex;align-items:center;justify-content:center;gap:6px;min-height:52px;border-radius:12px;font-size:16px;font-weight:800;text-decoration:none;color:#fff;background:#1D4ED8;}
+.btn-nav:first-child{background:#0EA5E9;color:#04202B;}
+.btn-nav.off{opacity:.35;pointer-events:none;}

@@ -85,6 +85,15 @@
     <button onclick="interpDesp()" class="btn-red">🧭 Interpretar (motor local)</button>
   </div>
   <div class="card">
+    <div class="lbl">📍 Ubicación del despacho</div>
+    <input id="dubic" placeholder="Se llena sola con el despacho; podés corregirla…" oninput="pintarNav()">
+    <div class="nav-ubic">
+      <a id="btnWaze" class="btn-nav" target="_blank" rel="noopener">🚗 Waze</a>
+      <a id="btnMaps" class="btn-nav" target="_blank" rel="noopener">🗺️ Google Maps</a>
+    </div>
+    <div style="font-size:12.5px;color:#64748B;">Abre la ruta en la app de mapas (necesita señal para calcularla).</div>
+  </div>
+  <div class="card">
     <div class="lbl">Códigos radio CRC — <span style="color:#DC2626;">E = Emergencia</span></div>
     <input id="csearch" placeholder="Buscá código o descripción..." oninput="renderCods()">
     <div id="clist" style="max-height:240px;overflow-y:auto;display:flex;flex-direction:column;gap:3px;margin-top:2px;"></div>

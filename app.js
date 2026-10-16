@@ -338,9 +338,30 @@ function analyzeRec(id){
 // DESPACHO — Agente local
 // ═══════════════════════════════════════════════════
 let ultimoDespacho=null;
+// Botones para ir a la ubicación: se arman con lo que diga el campo (editable).
+function pintarNav(){
+  const v=(ge('dubic')||{value:''}).value.trim();
+  const c=v.match(/^(-?\d{1,2}\.\d+)\s*,\s*(-?\d{2,3}\.\d+)$/);
+  const l=v&&despachoAgente?despachoAgente.enlacesNavegacion(c?{texto:v,lat:+c[1],lon:+c[2]}:{texto:v}):null;
+  for(const [id,k] of [['btnWaze','waze'],['btnMaps','maps']]){
+    const a=ge(id);if(!a)continue;
+    if(l){a.href=l[k];a.classList.remove('off');a.removeAttribute('aria-disabled');}
+    else{a.removeAttribute('href');a.classList.add('off');a.setAttribute('aria-disabled','true');}
+  }
+}
+// Mientras se escribe el despacho, la ubicación se va llenando sola (si no la corrigieron a mano).
+document.addEventListener('input',e=>{
+  if(e.target.id!=='dtxt'||!despachoAgente)return;
+  const du=ge('dubic');if(!du||du.dataset.manual)return;
+  const u=despachoAgente.extraerUbicacion(e.target.value);
+  du.value=u?u.texto:'';du.classList.toggle('auto-field',!!u);pintarNav();
+});
+document.addEventListener('input',e=>{if(e.target.id==='dubic')e.target.dataset.manual=e.target.value?'1':'';});
 function interpDesp(){
   const txt=(ge('dtxt')||{value:''}).value;if(!txt.trim()){alert('Ingresá el texto primero.');return;}
   ultimoDespacho=despachoAgente.interpretarDespacho(txt,{CODS,ENF,EPP_POR_TIPO});
+  const du=ge('dubic');if(du&&ultimoDespacho.ubicacion){du.value=ultimoDespacho.ubicacion.texto;du.classList.add('auto-field');}
+  pintarNav();
   addMsg('user','📻 Despacho: '+txt);addMsg('assistant','📻 DESPACHO INTERPRETADO (motor local)\n\n'+ultimoDespacho.resumen);go('chat');
   // autocompleta boleta automáticamente (marcado 🤖, editable)
   const auto=documentacionAgente.autocompletarBoleta(boleta,{despacho:ultimoDespacho});
@@ -751,7 +772,7 @@ document.addEventListener('DOMContentLoaded',()=>{
 // (tanto el HTML estático como el que este mismo archivo genera dinámicamente).
 // ═══════════════════════════════════════════════════
 Object.assign(window, {
-  abrirMas,cerrarMas,go, toggleTimer, resetTimer, addN, cerrarIncidente, exportarHistorial,
+  pintarNav,abrirMas,cerrarMas,go, toggleTimer, resetTimer, addN, cerrarIncidente, exportarHistorial,
   quickChat, renderCods, toggleRec, toggleRec2, analyzeRec, interpDesp,
   answTriage, resetTriage, adj, resetC, analyzeSO, setbt, campoEditado,
   autoBot, genSBAR, exportarBoleta, handleFoto, showEnfD, backEnf,

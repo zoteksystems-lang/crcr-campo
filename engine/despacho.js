@@ -38,6 +38,33 @@ export function sugerirEPP(enfermedadesProbables, EPP_POR_TIPO){
   return [...items];
 }
 
+// Ubicación del despacho para navegar: coordenadas si vienen, o la frase de
+// lugar ("Ruta 27 km 14", "200 m norte de la iglesia de Grecia", "barrio…").
+const MARCAS_LUGAR=/\b(ruta\s*(?:nacional\s*)?\d+[^,.;]*|km\s*\d+[^,.;]*|autopista[^,.;]*|carretera[^,.;]*|(?:\d+\s*(?:m|mts|metros|varas)\s*)?(?:al\s*)?(?:norte|sur|este|oeste)\s+de[^,.;]*|(?:frente|contiguo|costado|diagonal|detr[aá]s|cerca)\s+(?:a|al|de|del)?[^,.;]*|(?:barrio|urbanizaci[oó]n|residencial|condominio|calle|avenida|av\.?|caser[ií]o|distrito|cant[oó]n)\s+[^,.;]*|en\s+[A-ZÁÉÍÓÚÑ][^,.;]*)/gi;
+export function extraerUbicacion(texto){
+  const t=String(texto||'');
+  const c=t.match(/(-?\d{1,2}\.\d{3,})\s*,\s*(-?\d{2,3}\.\d{3,})/);
+  if(c)return{texto:`${c[1]}, ${c[2]}`,lat:+c[1],lon:+c[2]};
+  // Se descartan los códigos de radio para que no estorben ("E36", "código 65").
+  const limpio=t.replace(/\bE\d{2}\b/g,' ').replace(/\bc[oó]digo\s*\d+\b/gi,' ');
+  const partes=[];
+  for(const m of limpio.matchAll(MARCAS_LUGAR)){
+    const p=m[0].replace(/\s+/g,' ').trim().replace(/^en\s+/i,'');
+    if(p.length>=4&&!partes.some(x=>x.includes(p)))partes.push(p);
+  }
+  return partes.length?{texto:partes.slice(0,3).join(', ')}:null;
+}
+export function enlacesNavegacion(ub){
+  if(!ub)return null;
+  if(ub.lat!=null){
+    return{waze:`https://waze.com/ul?ll=${ub.lat},${ub.lon}&navigate=yes`,
+      maps:`https://www.google.com/maps/dir/?api=1&destination=${ub.lat},${ub.lon}&travelmode=driving`};
+  }
+  const q=encodeURIComponent(/costa rica/i.test(ub.texto)?ub.texto:ub.texto+', Costa Rica');
+  return{waze:`https://waze.com/ul?q=${q}&navigate=yes`,
+    maps:`https://www.google.com/maps/dir/?api=1&destination=${q}&travelmode=driving`};
+}
+
 export function interpretarDespacho(texto, {CODS, ENF, EPP_POR_TIPO}){
   const codigos=detectarCodigos(texto, CODS);
   const probables=clasificarTipo(texto, ENF);
@@ -50,5 +77,7 @@ export function interpretarDespacho(texto, {CODS, ENF, EPP_POR_TIPO}){
     ? '🩺 Tipo probable: '+probables.map(p=>`${p.i} ${p.t}${p.e?` (${p.e})`:''}`).join(' / ')
     : '🩺 No hay coincidencia clara con ningún cuadro conocido — revisá manualmente.');
   resumenLineas.push('🎒 Equipo/EPP sugerido: '+epp.join(', '));
-  return {codigos, probables, epp, resumen:resumenLineas.join('\n')};
+  const ubicacion=extraerUbicacion(texto);
+  if(ubicacion)resumenLineas.push('📍 Ubicación: '+ubicacion.texto+' (botones para navegar en Despacho)');
+  return {codigos, probables, epp, ubicacion, resumen:resumenLineas.join('\n')};
 }

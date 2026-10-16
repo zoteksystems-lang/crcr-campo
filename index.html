@@ -71,7 +71,7 @@
     <div class="lbl">🎙️ Grabación local</div>
     <div style="font-size:13px;color:#475569;font-style:italic;">Audio y transcripción quedan solo en este dispositivo (Whisper local). Sin nube.</div>
     <label class="rev-sw"><input type="checkbox" id="revOn" onchange="cambiarRevision()"><span>☁️ Guardar copia temporal para revisión</span></label>
-    <div id="revPinBox" hidden><input id="revPin" inputmode="numeric" maxlength="6" placeholder="PIN de revisión (6 dígitos)" oninput="guardarPinRev()"></div>
+    <div id="revPinBox" hidden><input id="revPin" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="40" placeholder="Código de revisión" oninput="guardarPinRev()"></div>
     <div id="revNota" class="nota-mapa" style="text-align:left;"></div>
     <label class="flbl" for="vozModo">Motor de voz</label>
     <select id="vozModo" onchange="cambiarVoz(this.value)">

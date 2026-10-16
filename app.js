@@ -582,14 +582,14 @@ function cambiarRevision(){
   try{localStorage.setItem('crcr-rev',on?'1':'0');}catch{}
   pintarRevision();if(on)subirPendientes();
 }
-function guardarPinRev(){try{localStorage.setItem('crcr-rev-pin',ge('revPin').value.replace(/\D/g,'').slice(0,6));}catch{}subirPendientes();}
+function guardarPinRev(){try{localStorage.setItem('crcr-rev-pin',ge('revPin').value.trim().slice(0,40));}catch{}subirPendientes();}
 async function subirArchivo(f,pin){
   const r=await fetch('./api/subir',{method:'POST',headers:{'content-type':f.type||'application/octet-stream','x-pin':pin,'x-nombre':f.name},body:f});
   if(!r.ok){let m='';try{m=(await r.json()).error;}catch{}throw new Error(m||('HTTP '+r.status));}
 }
 let subiendo=false;
 async function subirPendientes(){
-  const c=revCfg();if(!c.on||c.pin.length!==6||!navigator.onLine||subiendo)return;
+  const c=revCfg();if(!c.on||c.pin.length<12||!navigator.onLine||subiendo)return;
   subiendo=true;
   try{
     for(const r of recs){
@@ -599,7 +599,7 @@ async function subirPendientes(){
         await subirArchivo(archivoTranscripcion(r),c.pin);
         r.subido=true;
         const {url,...guardar}=r;storeAgente.guardarGrabacion(guardar);
-      }catch(e){ge('revNota').textContent='⚠️ No se pudo subir: '+e.message;if(/PIN/.test(e.message))break;}
+      }catch(e){ge('revNota').textContent='⚠️ No se pudo subir: '+e.message;if(/C[oó]digo/.test(e.message))break;}
     }
     renderRecs();
   }finally{subiendo=false;}

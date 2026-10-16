@@ -324,7 +324,32 @@ function renderRecs(){
     <audio controls src="${r.url}" style="width:100%;height:36px;"></audio>
     ${r.tx?`<div style="background:#080E1A;border-radius:5px;padding:6px;margin-top:4px;font-size:13px;color:#94A3B8;line-height:1.5;">${r.tx.slice(0,200)}</div>`:''}
     ${r.tx?`<button onclick="analyzeRec('${r.id}')" style="background:#1E3A5F;border:1px solid #2563EB;color:#93C5FD;border-radius:6px;padding:7px 10px;font-size:13px;margin-top:4px;width:100%;">🧭 Analizar (motor local)</button>`:''}
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px;">
+      <button onclick="guardarAudio('${r.id}')" class="btn-gray" style="padding:9px;">⬇️ Guardar audio</button>
+      <button onclick="compartirAudio('${r.id}')" class="btn-gray" style="padding:9px;">📤 Compartir</button>
+    </div>
   </div>`).join('');
+}
+// Sacar una grabación del teléfono (decisión explícita de quien la grabó).
+function archivoDeGrabacion(r){
+  const ext=(r.blob?.type||'').includes('ogg')?'ogg':'webm';
+  const nombre=`${(r.lbl||'grabacion').toLowerCase()}_${(r.ts||'').replace(/[^0-9]+/g,'-')}.${ext}`;
+  return new File([r.blob],nombre,{type:r.blob?.type||'audio/webm'});
+}
+function avisoPrivacidad(){
+  return confirm('Este audio puede tener datos del paciente (nombre, condición, ubicación). ¿Seguro que querés sacarlo de la app?');
+}
+function guardarAudio(id){
+  const r=recs.find(x=>x.id===id);if(!r?.blob||!avisoPrivacidad())return;
+  const f=archivoDeGrabacion(r);
+  const a=document.createElement('a');a.href=URL.createObjectURL(f);a.download=f.name;document.body.appendChild(a);a.click();a.remove();
+}
+async function compartirAudio(id){
+  const r=recs.find(x=>x.id===id);if(!r?.blob||!avisoPrivacidad())return;
+  const f=archivoDeGrabacion(r);
+  if(navigator.canShare?.({files:[f]})){
+    try{await navigator.share({files:[f],title:'Grabación CRCR Campo',text:r.tx?('Transcripción: '+r.tx):''});}catch(e){if(e.name!=='AbortError')alert('No se pudo compartir: '+e.message);}
+  }else{alert('Este navegador no permite compartir archivos; usá ⬇️ Guardar audio.');}
 }
 function analyzeRec(id){
   const r=recs.find(x=>x.id===id);if(!r||!r.tx)return;
@@ -772,7 +797,7 @@ document.addEventListener('DOMContentLoaded',()=>{
 // (tanto el HTML estático como el que este mismo archivo genera dinámicamente).
 // ═══════════════════════════════════════════════════
 Object.assign(window, {
-  pintarNav,abrirMas,cerrarMas,go, toggleTimer, resetTimer, addN, cerrarIncidente, exportarHistorial,
+  guardarAudio,compartirAudio,pintarNav,abrirMas,cerrarMas,go, toggleTimer, resetTimer, addN, cerrarIncidente, exportarHistorial,
   quickChat, renderCods, toggleRec, toggleRec2, analyzeRec, interpDesp,
   answTriage, resetTriage, adj, resetC, analyzeSO, setbt, campoEditado,
   autoBot, genSBAR, exportarBoleta, handleFoto, showEnfD, backEnf,

@@ -132,3 +132,13 @@ nav.abajo{display:flex;background:var(--tarjeta);border-top:1px solid var(--bord
 .marca-h{font-size:13.5px;color:#CBD5E1;padding:3px 0;}
 .news{border-radius:10px;padding:9px 11px;font-size:14px;line-height:1.45;margin-bottom:6px;background:#14213A;border-left:5px solid #22C55E;}
 .news.medio{border-left-color:#F59E0B;}.news.alto{border-left-color:#EF4444;background:#2A0E12;}
+
+/* Mapa dentro de la app */
+.mapa-box{display:flex;flex-direction:column;gap:6px;}
+.mapa-tabs{display:grid;grid-template-columns:1fr 1fr auto;gap:6px;}
+.mapa-tabs button{background:var(--campo);border:1px solid var(--campo-borde);color:#CBD5E1;border-radius:10px;padding:10px 8px;font-size:14px;font-weight:800;}
+.mapa-tabs button.on{border-color:#3B82F6;background:#14213A;color:#fff;}
+#mapaFrame{width:100%;height:62vh;min-height:320px;border:0;border-radius:12px;background:#1E293B;}
+
+.rev-sw{display:flex;gap:9px;align-items:center;font-size:14px;font-weight:700;color:#CBD5E1;}
+.rev-sw input{width:22px;height:22px;-webkit-appearance:checkbox;appearance:checkbox;accent-color:#3B82F6;padding:0;flex-shrink:0;}

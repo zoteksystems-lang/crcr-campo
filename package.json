@@ -2,10 +2,16 @@
   "name": "crcr-campo-pwa",
   "version": "1.0.0",
   "private": true,
-  "description": "CRCR Campo — asistente offline para Cruz Roja Costarricense. No requiere Node en producción: es un sitio estático (index.html + app.js + engine/*.js). package.json queda solo como registro de qué versiones exactas se vendorizaron en vendor/ y models/ (ver README.md).",
+  "description": "CRCR Campo — asistente offline para Cruz Roja Costarricense. Sitio estático (index.html + app.js + engine/*.js) más una función opcional (api/subir.js) para guardar grabaciones temporalmente para revisión.",
   "type": "module",
   "dependencies": {
-    "@xenova/transformers": "2.17.2",
-    "tesseract.js": "7.0.0"
+    "@vercel/blob": "2.8.2"
+  },
+  "vendorizado": {
+    "@xenova/transformers": "2.17.2 (vendor/transformers.min.js)",
+    "tesseract.js": "7.0.0 (vendor/)",
+    "maplibre-gl": "5.24.0 (vendor/)",
+    "pmtiles": "4.5.0 (vendor/)",
+    "@protomaps/basemaps": "5.7.2 (vendor/)"
   }
 }

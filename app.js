@@ -65,6 +65,8 @@ async function cargarMotores(){
   storeAgente=store;
   eqp=EQP.map(e=>({...e})); bot=BOT.map(b=>({...b}));
   await restaurarEstado();
+  storeAgente.pedirAlmacenamientoPersistente();
+  pintarRevision();setTimeout(subirPendientes,3000);
   initUI();
   precargarWhisper();
 }
@@ -282,7 +284,7 @@ async function toggleRec(){
         renderRecs();
         await transcribirYProcesar(blob,'desp');
         const found=recs.find(r=>r.id===rec.id); if(found){found.tx=trans; storeAgente.guardarGrabacion({...rec,tx:trans});}
-        renderRecs();
+        renderRecs();subirPendientes();
       };
       mr.start(500);
       iniciarVivo(()=>chunks,mime,'desp');
@@ -311,6 +313,8 @@ async function toggleRec2(){
         const rs=ge('rstat2');if(rs)rs.style.display='none';
         const rp=ge('recpill');if(rp)rp.style.display='none';
         await transcribirYProcesar(blob,'entrev');
+        const f2=recs.find(r=>r.id===rec.id);if(f2){f2.tx=trans2;storeAgente.guardarGrabacion({...rec,tx:trans2});}
+        renderRecs();subirPendientes();
       };
       mr2.start(500);
       iniciarVivo(()=>chunks2,mime,'entrev');
@@ -325,22 +329,50 @@ function renderRecs(){
   const c=ge('recsbox');if(!c)return;
   if(recs.length===0){c.style.display='none';return;}
   c.style.display='block';
-  ge('recsl').innerHTML=recs.map(r=>`<div style="background:#1E293B;border-radius:8px;padding:10px;margin-bottom:6px;">
-    <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="font-weight:700;font-size:14px;">${r.lbl}</span><span style="font-size:12px;color:#475569;">${r.ts}·${r.sz}</span></div>
+  const cab=ge('recsCab');if(cab)cab.textContent=`📼 Grabaciones guardadas en este teléfono (${recs.length})`;
+  ge('recsl').innerHTML=`<button class="btn-blue" style="width:100%;margin-bottom:8px;" onclick="enviarRevision()">📤 Enviar todas para revisión (audio + transcripción)</button>`+recs.slice().reverse().map(r=>`<div style="background:#1E293B;border-radius:8px;padding:10px;margin-bottom:6px;">
+    <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="font-weight:700;font-size:14px;">${r.lbl}</span><span style="font-size:12px;color:#475569;">${r.ts}·${r.sz}${r.subido?' · ☁️ en revisión':''}</span></div>
     <audio controls src="${r.url}" style="width:100%;height:36px;"></audio>
     ${r.tx?`<div style="background:#080E1A;border-radius:5px;padding:6px;margin-top:4px;font-size:13px;color:#94A3B8;line-height:1.5;">${r.tx.slice(0,200)}</div>`:''}
     ${r.tx?`<button onclick="analyzeRec('${r.id}')" style="background:#1E3A5F;border:1px solid #2563EB;color:#93C5FD;border-radius:6px;padding:7px 10px;font-size:13px;margin-top:4px;width:100%;">🧭 Analizar (motor local)</button>`:''}
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px;">
       <button onclick="guardarAudio('${r.id}')" class="btn-gray" style="padding:9px;">⬇️ Guardar audio</button>
-      <button onclick="compartirAudio('${r.id}')" class="btn-gray" style="padding:9px;">📤 Compartir</button>
+      <button onclick="enviarRevision(['${r.id}'])" class="btn-gray" style="padding:9px;">📤 Compartir</button>
     </div>
+    <button onclick="borrarRec('${r.id}')" class="btn-gray" style="padding:7px;width:100%;margin-top:6px;font-size:13px;color:#FCA5A5;">🗑️ Borrar</button>
   </div>`).join('');
 }
 // Sacar una grabación del teléfono (decisión explícita de quien la grabó).
+// Nombre claro con fecha y hora: crcr_despacho_2026-10-16_08-42.webm
+function nombreGrabacion(r){
+  const d=new Date(+String(r.id).replace(/\D/g,'')||Date.now());
+  const p=n=>String(n).padStart(2,'0');
+  return `crcr_${(r.lbl||'grabacion').toLowerCase()}_${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}_${p(d.getHours())}-${p(d.getMinutes())}`;
+}
 function archivoDeGrabacion(r){
   const ext=(r.blob?.type||'').includes('ogg')?'ogg':'webm';
-  const nombre=`${(r.lbl||'grabacion').toLowerCase()}_${(r.ts||'').replace(/[^0-9]+/g,'-')}.${ext}`;
-  return new File([r.blob],nombre,{type:r.blob?.type||'audio/webm'});
+  return new File([r.blob],nombreGrabacion(r)+'.'+ext,{type:r.blob?.type||'audio/webm'});
+}
+// La transcripción viaja con el audio, para poder revisar las dos cosas juntas.
+function archivoTranscripcion(r){
+  return new File([`Grabación: ${r.lbl} · ${r.ts}\n\nTranscripción automática (Whisper local):\n${r.tx||'(sin transcripción)'}\n`],nombreGrabacion(r)+'.txt',{type:'text/plain'});
+}
+async function enviarRevision(ids){
+  const lista=recs.filter(r=>(!ids||ids.includes(r.id))&&r.blob);
+  if(!lista.length)return;
+  if(!confirm(`Vas a sacar ${lista.length} grabación(es) de la app. Pueden tener datos del paciente. ¿Continuar?`))return;
+  const files=lista.flatMap(r=>[archivoDeGrabacion(r),archivoTranscripcion(r)]);
+  if(navigator.canShare?.({files})){
+    try{await navigator.share({files,title:'CRCR Campo — grabaciones para revisión',text:'Guardalas en Google Drive (carpeta "CRCR audios") para revisarlas.'});return;}
+    catch(e){if(e.name==='AbortError')return;}
+  }
+  // Sin "compartir archivos": se descargan uno por uno.
+  for(const f of files){const a=document.createElement('a');a.href=URL.createObjectURL(f);a.download=f.name;document.body.appendChild(a);a.click();a.remove();await new Promise(r=>setTimeout(r,400));}
+}
+async function borrarRec(id){
+  if(!confirm('¿Borrar esta grabación del teléfono? No se puede deshacer.'))return;
+  await storeAgente.borrarGrabacion(id);
+  recs=recs.filter(r=>r.id!==id);renderRecs();
 }
 function avisoPrivacidad(){
   return confirm('Este audio puede tener datos del paciente (nombre, condición, ubicación). ¿Seguro que querés sacarlo de la app?');
@@ -371,6 +403,40 @@ function analyzeRec(id){
 // ═══════════════════════════════════════════════════
 let ultimoDespacho=null;
 // Botones para ir a la ubicación: se arman con lo que diga el campo (editable).
+// ── Mapa dentro de la app ──
+let mapaModo=null,posUnidad=null;
+function ubicacionUnidad(){
+  return new Promise(res=>{
+    if(!navigator.geolocation)return res(null);
+    navigator.geolocation.getCurrentPosition(p=>res({lat:+p.coords.latitude.toFixed(5),lon:+p.coords.longitude.toFixed(5)}),()=>res(null),{enableHighAccuracy:true,timeout:8000,maximumAge:60000});
+  });
+}
+function destinoActual(){
+  const v=(ge('dubic')||{value:''}).value.trim();if(!v)return null;
+  const c=v.match(/^(-?\d{1,2}\.\d+)\s*,\s*(-?\d{2,3}\.\d+)$/);
+  return c?{texto:v,lat:+c[1],lon:+c[2]}:{texto:v};
+}
+async function abrirMapa(modo){
+  const dest=destinoActual();
+  if(!dest){alert('Primero escribí o dictá la ubicación del despacho.');return;}
+  if(!navigator.onLine){alert('Sin señal: el mapa necesita internet. La ubicación queda guardada para cuando haya señal.');return;}
+  mapaModo=modo;
+  const box=ge('mapaBox'),fr=ge('mapaFrame'),nota=ge('mapaNota');
+  box.hidden=false;ge('btnMapaAqui').hidden=true;
+  ge('mt-ruta').classList.toggle('on',modo==='ruta');ge('mt-transito').classList.toggle('on',modo==='transito');
+  nota.textContent='📡 Buscando la ubicación de la unidad…';
+  posUnidad=await ubicacionUnidad()||posUnidad;
+  if(modo==='ruta'){
+    fr.src=despachoAgente.mapaRuta(dest,posUnidad);
+    nota.textContent=posUnidad?'Ruta desde la unidad (GPS) hasta el despacho, con tiempo estimado.':'Sin GPS: se muestra el destino. Activá la ubicación para ver la ruta y el tiempo.';
+  }else{
+    const p=dest.lat!=null?dest:posUnidad;
+    if(!p){nota.textContent='Para el tránsito de Waze hacen falta coordenadas (GPS de la unidad o del despacho).';fr.removeAttribute('src');return;}
+    fr.src=despachoAgente.mapaTransito(p.lat,p.lon,dest.lat!=null?15:13);
+    nota.textContent=dest.lat!=null?'Tránsito en vivo alrededor del despacho.':'Tránsito en vivo alrededor de la unidad. Si Waze pide verificación, usá el botón 🚗 Waze de abajo.';
+  }
+}
+function cerrarMapa(){ge('mapaBox').hidden=true;ge('btnMapaAqui').hidden=false;ge('mapaFrame').removeAttribute('src');mapaModo=null;}
 function pintarNav(){
   const v=(ge('dubic')||{value:''}).value.trim();
   const c=v.match(/^(-?\d{1,2}\.\d+)\s*,\s*(-?\d{2,3}\.\d+)$/);
@@ -503,6 +569,42 @@ async function compartirPrealerta(){
   if(!confirm('La prealerta puede tener datos del paciente. ¿Compartirla?'))return;
   try{if(navigator.share)await navigator.share({text:t});else copiarPrealerta();}catch(e){}
 }
+// ── Copia temporal para revisión (opcional, con PIN) ──
+function revCfg(){try{return {on:localStorage.getItem('crcr-rev')==='1',pin:localStorage.getItem('crcr-rev-pin')||''};}catch{return {on:false,pin:''};}}
+function pintarRevision(){
+  const c=revCfg();const on=ge('revOn');if(!on)return;
+  on.checked=c.on;ge('revPinBox').hidden=!c.on;ge('revPin').value=c.pin;
+  ge('revNota').textContent=c.on?'Cada grabación (audio + transcripción) se sube a un almacenamiento privado para revisarla y después se borra. Necesita señal; si no hay, queda pendiente.':'Las grabaciones quedan solo en este teléfono.';
+}
+function cambiarRevision(){
+  const on=ge('revOn').checked;
+  if(on&&!confirm('Las grabaciones pueden tener datos del paciente (voz, nombre, ubicación). Se subirán a un almacenamiento privado solo para revisión y se borrarán después. ¿Activar?')){ge('revOn').checked=false;return;}
+  try{localStorage.setItem('crcr-rev',on?'1':'0');}catch{}
+  pintarRevision();if(on)subirPendientes();
+}
+function guardarPinRev(){try{localStorage.setItem('crcr-rev-pin',ge('revPin').value.replace(/\D/g,'').slice(0,6));}catch{}subirPendientes();}
+async function subirArchivo(f,pin){
+  const r=await fetch('./api/subir',{method:'POST',headers:{'content-type':f.type||'application/octet-stream','x-pin':pin,'x-nombre':f.name},body:f});
+  if(!r.ok){let m='';try{m=(await r.json()).error;}catch{}throw new Error(m||('HTTP '+r.status));}
+}
+let subiendo=false;
+async function subirPendientes(){
+  const c=revCfg();if(!c.on||c.pin.length!==6||!navigator.onLine||subiendo)return;
+  subiendo=true;
+  try{
+    for(const r of recs){
+      if(r.subido||!r.blob)continue;
+      try{
+        await subirArchivo(archivoDeGrabacion(r),c.pin);
+        await subirArchivo(archivoTranscripcion(r),c.pin);
+        r.subido=true;
+        const {url,...guardar}=r;storeAgente.guardarGrabacion(guardar);
+      }catch(e){ge('revNota').textContent='⚠️ No se pudo subir: '+e.message;if(/PIN/.test(e.message))break;}
+    }
+    renderRecs();
+  }finally{subiendo=false;}
+}
+window.addEventListener('online',subirPendientes);
 function cambiarVoz(v){
   try{localStorage.setItem('crcr-voz',v);}catch{}
   whisperListo=false;
@@ -988,7 +1090,7 @@ document.addEventListener('DOMContentLoaded',()=>{
 // Exponer al scope global — necesario para los onclick="..." inline del HTML
 // (tanto el HTML estático como el que este mismo archivo genera dinámicamente).
 // ═══════════════════════════════════════════════════
-Object.assign(window, {cambiarVoz,marcarHora,metronomo,verPrealerta,copiarPrealerta,compartirPrealerta,usarImpresiones,sugerirEnBoleta,verSignos,modoTriage,
+Object.assign(window, {cambiarRevision,guardarPinRev,subirPendientes,enviarRevision,borrarRec,abrirMapa,cerrarMapa,cambiarVoz,marcarHora,metronomo,verPrealerta,copiarPrealerta,compartirPrealerta,usarImpresiones,sugerirEnBoleta,verSignos,modoTriage,
   guardarAudio,compartirAudio,pintarNav,abrirMas,cerrarMas,go, toggleTimer, resetTimer, addN, cerrarIncidente, exportarHistorial,
   quickChat, renderCods, toggleRec, toggleRec2, analyzeRec, interpDesp,
   answTriage, resetTriage, adj, resetC, analyzeSO, setbt, campoEditado,

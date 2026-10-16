@@ -46,6 +46,13 @@ export async function cargarEstado(id){
 export async function guardarGrabacion(rec){
   return tx('grabaciones','readwrite',store=>store.put(rec));
 }
+export async function borrarGrabacion(id){
+  return tx('grabaciones','readwrite',store=>store.delete(id));
+}
+// Pide al navegador que no borre las grabaciones aunque falte espacio.
+export async function pedirAlmacenamientoPersistente(){
+  try{return navigator.storage?.persist?await navigator.storage.persist():false;}catch{return false;}
+}
 export async function listarGrabaciones(){
   const db=await openDB();
   return new Promise((resolve,reject)=>{

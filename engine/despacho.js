@@ -57,6 +57,20 @@ export function extraerUbicacion(texto){
   }
   return partes.length?{texto:partes.slice(0,3).join(', ')}:null;
 }
+// Mapas DENTRO de la app (iframe), sin cambiar de aplicación:
+//  · Google Maps: ruta desde la unidad hasta el destino, con tiempo y distancia
+//    (acepta la dirección en texto, p. ej. "200 m norte de la iglesia de Grecia").
+//  · Waze: mapa de tránsito en vivo alrededor de un punto (necesita coordenadas).
+export function mapaRuta(ub,origen){
+  if(!ub)return null;
+  const dest=ub.lat!=null?`${ub.lat},${ub.lon}`:(/costa rica/i.test(ub.texto)?ub.texto:ub.texto+', Costa Rica');
+  const d=encodeURIComponent(dest);
+  return origen?`https://maps.google.com/maps?saddr=${origen.lat},${origen.lon}&daddr=${d}&output=embed`
+    :`https://maps.google.com/maps?q=${d}&z=15&output=embed`;
+}
+export function mapaTransito(lat,lon,zoom=14){
+  return `https://embed.waze.com/es/iframe?zoom=${zoom}&lat=${lat}&lon=${lon}&pin=1`;
+}
 export function enlacesNavegacion(ub){
   if(!ub)return null;
   if(ub.lat!=null){

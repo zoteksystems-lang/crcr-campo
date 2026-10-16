@@ -70,6 +70,9 @@
   <div class="card">
     <div class="lbl">🎙️ Grabación local</div>
     <div style="font-size:13px;color:#475569;font-style:italic;">Audio y transcripción quedan solo en este dispositivo (Whisper local). Sin nube.</div>
+    <label class="rev-sw"><input type="checkbox" id="revOn" onchange="cambiarRevision()"><span>☁️ Guardar copia temporal para revisión</span></label>
+    <div id="revPinBox" hidden><input id="revPin" inputmode="numeric" maxlength="6" placeholder="PIN de revisión (6 dígitos)" oninput="guardarPinRev()"></div>
+    <div id="revNota" class="nota-mapa" style="text-align:left;"></div>
     <label class="flbl" for="vozModo">Motor de voz</label>
     <select id="vozModo" onchange="cambiarVoz(this.value)">
       <option value="rapido">⚡ Rápido (recomendado en celulares sencillos)</option>
@@ -97,18 +100,28 @@
   <div class="card">
     <div class="lbl">📍 Ubicación del despacho</div>
     <input id="dubic" placeholder="Se llena sola con el despacho; podés corregirla…" oninput="pintarNav()">
+    <button id="btnMapaAqui" class="btn-red" onclick="abrirMapa('ruta')">🗺️ Ver ruta aquí, sin salir de la app</button>
+    <div id="mapaBox" class="mapa-box" hidden>
+      <div class="mapa-tabs">
+        <button id="mt-ruta" class="on" onclick="abrirMapa('ruta')">🛣️ Ruta y tiempo</button>
+        <button id="mt-transito" onclick="abrirMapa('transito')">🚦 Tránsito (Waze)</button>
+        <button onclick="cerrarMapa()" aria-label="Cerrar mapa">✕</button>
+      </div>
+      <iframe id="mapaFrame" title="Mapa" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allow="geolocation"></iframe>
+      <div id="mapaNota" class="nota-mapa"></div>
+    </div>
     <div class="nav-ubic">
       <a id="btnWaze" class="btn-nav" target="_blank" rel="noopener">🚗 Waze</a>
       <a id="btnMaps" class="btn-nav" target="_blank" rel="noopener">🗺️ Google Maps</a>
     </div>
-    <div style="font-size:12.5px;color:#64748B;">Abre la ruta en la app de mapas (necesita señal para calcularla).</div>
+    <div style="font-size:12.5px;color:#64748B;">El mapa de arriba se ve dentro de la app. Los botones Waze / Maps abren la navegación por voz (cambian de app). Todo necesita señal.</div>
   </div>
   <div class="card">
     <div class="lbl">Códigos radio CRC — <span style="color:#DC2626;">E = Emergencia</span></div>
     <input id="csearch" placeholder="Buscá código o descripción..." oninput="renderCods()">
     <div id="clist" style="max-height:240px;overflow-y:auto;display:flex;flex-direction:column;gap:3px;margin-top:2px;"></div>
   </div>
-  <div id="recsbox" style="display:none;" class="card"><div class="lbl">Grabaciones locales</div><div id="recsl"></div></div>
+  <div id="recsbox" style="display:none;" class="card"><div class="lbl" id="recsCab">Grabaciones guardadas</div><div id="recsl"></div></div>
 </div></div>
 
 <!-- TRIAGE -->

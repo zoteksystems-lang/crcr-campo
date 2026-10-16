@@ -5,6 +5,8 @@
 // y geriátricas). Es apoyo: la impresión final la decide el socorrista.
 import {normalize} from './util.js';
 import {triadasPresentes} from './triadas.js';
+import {preparar,detectarSenales,buscarFrase} from './senales.js';
+import {PESOS,COMBOS} from './pesos.js';
 export {triadasPresentes};
 
 // n: como se anota en la boleta · enf: ficha de la app con signos/acciones
@@ -262,12 +264,19 @@ function pistasVitales(sv={},ctx={}){
 // Devuelve SIEMPRE 3 impresiones (si hay datos): las más probables y, si faltan,
 // los diferenciales del cuadro principal. Cada una dice por qué y qué confirmar.
 export function tresImpresiones(texto,{sv,ctx={}}={}){
-  const nt=' '+normalize(texto)+' ';
+  const toks=preparar(texto);
+  const sen=detectarSenales(texto);
   const pts=new Map();
-  const add=(id,s,por)=>{if(!POR_ID[id])return;const o=pts.get(id)||{s:0,por:[]};o.s+=s;if(por&&!o.por.includes(por)&&o.por.length<4)o.por.push(por);pts.set(id,o);};
-  for(const d of DX)for(const k of d.k)if(contiene(nt,k))add(d.id,/^e\d\d$/.test(k)?6:(k.includes(' ')?3:2),k);
+  const add=(id,s,por)=>{if(!POR_ID[id]||!s)return;const o=pts.get(id)||{s:0,por:[]};o.s+=s;if(por&&!o.por.includes(por)&&o.por.length<4)o.por.push(por);pts.set(id,o);};
+  // 1. Señales clínicas (raíces, fonética, negación) y combinaciones.
+  for(const [id,w] of Object.entries(PESOS))for(const [k,p] of Object.entries(w))if(sen[k])add(id,p,sen[k]);
+  for(const [id,req,p] of COMBOS)if(req.every(k=>sen[k]))add(id,p,req.map(k=>sen[k]).join(' + '));
+  // 2. Frases propias de cada cuadro y códigos E (máx. 6 puntos por cuadro).
+  for(const d of DX){let s=0;for(const k of d.k){if(s>=6)break;const h=buscarFrase(toks,k);if(h){const p=/^e\d\d$/.test(k)?6:(k.includes(' ')?2:1.5);s+=p;add(d.id,p,h);}}}
   for(const [id,s,por] of pistasVitales(sv,ctx))add(id,s,por);
   for(const t of triadasPresentes(texto,{sv}))add(t.dx,t.completa?10:5,t.n+(t.completa?'':' (2/3)'));
+  // Con mecanismo de trauma, el dolor de pecho es traumático hasta demostrar lo contrario.
+  if(sen.vehiculo||sen.altura||sen.penetrante||(sen.golpe&&sen.r_torax))for(const id of ['iam','angina'])if(pts.has(id))pts.get(id).s*=0.35;
   // Contexto: embarazo, edad.
   if(ctx.embarazo){['parto','amenaza_aborto','preeclampsia'].forEach(id=>{if(pts.has(id))add(id,2,'embarazo');});}
   if(ctx.mayor&&pts.has('caida_mayor'))add('caida_mayor',2,'adulto mayor');
@@ -276,7 +285,8 @@ export function tresImpresiones(texto,{sv,ctx={}}={}){
   const orden=[...pts.entries()].sort((a,b)=>b[1].s-a[1].s);
   if(!orden.length)return [];
   const top=orden[0][1].s;
-  const res=orden.slice(0,3).map(([id,o])=>({...POR_ID[id],por:o.por,conf:o.s>=Math.max(6,top*0.8)?'alta':o.s>=3?'media':'baja'}));
+  // Los candidatos con muy poco respaldo ceden su lugar a los diferenciales clínicos.
+  const res=orden.slice(0,3).filter(([,o],i)=>i===0||o.s>=Math.max(3,top*0.3)).map(([id,o])=>({...POR_ID[id],por:o.por,conf:o.s>=Math.max(7,top*0.8)?'alta':o.s>=4?'media':'baja'}));
   // Completar con diferenciales para que siempre haya 3 que considerar.
   for(const id of POR_ID[orden[0][0]].dif){
     if(res.length>=3)break;

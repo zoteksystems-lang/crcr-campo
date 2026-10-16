@@ -91,18 +91,29 @@ const PELIGROS=[
 
 function contiene(nt,frase){return new RegExp('(^| )'+normalize(frase)+'( |$)').test(nt);}
 
+// "sesenta y dos años" → "62 años" (Whisper a veces escribe los números en letras).
+const UNI={un:1,uno:1,una:1,dos:2,tres:3,cuatro:4,cinco:5,seis:6,siete:7,ocho:8,nueve:9,diez:10,once:11,doce:12,trece:13,catorce:14,quince:15,
+  dieciseis:16,diecisiete:17,dieciocho:18,diecinueve:19,veinte:20,veintiun:21,veintiuno:21,veintidos:22,veintitres:23,veinticuatro:24,veinticinco:25,veintiseis:26,veintisiete:27,veintiocho:28,veintinueve:29};
+const DEC={treinta:30,cuarenta:40,cincuenta:50,sesenta:60,setenta:70,ochenta:80,noventa:90,cien:100};
+function numerosEnLetras(t){
+  return t.replace(/\b(treinta|cuarenta|cincuenta|sesenta|setenta|ochenta|noventa)(?: y (uno|un|dos|tres|cuatro|cinco|seis|siete|ocho|nueve))?\b/g,(x,d,u)=>String(DEC[d]+(u?UNI[u]:0)))
+    .replace(/\b(cien|un|uno|una|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|once|doce|trece|catorce|quince|dieciseis|diecisiete|dieciocho|diecinueve|veinte|veintiun|veintiuno|veintidos|veintitres|veinticuatro|veinticinco|veintiseis|veintisiete|veintiocho|veintinueve)(?= (anos|ano|meses|mes|semanas|heridos|lesionados|victimas|pacientes|personas|ocupantes|metros|minutos|horas))/g,x=>String(UNI[x]??DEC[x]));
+}
 // Edad, embarazo y cantidad de víctimas, si el despacho los dice.
 export function contextoPaciente(texto){
-  const nt=' '+normalize(texto)+' ';
+  const nt=' '+numerosEnLetras(normalize(texto))+' ';
   const ctx={};
+  if(/ (embarazada|embarazo|gestante|semanas de gestacion|encinta)\b/.test(nt))ctx.embarazo=true;
   const m=nt.match(/ (\d{1,3}) (anos|ano)\b/);
   if(m)ctx.edad=+m[1];
   else{const mm=nt.match(/ (\d{1,2}) (meses|mes)\b/);if(mm)ctx.edad=+mm[1]/12;}
-  if(ctx.edad==null&&/ (bebe|recien nacido|lactante|infante)\b/.test(nt))ctx.edad=0.5;
-  if(ctx.edad==null&&/ (nino|nina|menor de edad|menor|chiquito|chiquita|escolar)\b/.test(nt))ctx.nino=true;
+  // En una embarazada, "el bebé" es el que viene, no el paciente.
+  if(!ctx.embarazo){
+    if(ctx.edad==null&&/ (bebe|recien nacido|lactante|infante)\b/.test(nt))ctx.edad=0.5;
+    if(ctx.edad==null&&/ (nino|nina|menor de edad|menor|chiquito|chiquita|escolar)\b/.test(nt))ctx.nino=true;
+  }
   if(ctx.edad==null&&/ (adulto mayor|senor mayor|senora mayor|anciano|anciana)\b/.test(nt))ctx.mayor=true;
   if(ctx.edad!=null){if(ctx.edad<8)ctx.nino=true;if(ctx.edad>=65)ctx.mayor=true;}
-  if(/ (embarazada|embarazo|gestante|semanas de gestacion)\b/.test(nt))ctx.embarazo=true;
   const v=nt.match(/ (\d{1,3}) (heridos|lesionados|victimas|pacientes|personas|ocupantes)\b/);
   if(v&&+v[1]>1)ctx.victimas=+v[1];
   if(/ (multiples|varios|varias|masivo|incidente con multiples|imv) /.test(nt))ctx.victimas=Math.max(ctx.victimas||0,3);

@@ -70,6 +70,11 @@
   <div class="card">
     <div class="lbl">🎙️ Grabación local</div>
     <div style="font-size:13px;color:#475569;font-style:italic;">Audio y transcripción quedan solo en este dispositivo (Whisper local). Sin nube.</div>
+    <label class="flbl" for="vozModo">Motor de voz</label>
+    <select id="vozModo" onchange="cambiarVoz(this.value)">
+      <option value="rapido">⚡ Rápido (recomendado en celulares sencillos)</option>
+      <option value="preciso">🎯 Preciso (entiende mejor, más lento, descarga 77 MB una vez)</option>
+    </select>
     <div style="display:flex;gap:6px;">
       <select id="rlbl" style="flex:1;"><option>Despacho</option><option>Entrevista</option><option>Escena</option><option>Hospital</option></select>
       <button id="rbtn" onclick="toggleRec()" style="background:#DC2626;color:#fff;border-radius:7px;padding:9px 14px;font-size:15px;font-weight:700;">🎙️ Grabar</button>
@@ -88,6 +93,7 @@
     <div class="lbl" style="color:#93C5FD;display:flex;justify-content:space-between;align-items:center;">🧭 Al llegar: qué revisar <span id="guiaVivo" class="vivo" hidden>escuchando</span></div>
     <div id="guiaCont"><div class="guia-vacia">Escribí o grabá el despacho. Mientras tanto, acá van apareciendo las <b>3 impresiones diagnósticas</b>, las tríadas que coincidan y la lista de qué revisar al llegar, en orden.</div></div>
   </div>
+  <div class="card" id="prealertaBox" hidden></div>
   <div class="card">
     <div class="lbl">📍 Ubicación del despacho</div>
     <input id="dubic" placeholder="Se llena sola con el despacho; podés corregirla…" oninput="pintarNav()">

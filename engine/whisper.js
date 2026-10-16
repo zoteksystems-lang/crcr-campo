@@ -22,13 +22,18 @@ async function cargarTransformers(){
   return transformersMod;
 }
 
-export async function precargarModelo(onProgress){
+// Dos motores: "rapido" (whisper-tiny, 39 MB) y "preciso" (whisper-base, 77 MB).
+export function modeloElegido(){
+  try{return localStorage.getItem('crcr-voz')==='preciso'?'whisper-base':'whisper-tiny';}catch{return 'whisper-tiny';}
+}
+export async function precargarModelo(onProgress,modelo=modeloElegido()){
   const {pipeline}=await cargarTransformers();
-  if(!transcriberPromise){
-    transcriberPromise=pipeline('automatic-speech-recognition','whisper-tiny',{
+  if(!transcriberPromise||transcriberPromise.modelo!==modelo){
+    transcriberPromise=pipeline('automatic-speech-recognition',modelo,{
       quantized:true,
       progress_callback:onProgress
     });
+    transcriberPromise.modelo=modelo;
   }
   return transcriberPromise;
 }
@@ -54,12 +59,24 @@ async function blobA16kMono(blob){
 
 // chunk_length_s: Whisper solo "ve" 30 s por vez; sin esto un despacho largo
 // quedaba cortado en los primeros 30 segundos.
-const OPC={language:'spanish',task:'transcribe',chunk_length_s:30,stride_length_s:5};
-export async function transcribir(blob, {onProgress}={}){
-  const transcriber=await precargarModelo(onProgress);
+// no_repeat_ngram_size / repetition_penalty: evitan que Whisper se quede en
+// bucle ("de julio de julio de julio…") y pierda el resto del despacho.
+const OPC={language:'spanish',task:'transcribe',chunk_length_s:30,stride_length_s:5,no_repeat_ngram_size:4,repetition_penalty:1.15};
+// Limpieza final: quita etiquetas de ruido y repeticiones seguidas que se cuelen.
+export function limpiarTranscripcion(t){
+  let s=String(t||'').replace(/\[[^\]]*\]|\([^)]*(m[uú]sica|ruido|aplausos)[^)]*\)/gi,' ');
+  // Frases de 1 a 6 palabras repetidas 3+ veces seguidas → una sola vez.
+  for(let n=6;n>=1;n--){
+    const re=new RegExp('((?:\\S+\\s+){'+(n-1)+'}\\S+)(?:[\\s,.]+\\1){2,}','gi');
+    s=s.replace(re,'$1');
+  }
+  return s.replace(/\s+/g,' ').trim();
+}
+export async function transcribir(blob, {onProgress,modelo}={}){
+  const transcriber=await precargarModelo(onProgress,modelo);
   const audio=await blobA16kMono(blob);
   const resultado=await transcriber(audio,OPC);
-  return (resultado.text||'').trim();
+  return limpiarTranscripcion(resultado.text);
 }
 // Transcripción en vivo: solo el pedazo nuevo desde el segundo `desde`
 // (con 1 s de solape para no cortar palabras). Devuelve hasta dónde llegó.
@@ -70,5 +87,5 @@ export async function transcribirDesde(blob, desde=0){
   const hasta=audio.length/16000;
   if(hasta-desde<3)return {texto:'',hasta:desde};
   const resultado=await transcriber(audio.subarray(ini),OPC);
-  return {texto:(resultado.text||'').trim(),hasta};
+  return {texto:limpiarTranscripcion(resultado.text),hasta};
 }

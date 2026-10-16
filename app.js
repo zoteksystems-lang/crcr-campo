@@ -6,7 +6,7 @@
 'use strict';
 
 let CODS,TNIV,TSTEPS,TSTEPS_NINO,trModo='ad',TACC,SCAMPOS,OCAMPOS,ENF,PROT,EQP,BOT,QPROMPTS,EPP_POR_TIPO,SIGNOS={},ZONAS={};
-let arriboAgente, impresionAgente, despachoAgente, vitalsAgente, entrevistaAgente, diagnosticoAgente, documentacionAgente, chatAgente, whisperAgente, ocrAgente, storeAgente;
+let arriboAgente, impresionAgente, herrAgente, despachoAgente, vitalsAgente, entrevistaAgente, diagnosticoAgente, documentacionAgente, chatAgente, whisperAgente, ocrAgente, storeAgente;
 
 // ═══════════════════════════════════════════════════
 // ESTADO
@@ -58,7 +58,7 @@ async function cargarMotores(){
     import('./engine/store.js'),
   ]);
   try{({SIGNOS,ZONAS}=await import('./engine/signos.js'));}catch(e){console.error(e);}
-  try{arriboAgente=await import('./engine/arribo.js');impresionAgente=await import('./engine/impresion.js');}catch(e){console.error(e);}
+  try{arriboAgente=await import('./engine/arribo.js');impresionAgente=await import('./engine/impresion.js');herrAgente=await import('./engine/herramientas.js');}catch(e){console.error(e);}
   ({CODS,TNIV,TSTEPS,TSTEPS_NINO,TACC,SCAMPOS,OCAMPOS,ENF,PROT,EQP,BOT,QPROMPTS,EPP_POR_TIPO}=data);
   despachoAgente=despacho; vitalsAgente=vitals; entrevistaAgente=entrevista;
   diagnosticoAgente=diagnostico; documentacionAgente=documentacion; chatAgente=chat;
@@ -183,7 +183,7 @@ function renderNotas(){
 async function cerrarIncidente(){
   if(!confirm('¿Cerrar este incidente? Se archiva la boleta actual y se abre una en blanco.'))return;
   await storeAgente.archivarIncidente(JSON.parse(JSON.stringify(boleta)));
-  boleta=boletaVacia();boletaAuto=new Set();notas=[];trCts={r:0,a:0,v:0,n:0};trStep=0;
+  boleta=boletaVacia();boletaAuto=new Set();notas=[];trCts={r:0,a:0,v:0,n:0};trStep=0;marcas=[];if(metroOn)metronomo();
   trans='';trans2='';
   renderNotas();resetC();resetTriage();renderBol();guardarEstado();
   alert('Incidente archivado. Boleta lista para el siguiente llamado.');
@@ -433,6 +433,83 @@ function detenerVivo(){
   clearInterval(vivoTimer);vivoTimer=null;
   const marca=ge('guiaVivo');if(marca)marca.hidden=true;
 }
+// ── Marcas de hora, NEWS2, trauma ROJO, metrónomo RCP y prealerta ──
+let marcas=[];   // {k,nombre,hora,ms}
+function marcarHora(k,nombre){
+  const ahora=new Date();
+  const hora=ahora.toLocaleTimeString('es-CR',{hour:'2-digit',minute:'2-digit'});
+  marcas=marcas.filter(m=>m.k!==k);
+  marcas.push({k,nombre,hora,ms:ahora.getTime()});
+  notas.push({ts:nowStr(),txt:`⏱️ ${nombre}: ${hora}`});renderNotas();
+  guardarEstado();pintarGuia();
+}
+function haceCuanto(ms){const m=Math.floor((Date.now()-ms)/60000);return m<60?`hace ${m} min`:`hace ${Math.floor(m/60)} h ${m%60} min`;}
+function htmlMarcas(impresiones){
+  const ids=impresiones.filter(d=>d.conf!=='descartar').map(d=>d.id);
+  const lista=[...herrAgente.MARCAS_SIEMPRE];
+  for(const id of ids)for(const x of (herrAgente.MARCAS[id]||[]))if(!lista.some(y=>y[0]===x[0]))lista.push(x);
+  const hechas=marcas.map(m=>{
+    const alerta=m.k==='torniquete'&&Date.now()-m.ms>=2*3600000?' ⚠️ más de 2 h':'';
+    return `<div class="marca-h"><b>${escHtml(m.nombre)}</b> ${m.hora} · ${haceCuanto(m.ms)}${alerta}</div>`;}).join('');
+  return `<div class="g-sec"><h4>⏱️ Marcar la hora (un toque)</h4>
+    <div class="marcas">${lista.map(([k,n])=>`<button class="btn-marca${marcas.some(m=>m.k===k)?' hecha':''}" onclick="marcarHora('${k}','${escHtml(n)}')">${escHtml(n)}</button>`).join('')}</div>${hechas}
+    ${ids.includes('pcr')?`<button class="btn-red" style="margin-top:6px;" onclick="metronomo()" id="btnMetro">${metroOn?'⏹ Detener metrónomo':'🫀 Metrónomo RCP 110/min'}</button>`:''}</div>`;
+}
+function htmlGravedad(g){
+  const sv=boleta.sv1||{};
+  if(!Object.values(sv).some(v=>String(v||'').trim()))return '';
+  const n=herrAgente.news2(sv,false);
+  let h=`<div class="g-sec"><h4>📊 Gravedad con los signos vitales</h4>`;
+  if(n.partes.length||n.completo)h+=`<div class="news ${n.riesgo}"><b>NEWS2 = ${n.total}</b> (riesgo ${n.riesgo})${n.falta.length?` · faltan: ${n.falta.join(', ')}`:''}<br>${escHtml(n.accion)}</div>`;
+  const trauma=g.impresiones.some(d=>d.g==='Trauma'&&d.conf!=='descartar');
+  if(trauma){
+    const rojo=herrAgente.traumaRojo(sv,g.contexto.edad??null);
+    h+=rojo.length?`<div class="news alto">🚨 <b>Trauma grave (criterio ROJO):</b> ${escHtml(rojo.join(', '))} → centro de trauma de mayor nivel.</div>`
+      :`<div class="nota">Revisá también las lesiones que son criterio ROJO:</div>`;
+    h+=herrAgente.TRAUMA_ROJO_LESIONES.map(x=>`<label><input type="checkbox" data-k="${escHtml('rojo|'+x)}" ${guiaHechos.has('rojo|'+x)?'checked':''}><span>${escHtml(x)}</span></label>`).join('');
+  }
+  return h+'</div>';
+}
+// Metrónomo de RCP: 110/min y aviso cada 2 min para cambiar de compresor y revisar con el DEA.
+let metroOn=false,metroInt=null,metroCiclo=null,metroCtx=null;
+function pitido(f=880,dur=0.05,vol=0.3){
+  try{metroCtx=metroCtx||new (window.AudioContext||window.webkitAudioContext)();
+    const o=metroCtx.createOscillator(),g=metroCtx.createGain();o.frequency.value=f;g.gain.value=vol;o.connect(g);g.connect(metroCtx.destination);o.start();o.stop(metroCtx.currentTime+dur);}catch{}
+}
+function metronomo(){
+  metroOn=!metroOn;
+  clearInterval(metroInt);clearInterval(metroCiclo);
+  if(metroOn){
+    if(!marcas.some(m=>m.k==='inicioRCP'))marcarHora('inicioRCP','🫀 Inicio RCP');
+    metroInt=setInterval(()=>pitido(),545);
+    metroCiclo=setInterval(()=>{pitido(440,0.6,0.5);navigator.vibrate?.([300,100,300]);
+      alert('⏱️ 2 minutos: cambiar de compresor y analizar con el DEA.');},120000);
+  }
+  const b=ge('btnMetro');if(b)b.textContent=metroOn?'⏹ Detener metrónomo':'🫀 Metrónomo RCP 110/min';
+}
+function verPrealerta(){
+  const texto=herrAgente.prealerta({boleta,impresiones:ultimaGuia?.impresiones||[],marcas,ctx:ultimaGuia?.contexto||{}});
+  const el=ge('prealertaBox');if(!el)return;
+  el.hidden=false;
+  el.innerHTML=`<div class="lbl" style="color:#93C5FD;">📻 Prealerta IMIST-AMBO</div>
+    <textarea id="prealertaTxt" rows="9" style="font-size:14px;line-height:1.5;">${escHtml(texto)}</textarea>
+    <div class="g2"><button class="btn-gray" onclick="copiarPrealerta()">📋 Copiar</button><button class="btn-gray" onclick="compartirPrealerta()">📤 Compartir</button></div>
+    <div class="nota">Leela por radio en este orden. Completá lo que diga (entre paréntesis).</div>`;
+  el.scrollIntoView({behavior:'smooth',block:'start'});
+}
+async function copiarPrealerta(){try{await navigator.clipboard.writeText(ge('prealertaTxt').value);alert('Copiada.');}catch{ge('prealertaTxt').select();}}
+async function compartirPrealerta(){
+  const t=ge('prealertaTxt').value;
+  if(!confirm('La prealerta puede tener datos del paciente. ¿Compartirla?'))return;
+  try{if(navigator.share)await navigator.share({text:t});else copiarPrealerta();}catch(e){}
+}
+function cambiarVoz(v){
+  try{localStorage.setItem('crcr-voz',v);}catch{}
+  whisperListo=false;
+  const st=ge('rtxt');if(st){st.style.display='block';st.textContent=v==='preciso'?'⏳ Cargando el motor preciso (la primera vez descarga 77 MB; después funciona sin señal)…':'⏳ Cargando el motor rápido…';}
+  whisperAgente?.precargarModelo().then(()=>{whisperListo=true;if(st)st.textContent='✅ Motor de voz listo.';}).catch(e=>{if(st)st.textContent='⚠️ No se pudo cargar el motor: '+e.message;});
+}
+document.addEventListener('DOMContentLoaded',()=>{try{const v=localStorage.getItem('crcr-voz');const s=ge('vozModo');if(s&&v)s.value=v;}catch{}});
 let ultimaGuia=null,guiaTimer=null;
 const guiaHechos=new Set();
 const escHtml=t=>String(t??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -462,6 +539,7 @@ function pintarGuia(texto){
   const g=arriboAgente.guiaArribo(texto,{ENF,SIGNOS,EPP_POR_TIPO,sv:boleta.sv1});
   ultimaGuia=g;
   let h=htmlImpresiones(g.impresiones,g.triadas,'guia');
+  if(herrAgente){h+=htmlMarcas(g.impresiones);h+=htmlGravedad(g);}
   for(const sec of g.secciones){
     if(sec.id==='triadas')continue;
     h+=`<div class="g-sec"><h4>${escHtml(sec.t)}</h4>${sec.items.map(it=>{
@@ -469,6 +547,9 @@ function pintarGuia(texto){
       return `<label><input type="checkbox" data-k="${escHtml(k)}" ${guiaHechos.has(k)?'checked':''}><span>${it}</span></label>`;}).join('')}
       ${sec.enf&&SIGNOS[sec.enf]?`<button class="btn-gray" style="width:100%;margin-top:4px;" onclick="verSignos('${sec.enf}')">🧍 Ver en el mapa del cuerpo</button>`:''}</div>`;
   }
+  const dest=herrAgente&&g.impresiones.filter(d=>d.conf!=='descartar').map(d=>herrAgente.DESTINO[d.id]).find(Boolean);
+  if(dest)h+=`<div class="g-sec"><h4>🏥 Destino</h4><div style="font-size:14px;line-height:1.5;">${escHtml(dest)}</div></div>`;
+  if(herrAgente)h+=`<button class="btn-blue" style="width:100%;margin-top:8px;" onclick="verPrealerta()">📻 Armar prealerta para el hospital (IMIST-AMBO)</button>`;
   el.innerHTML=h;
 }
 document.addEventListener('change',e=>{
@@ -907,7 +988,7 @@ document.addEventListener('DOMContentLoaded',()=>{
 // Exponer al scope global — necesario para los onclick="..." inline del HTML
 // (tanto el HTML estático como el que este mismo archivo genera dinámicamente).
 // ═══════════════════════════════════════════════════
-Object.assign(window, {usarImpresiones,sugerirEnBoleta,verSignos,modoTriage,
+Object.assign(window, {cambiarVoz,marcarHora,metronomo,verPrealerta,copiarPrealerta,compartirPrealerta,usarImpresiones,sugerirEnBoleta,verSignos,modoTriage,
   guardarAudio,compartirAudio,pintarNav,abrirMas,cerrarMas,go, toggleTimer, resetTimer, addN, cerrarIncidente, exportarHistorial,
   quickChat, renderCods, toggleRec, toggleRec2, analyzeRec, interpDesp,
   answTriage, resetTriage, adj, resetC, analyzeSO, setbt, campoEditado,

@@ -124,3 +124,11 @@ nav.abajo{display:flex;background:var(--tarjeta);border-top:1px solid var(--bord
 .g-sec input:checked+span{text-decoration:line-through;color:var(--tenue);}
 .vivo{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:800;color:#FCA5A5;}
 .vivo::before{content:'';width:8px;height:8px;border-radius:50%;background:#EF4444;animation:blink 1s infinite;}
+
+/* Marcas de hora, gravedad */
+.marcas{display:flex;flex-wrap:wrap;gap:6px;}
+.btn-marca{background:var(--campo);border:1px solid var(--campo-borde);color:#E2E8F0;border-radius:10px;padding:9px 10px;font-size:14px;font-weight:700;}
+.btn-marca.hecha{border-color:#22C55E;background:#0B2A17;color:#86EFAC;}
+.marca-h{font-size:13.5px;color:#CBD5E1;padding:3px 0;}
+.news{border-radius:10px;padding:9px 11px;font-size:14px;line-height:1.45;margin-bottom:6px;background:#14213A;border-left:5px solid #22C55E;}
+.news.medio{border-left-color:#F59E0B;}.news.alto{border-left-color:#EF4444;background:#2A0E12;}

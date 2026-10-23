@@ -1,0 +1,1 @@
+{"name":"crcr-campo-tests","private":true,"type":"module","description":"Pruebas con Chrome real (playwright-core). npm install aquí; correr con un servidor en :5602 (python -m http.server 5602 --directory ..).","dependencies":{"playwright-core":"^1.55.0"}}

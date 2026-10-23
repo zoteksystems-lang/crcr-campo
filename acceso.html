@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#0F172A">
+<link rel="icon" href="/icon.svg">
+<title>CRCR Campo — acceso</title>
+<style>
+:root{color-scheme:dark;}
+body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#0F172A;color:#E2E8F0;font:16px system-ui,sans-serif;padding:16px;box-sizing:border-box;}
+form{width:100%;max-width:360px;background:#1E293B;border:1px solid #334155;border-radius:14px;padding:22px;}
+h1{font-size:20px;margin:0 0 6px;}
+p{color:#94A3B8;font-size:14px;line-height:1.45;margin:0 0 16px;}
+label{display:block;font-size:13px;font-weight:700;margin-bottom:6px;}
+input{width:100%;box-sizing:border-box;font-size:18px;padding:12px;border-radius:10px;border:1px solid #475569;background:#0F172A;color:#F8FAFC;}
+button{margin-top:14px;width:100%;padding:13px;border:0;border-radius:10px;background:#DC2626;color:#fff;font-size:16px;font-weight:800;}
+button:disabled{opacity:.6;}
+#msg{margin-top:12px;font-size:14px;min-height:1.4em;color:#FCA5A5;}
+</style>
+</head>
+<body>
+<form id="f">
+  <h1>➕ CRCR Campo</h1>
+  <p>App de uso interno para socorristas. Ingresá el código de acceso que te dio tu coordinador. Se pide una sola vez en este teléfono.</p>
+  <label for="c">Código de acceso</label>
+  <input id="c" autocomplete="off" autocapitalize="off" spellcheck="false" required>
+  <button id="b">Entrar</button>
+  <div id="msg" role="status"></div>
+</form>
+<script>
+document.getElementById('f').addEventListener('submit',async e=>{
+  e.preventDefault();const b=document.getElementById('b'),m=document.getElementById('msg');
+  b.disabled=true;m.textContent='';
+  try{
+    const r=await fetch('/api/entrar',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({codigo:document.getElementById('c').value})});
+    if(r.ok){location.replace('/');return;}
+    m.textContent=r.status===401?'Código incorrecto.':'No se pudo verificar. Probá de nuevo.';
+  }catch{m.textContent='Sin conexión: la primera vez se necesita internet.';}
+  b.disabled=false;
+});
+</script>
+</body>
+</html>

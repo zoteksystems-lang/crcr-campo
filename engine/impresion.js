@@ -263,6 +263,10 @@ function pistasVitales(sv={},ctx={}){
 
 // Devuelve SIEMPRE 3 impresiones (si hay datos): las más probables y, si faltan,
 // los diferenciales del cuadro principal. Cada una dice por qué y qué confirmar.
+// Cuadros que no se proponen en un niño y diferenciales pediátricos por sistema.
+const SOLO_ADULTO=new Set(['iam','angina','crisis_hta','epoc','aneurisma','caida_mayor','disnea_icc','preeclampsia','parto','amenaza_aborto']);
+const PEDIATRICOS={Respiratorio:['ovace','neumonia','anafilaxia'],Neurológico:['convulsion','hipoglucemia','tce'],
+  Cardiovascular:['asma','neumonia','anafilaxia'],Shock:['sepsis','anafilaxia','hemorragia_int']};
 export function tresImpresiones(texto,{sv,ctx={}}={}){
   const toks=preparar(texto);
   const sen=detectarSenales(texto);
@@ -280,17 +284,31 @@ export function tresImpresiones(texto,{sv,ctx={}}={}){
   // Contexto: embarazo, edad.
   if(ctx.embarazo){['parto','amenaza_aborto','preeclampsia'].forEach(id=>{if(pts.has(id))add(id,2,'embarazo');});}
   if(ctx.mayor&&pts.has('caida_mayor'))add('caida_mayor',2,'adulto mayor');
-  if(ctx.nino)for(const id of ['acv','iam','angina','crisis_hta','epoc','aneurisma','caida_mayor'])if(pts.has(id))pts.get(id).s*=0.3;
+  // En un niño los cuadros de adulto no se proponen: se quitan (y se recuerda su sistema por
+  // si no queda nada, para ofrecer los pediátricos de ese sistema). El ACV pediátrico existe
+  // pero es raro: solo baja su peso.
+  let sistemaAdulto=null;
+  if(ctx.nino){
+    if(pts.has('acv'))pts.get('acv').s*=0.3;
+    for(const id of SOLO_ADULTO)if(pts.has(id)){if(!sistemaAdulto||pts.get(id).s>sistemaAdulto.s)sistemaAdulto={s:pts.get(id).s,g:POR_ID[id].g,por:pts.get(id).por};pts.delete(id);}
+  }
   if(ctx.edad!=null&&ctx.edad<9)for(const id of ['parto','amenaza_aborto','preeclampsia'])pts.delete(id);
   const orden=[...pts.entries()].sort((a,b)=>b[1].s-a[1].s);
-  if(!orden.length)return [];
+  if(!orden.length){
+    if(!sistemaAdulto)return [];
+    // Solo había cuadros de adulto: se ofrecen los pediátricos de ese sistema para descartar.
+    return (PEDIATRICOS[sistemaAdulto.g]||['sepsis','intox','hipoglucemia']).slice(0,3).map(id=>({...POR_ID[id],por:['niño: '+(sistemaAdulto.por[0]||'síntomas del despacho')],conf:'descartar'}));
+  }
   const top=orden[0][1].s;
   // Los candidatos con muy poco respaldo ceden su lugar a los diferenciales clínicos.
   const res=orden.slice(0,3).filter(([,o],i)=>i===0||o.s>=Math.max(3,top*0.3)).map(([id,o])=>({...POR_ID[id],por:o.por,conf:o.s>=Math.max(7,top*0.8)?'alta':o.s>=4?'media':'baja'}));
-  // Completar con diferenciales para que siempre haya 3 que considerar.
-  for(const id of POR_ID[orden[0][0]].dif){
+  // Completar con diferenciales para que siempre haya 3 que considerar. En un niño no se
+  // proponen cuadros de adulto (EPOC, infarto, insuficiencia cardíaca…): van los pediátricos.
+  const ppal=POR_ID[orden[0][0]];
+  const difs=ctx.nino?[...ppal.dif.filter(id=>!SOLO_ADULTO.has(id)),...(PEDIATRICOS[ppal.g]||['sepsis','intox'])]:ppal.dif;
+  for(const id of difs){
     if(res.length>=3)break;
-    if(!res.some(r=>r.id===id))res.push({...POR_ID[id],por:['diferencial de '+POR_ID[orden[0][0]].n.toLowerCase()],conf:'descartar'});
+    if(POR_ID[id]&&!res.some(r=>r.id===id))res.push({...POR_ID[id],por:['diferencial de '+ppal.n.toLowerCase()],conf:'descartar'});
   }
   return res;
 }

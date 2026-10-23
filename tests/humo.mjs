@@ -37,6 +37,12 @@ const casos=[
   ['niño de 4 años con dificultad para respirar, silbido en el pecho, antecedente de asma','asma',3],
   ['colisión de motocicleta, paciente con dolor en el pecho y dificultad para respirar','iam',-1],
 ];
+// En un niño no se proponen cuadros de adulto (EPOC, infarto, insuficiencia cardíaca, angina).
+for(const t of ['niño de 4 años con dificultad para respirar, silbido en el pecho, antecedente de asma','niña de 6 años con dolor en el pecho y le cuesta respirar']){
+  const r=await p.evaluate(async([t])=>{const m=await import('./engine/impresion.js');const a=await import('./engine/arribo.js');
+    return m.tresImpresiones(t,{ctx:a.contextoPaciente(t)}).map(d=>d.id);},[t]);
+  check(`niño: sin cuadros de adulto ("${t.slice(0,40)}…")`,r.length===3&&!r.some(id=>['epoc','iam','angina','disnea_icc','aneurisma'].includes(id)),r.join(', '));
+}
 for(const [t,dx,pos] of casos){
   const r=await p.evaluate(async([t])=>{const m=await import('./engine/impresion.js');const a=await import('./engine/arribo.js');
     return m.tresImpresiones(t,{ctx:a.contextoPaciente(t)}).map(d=>d.id);},[t]);
